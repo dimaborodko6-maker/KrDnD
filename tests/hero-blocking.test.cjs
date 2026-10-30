@@ -3,6 +3,54 @@ const assert = require('node:assert/strict');
 const { game } = require('./helpers/game-harness.cjs');
 const statuses = require('../public/unit-statuses.js');
 
+for (const direct of [false, true]) {
+    for (const sample of [
+        { name:'effective health outweighs higher HP', first:[100, 30], second:[70, 60], winner:1 },
+        { name:'zero armor uses current HP', first:[70, 50], second:[150, 0], winner:1 },
+        { name:'equal effective health preserves order', first:[100, 0], second:[50, 50], winner:0 },
+        { name:'full armor has infinite priority', first:[200, 90], second:[1, 100], winner:1 },
+        { name:'two full armor heroes preserve order', first:[1, 100], second:[200, 100], winner:0 },
+        { name:'full block limit excludes the stronger hero', first:[100, 0], second:[200, 100], winner:0, full:true },
+        { name:'fallen hero is excluded', first:[100, 0], second:[0, 100], winner:0 }
+    ]) {
+        test(`block priority: ${sample.name}, direct=${direct}`, () => {
+            const g = game();
+            const heroes = [g.player().hero, g.player('connor').hero];
+            [sample.first, sample.second].forEach(([hp, armor], i) => {
+                Object.assign(heroes[i], { hp, maxHp:200, armor, hasMovedThisRound:true });
+            });
+            if (sample.full) heroes[1].blockLimit = 0;
+            // The first hero is beside the next road cell; the second is diagonal.
+            if (!direct) { heroes[0].x = 3; heroes[0].y = 3; heroes[1].y = 3; }
+            g.enemy(1, direct ? 3 : 2, 2, {speed:3});
+            g.moveEnemies();
+            assert.deepEqual(Array.from(heroes[sample.winner].blockedEnemyIds), [1]);
+            assert.deepEqual(Array.from(heroes[1 - sample.winner].blockedEnemyIds), []);
+        });
+    }
+}
+
+test('hero on the next cell has priority over a stronger adjacent hero', () => {
+    const g = game(); const first = g.player().hero; const second = g.player('connor').hero;
+    Object.assign(first, {hp:20, maxHp:200, armor:0, hasMovedThisRound:true});
+    Object.assign(second, {hp:200, maxHp:200, armor:100, y:3});
+    g.enemy(1, 3, 2, {speed:3});
+    g.moveEnemies();
+    assert.deepEqual(Array.from(first.blockedEnemyIds), [1]);
+    assert.deepEqual(Array.from(second.blockedEnemyIds), []);
+});
+
+test('a stronger hero does not take over an existing block', () => {
+    const g = game(); const first = g.player().hero; const second = g.player('connor').hero;
+    Object.assign(first, {hp:20, maxHp:200, armor:0, blockedEnemyIds:[1], hasMovedThisRound:true});
+    Object.assign(second, {hp:200, maxHp:200, armor:100});
+    const enemy = g.enemy(1, 3, 2, {speed:3});
+    g.moveEnemies();
+    assert.equal(enemy.x, 3);
+    assert.deepEqual(Array.from(first.blockedEnemyIds), [1]);
+    assert.deepEqual(Array.from(second.blockedEnemyIds), []);
+});
+
 for (const [y, x, speed] of [[2, 1, 5], [3, 1, 5], [2, 3, 1]]) {
     test('нулевой лимит запрещает перехват: герой на строке ' + y + ', враг стартует на x=' + x, () => {
         const g = game(); const { hero } = g.player(); hero.y = y; hero.blockLimit = 0;

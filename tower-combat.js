@@ -1,6 +1,7 @@
 'use strict';
 
 const { towers: towerAbilities, soldiers: soldierAbilities } = require('./tower-abilities');
+const EVENT_RULES = require('./public/activated-event-rules');
 
 const PHASES = [
     { min: 16, max: 99, name: 'PHASE 1: HIGH INITIATIVE (>= 16)' },
@@ -26,7 +27,7 @@ module.exports = function createTowerCombat({
             damage(enemy, raw, type = 'pure', armorPiercing = 0) {
                 let amount = raw;
                 if (type !== 'pure') {
-                    const armor = enemy.armor || 0;
+                    const armor = Math.min(100, (enemy.armor || 0) + EVENT_RULES.auraBonus(state, enemy, 'armor'));
                     const resist = type === 'magic' ? (enemy.magicRes || 0) :
                         (armorPiercing ? Math.max(0, armor - armorPiercing) : armor);
                     amount = Math.max(1, Math.round(raw * ((100 - resist) / 100)));

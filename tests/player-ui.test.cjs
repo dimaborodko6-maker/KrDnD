@@ -16,7 +16,8 @@ function playerUI(state, key = 'ratchet', gameData = data) {
         setAttribute(name, value) { this[name] = value; }
         append(...children) { this.children.push(...children); }
         appendChild(child) { this.children.push(child); }
-        addEventListener() {}
+        addEventListener(event, handler) { (this.listeners ||= {})[event] ||= []; this.listeners[event].push(handler); }
+        click() { this.onclick?.(); for (const handler of this.listeners?.click || []) handler(); }
         get offsetWidth() { return 46; }
         get offsetHeight() { return 24; }
         replaceChildren(...children) { this.children = children; }
@@ -61,6 +62,42 @@ function playerUI(state, key = 'ratchet', gameData = data) {
     return { ui: context, sent, element: id => document.getElementById(id),
         run: code => vm.runInContext(code, context) };
 }
+
+test('один клик готовности отправляет одну команду и сохраняет состояние до отмены', () => {
+    const g = game(); const { hero, ws } = g.player('ratchet');
+    const { element, sent, run } = playerUI(g.state);
+    const html = require('node:fs').readFileSync(require('node:path').join(__dirname, '../public/player.html'), 'utf8');
+    const tag = html.match(/<button\b[^>]*id="btn-toggle-ready"[^>]*>/)[0];
+    const inline = tag.match(/onclick="([^"]*)"/);
+    if (inline) element('btn-toggle-ready').onclick = () => run(inline[1]);
+    run('initPlayerEventListeners()');
+    element('btn-toggle-ready').click();
+    assert.equal(sent.length, 1);
+    for (const command of sent) g.send(ws, command);
+    assert.equal(hero.isReady, true);
+    run('renderGridAndUI(state)');
+    assert.equal(element('btn-toggle-ready').classList.contains('is-ready'), true);
+    element('btn-toggle-ready').click();
+    assert.equal(sent.length, 2);
+    g.send(ws, sent[1]);
+    assert.equal(hero.isReady, false);
+});
+
+test('Отход доступен всем героям без выбора цели и маны', () => {
+    for (const key of Object.keys(data.heroes)) {
+        const g = game(); const { hero } = g.player(key); hero.mana = 0;
+        const { element, ui, sent } = playerUI(g.state, key);
+        const button = element('ab-box').children.find(button => button.dataset.ability === 'disengage');
+        assert.ok(button, key);
+        button.click();
+        assert.equal(element('ability-name').textContent, 'Disengage');
+        assert.equal(element('target-step').hidden, true);
+        assert.equal(element('attack-main-btn').disabled, false);
+        ui.attack();
+        assert.equal(sent.length, 1);
+        assert.equal(sent[0].ability, 'disengage');
+    }
+});
 
 test('события сокета переживают перерисовку карты, масштабируются вместе с ней и очищаются при откате', () => {
     const g = game(); g.player('ratchet');

@@ -8,11 +8,11 @@ Choose the layer: built-in `public/gamedata.js` or saved `gamecatalog.json`. A s
 
 Use the supported trait schema from `public/enemy-traits.js`. Summoning must reference a valid type. A custom description is not executable. The example `docs/examples/enemy-and-wave.json` is a valid copyable fragment, not a full importable game catalog.
 
-For new balance, establish the intended budget and validate it. The English release did not apply the source README's theoretical balance tables as new live values. For historical design equations see [balance-reference.md](balance-reference.md); actual code and existing tests take precedence for current behavior.
+For new balance, establish the intended budget and validate it using the [design model in AGENTS.md](../AGENTS.md#математический-баланс-и-формулы-спецификация-для-ии-агентов). These design targets do not describe every live value; actual code and existing tests take precedence for current behavior. [balance-reference.md](balance-reference.md) explains the status of the model.
 
 ## Wave
 
-Add a unique `waveNum`, title, description and groups `{type,count,offsetDelay}`. Delay is in GM wave turns, not seconds. Existing pending spawns keep the wave active until processed. Reference IDs must exist in the authoritative catalog. Run `npm run check:content` and the catalog/scenario tests.
+Add a unique `waveNum`, title, description and groups `{type,count,offsetDelay}`. Delay is in GM wave turns, not seconds, and sets when a group starts. Each group releases one enemy per spawn point per turn: enemy index `i` appears after `offsetDelay + Math.floor(i / spawnCount)` turns. Groups can overlap. Existing pending spawns keep the wave active until processed. Reference IDs must exist in the authoritative catalog. Run `npm run check:content` and the catalog/scenario tests.
 
 ## New enemy trait
 

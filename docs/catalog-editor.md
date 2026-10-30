@@ -12,7 +12,7 @@ Some mechanics remain tied to the original enemy type: goblin rider dismount, wi
 
 ## Waves
 
-A wave has a unique number, title, description and ordered groups. Each group names an enemy type, count and `offsetDelay` in wave turns. Delay 0 spawns at launch; 1 on the next Wave Turn; 2 on the second. Groups are distributed across available spawns.
+A wave has a unique number, title, description and ordered groups. Each group names an enemy type, count and `offsetDelay` in wave turns. Delay 0 starts the group at launch; 1 on the next Wave Turn; 2 on the second. Each group releases one enemy per available spawn point per turn until its count is reached. Groups may overlap. Remaining enemies stay in the saved reinforcement queue and prevent early wave completion.
 
 The catalog allows 1–100 enemy types, 1–200 waves, 1–30 groups per wave and no more than 500 enemies per wave. Group counts range from 1 to 200 and delay from 0 to 100. Validation rejects a complete save if any referenced type or numeric field is invalid.
 

@@ -2,6 +2,7 @@
 
 // Геометрия применения общая для сервера и личного предпросмотра игрока.
 const BATTLE_ABILITY_RULES = (() => {
+    const disengage = { key: 'disengage', name: 'Disengage', cooldown: 0, desc: 'Use your action to move without provoking retreat attacks for the rest of this round. Costs no mana; movement is still required.' };
     const centeredAttacks = ['slash', 'shatter', 'earthquake', 'blades', 'ground_tremor'];
     const selfBuffs = ['shield_wall', 'retribution', 'unbreakable', 'connor_retribution'];
     const targetAreas = ['mortar', 'glitter', 'hammer', 'tag'];
@@ -9,6 +10,7 @@ const BATTLE_ABILITY_RULES = (() => {
         const key = (ability || '').replace('spell_', '');
         const rule = (selection, shape, radius = 0, tone = 'attack', metric = 'chebyshev') => ({ selection, shape, radius, tone, metric });
         if (!ability) return rule('none', 'none');
+        if (ability === 'disengage') return rule('none', 'self', 0, 'support');
         if (centeredAttacks.includes(key) || (ability === 'ultimate' && heroKey === 'malik')) return rule('none', 'aoe_around_player', 1);
         if (key === 'nanite_cloud') return rule('none', 'nanites', 2, 'heal', 'euclidean');
         if (key === 'inspire') return rule('none', 'all_allies', Infinity, 'support');
@@ -166,7 +168,7 @@ function rangeInfo(abilityKey, heroObj) {
 function manaCost(ability) {
     if (!ability) return 0;
     const key = ability.replace('spell_', '');
-    if (ability === 'attack' || ability === 'ultimate') return 0;
+    if (ability === 'attack' || ability === 'ultimate' || ability === 'disengage') return 0;
     if (key === 'blink') return 3;
     if (['blades', 'unbreakable', 'mines', 'tag', 'prey', 'shield_slam'].includes(key)) return 4;
     if (['retribution', 'earthquake', 'connor_retribution', 'nanite_cloud'].includes(key)) return 6;
@@ -214,7 +216,7 @@ function availableTargets(state, playerId, abilityKey, heroKey = state?.players?
     return targets;
 }
 
-    return { definition, application, contains, rangeInfo, manaCost, availableTargets };
+    return { disengage, definition, application, contains, rangeInfo, manaCost, availableTargets };
 })();
 
 if (typeof module !== 'undefined' && module.exports) module.exports = BATTLE_ABILITY_RULES;

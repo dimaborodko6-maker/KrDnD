@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="unit-statuses.css">
     <link rel="stylesheet" href="tower-roster.css">
     <link rel="stylesheet" href="tower-preparation.css">
+    <link rel="stylesheet" href="activated-events.css">
 </head>
 
 <body>
@@ -154,6 +155,7 @@
             </div>
         </div>
         <section id="revealed-scene-panel" class="revealed-scene-panel" hidden aria-label="Scene notes"><h3>Map discoveries</h3><div id="revealed-scene-notes"></div></section>
+        <div id="player-active-event-summary" class="activated-event-summary" aria-live="polite" hidden></div>
         <div class="map-zoom-bar">
             <div style="display:flex; align-items:center; gap:8px;">
                 <span id="map-title-label">🗺️ Tactical Map</span>
@@ -217,7 +219,7 @@
         </div>
         <div class="dock-footer">
           <button class="btn" id="attack-main-btn" onclick="attack()" disabled>Select a target</button>
-          <button id="btn-toggle-ready" class="btn ready-btn" onclick="toggleReady()">✓ End turn</button>
+          <button id="btn-toggle-ready" class="btn ready-btn">✓ End turn</button>
         </div>
       </aside>
     </div>
@@ -239,6 +241,7 @@
     <script src="battle-ability-rules.js"></script>
     <script src="map-range-contours.js"></script>
     <script src="tower-rules.js"></script>
+    <script src="activated-event-rules.js"></script>
     <script src="unit-statuses.js"></script>
     <script src="tower-roster-ui.js"></script>
     <script src="tower-preparation.js"></script>
@@ -250,6 +253,7 @@
     <script src="tower-draft-catalog.js"></script>
     <script src="i18n-dict.js"></script>
     <script src="i18n.js"></script>
+    <script src="activated-event-overlays.js"></script>
     <script src="player-logic.js"></script>
 </body>
 

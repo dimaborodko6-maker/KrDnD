@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const { validateCatalog } = require('./game-catalog');
 const TOWER_RULES = require('./public/tower-rules');
 const SCENARIO_RULES = require('./public/scenario-rules');
+const ACTIVATED_EVENTS = require('./public/activated-event-rules');
 const copy = value => JSON.parse(JSON.stringify(value));
 const object = value => value && typeof value === 'object' && !Array.isArray(value);
 function integer(value, min, max, label) {
@@ -71,9 +72,25 @@ function validateScene(input, data, strictReferences = true) {
     const kind = SCENARIO_RULES.choice(input.kind ?? 'combat',SCENARIO_RULES.kinds,'scene type');
     const context = {data,strict:strictReferences,width,height,waves,notes};
     const scenario = SCENARIO_RULES.normalize(input.scenario,context), cards = SCENARIO_RULES.cards(input.cards,context);
-    return { id:id(input.id),kind,scenario,cards,title:text(input.title,160,'Scene title',true), description:text(input.description ?? '',8000,'Description'),
+    const eventPresets = validateEventPresets(input.eventPresets,grid,data,strictReferences);
+    return { id:id(input.id),kind,scenario,cards,eventPresets,title:text(input.title,160,'Scene title',true), description:text(input.description ?? '',8000,'Description'),
         objectives:text(input.objectives ?? '',4000,'Victory conditions'),gold:integer(input.gold,0,1000000,'Starting gold'),
         baseHp:integer(input.baseHp,1,1000000,'Base health'),gridWidth:width,gridHeight:height,grid,enemies,waves,notes,availableTowerTypes:[...availableTowerTypes] };
+}
+function validateEventPresets(input = [], grid, data, strictReferences = true) {
+    if (!Array.isArray(input) || input.length > 100) throw new Error('No more than 100 activated event presets per scene');
+    const presets = input.map(source => {
+        if (!object(source)) throw new Error('Invalid activated event preset');
+        const presetId = id(source.id);
+        const config = { ...source, title:text(source.title,120,'Event preset title',true) };
+        delete config.id;
+        delete config.playerNames; delete config.results; delete config.sourceId; delete config.target;
+        const normalized = ACTIVATED_EVENTS.normalize(config,{grid,players:{},enemies:[],soldiers:[]},data,{preset:true,strictReferences});
+        delete normalized.playerNames; delete normalized.results; delete normalized.sourceId; delete normalized.target;
+        return {id:presetId,...normalized};
+    });
+    if (new Set(presets.map(preset => preset.id)).size !== presets.length) throw new Error('Activated event preset IDs must be unique');
+    return presets;
 }
 function validatePlayable(scene, data) {
     const next = validateScene(scene,data);
@@ -95,11 +112,11 @@ function publicSceneNotes(scene) {
 }
 function captureScene(state, data, sceneId) {
     const enemies = [];
-    for (const enemy of (state.enemies || []).filter(enemy => enemy.hp > 0)) {
+    for (const enemy of (state.enemies || []).filter(enemy => enemy.hp > 0 && !enemy.eventKind)) {
         const group = enemies.find(group => group.type === enemy.type && group.x === enemy.x && group.y === enemy.y && group.count < 200);
         if (group) group.count++; else enemies.push({type:enemy.type,x:enemy.x,y:enemy.y,count:1});
     }
-    return validateScene({ id:sceneId,kind:state.sceneMaster?.kind || 'combat',scenario:state.sceneMaster?.scenario,cards:state.sceneMaster?.cards,title:state.sceneMaster?.title || 'Scene from current map',
+    return validateScene({ id:sceneId,kind:state.sceneMaster?.kind || 'combat',scenario:state.sceneMaster?.scenario,cards:state.sceneMaster?.cards,eventPresets:state.sceneMaster?.eventPresets,title:state.sceneMaster?.title || 'Scene from current map',
         description:state.sceneMaster?.description || '',objectives:state.sceneMaster?.objectives || '',
         gridWidth:state.gridWidth,gridHeight:state.gridHeight,grid:state.grid,gold:state.gold,baseHp:Math.max(1,state.baseHp),
         availableTowerTypes:state.availableTowerTypes,
@@ -158,4 +175,4 @@ function createSceneStore(data, file) {
         deleteAdventure(adventureId, expected) { this.getAdventure(adventureId); commit(scenes,expected,adventures.filter(item=>item.id !== adventureId)); }
     };
 }
-module.exports = { createSceneStore,validateScene,validateNote,validatePlayable,captureScene,publicSceneNotes,validateAdventure,adventureTransitions };
+module.exports = { createSceneStore,validateScene,validateNote,validatePlayable,captureScene,publicSceneNotes,validateAdventure,adventureTransitions,validateEventPresets };

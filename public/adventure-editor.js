@@ -12,7 +12,7 @@ function planControls(){
     planEl('plan-save-state').textContent=planSaving ? _tr('Saving…') : planConflict ? _tr('The library changed in another window') : planDirty ? _tr('You have unsaved changes') : planRevision < 0 ? _tr('Loading…') : _tr('Saved · version ')+planRevision;
 }
 function changePlan(){planDirty=true;planControls();planDuration();}
-function discardPlan(){return !planDirty || confirm('Discard unsaved plan changes?');}
+function discardPlan(){return !planDirty || confirm(_tr('Discard unsaved plan changes?'));}
 function sendPlan(message){if(!planOnline){planNotice('No connection. Your draft remains in this window.',true);return false;}planSocket.send(JSON.stringify(message));return true;}
 function connectPlan(){
     planSocket=new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://')+location.host);window.KR_DIAGNOSTICS?.trackSocket(planSocket);
@@ -46,7 +46,7 @@ function renderPlanSteps(){
         const article=planUI.node('article',null,'planning-entry'),head=planUI.node('div',null,'section-heading');head.append(planUI.node('h3',(index+1)+'. '+step.title));
         const controls=planUI.node('div',null,'button-row');
         for(const [title,delta] of [['↑',-1],['↓',1]]){const button=planUI.button(title,()=>{[planDraft.steps[index],planDraft.steps[index+delta]]=[planDraft.steps[index+delta],planDraft.steps[index]];changePlan();renderPlanSteps();});button.disabled=index+delta < 0 || index+delta >= planDraft.steps.length;button.setAttribute('aria-label',delta < 0 ? 'Move scene up' : 'Move scene down');controls.append(button);}
-        controls.append(planUI.button('Remove step',()=>{if(!confirm('Remove this step and all transitions leading to it?'))return;planDraft.steps.splice(index,1);for(const other of planDraft.steps)other.branches=other.branches.filter(branch=>branch.target !== step.id);changePlan();renderPlanSteps();},'danger-outline'));head.append(controls);article.append(head);
+        controls.append(planUI.button('Remove step',()=>{if(!confirm(_tr('Remove this step and all transitions leading to it?')))return;planDraft.steps.splice(index,1);for(const other of planDraft.steps)other.branches=other.branches.filter(branch=>branch.target !== step.id);changePlan();renderPlanSteps();},'danger-outline'));head.append(controls);article.append(head);
         const fields=planUI.node('div',null,'scene-text-fields');
         const title=planUI.field(fields,'Step title',step.title,{required:true}),kind=planUI.field(fields,'Scene importance',step.kind,{options:{essential:'Required',optional:'Optional',backup:'Backup'}}),minutes=planUI.field(fields,'Duration, minutes',step.minutes,{type:'number',min:0,max:300,step:1,required:true}),scene=planUI.field(fields,'Scene template',step.sceneId,{options:Object.fromEntries(planScenes.map(scene=>[scene.id,scene.title])),required:true});
         title.oninput=()=>{step.title=title.value;changePlan();head.querySelector('h3').textContent=(index+1)+'. '+step.title;};kind.onchange=()=>{step.kind=kind.value;changePlan();};minutes.oninput=()=>{step.minutes=Number(minutes.value);changePlan();};scene.onchange=()=>{step.sceneId=scene.value;changePlan();};article.append(fields);
@@ -67,7 +67,7 @@ planEl('new-plan').onclick=()=>{if(!discardPlan())return;planDraft={id:sceneNewI
 planEl('copy-plan').onclick=()=>{planDraft=planCopy(planDraft);planDraft.id=sceneNewId();planDraft.title=(planDraft.title+' — copy').slice(0,160);planDirty=true;renderPlan();};
 planEl('add-plan-step').onclick=()=>{const scene=planScenes.find(scene=>scene.id === planEl('plan-scene-choice').value);if(!scene)return;if(planDraft.steps.length >= 100){planNotice('No more than 100 steps.',true);return;}planDraft.steps.push({id:sceneNewId(),sceneId:scene.id,title:scene.title,kind:'essential',minutes:20,notes:'',branches:[]});changePlan();renderPlanSteps();};
 planEl('save-plan').onclick=()=>{if(planSaving || planConflict || !planEl('plan-fields'))return;if(![...planEl('plan-fields').querySelectorAll('input,textarea,select')].every(input=>input.reportValidity()))return;if(sendPlan({type:'ADVENTURE_SAVE',adventure:planDraft,revision:planRevision})){planSaving=true;planControls();}};
-planEl('delete-plan').onclick=()=>{if(!confirm('Delete plan “'+planDraft.title+'” from the library? The active session will be preserved.'))return;if(sendPlan({type:'ADVENTURE_DELETE',adventureId:planDraft.id,revision:planRevision})){planSaving=true;planControls();}};
+planEl('delete-plan').onclick=()=>{if(!confirm(_tr('Delete plan “'+planDraft.title+'” from the library? The active session will be preserved.')))return;if(sendPlan({type:'ADVENTURE_DELETE',adventureId:planDraft.id,revision:planRevision})){planSaving=true;planControls();}};
 planEl('reload-plans').onclick=()=>{if(!discardPlan())return;planReload=true;if(!planOnline)connectPlan();else sendPlan({type:'SCENE_GET_LIBRARY'});};
 window.addEventListener('beforeunload',event=>{if(planDirty){event.preventDefault();event.returnValue='';}});
 planControls();connectPlan();

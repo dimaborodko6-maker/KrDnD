@@ -29,3 +29,7 @@ Launching a wave adds to the current enemies. Preparation blocks Wave Turn; swit
 Player rollback restores the full world before a selected action, including subsequent actions by other players, treasury, effects and action availability. It is confined to the available current-round history. World changes by the GM and a new round invalidate it.
 
 Session resets are distinct from restoration. Read the confirmation carefully and keep a stopped-server backup before clearing a party or the full map.
+
+## Activated combat events
+
+Use the dashboard's activated events panel during Play to configure Frost, Golden goblin, Sandstorm, Goblin tower, Bombardment, Ritual totem, Warlord banner or Chain lightning. Select an active scene's named preset to reuse prepared settings. Live targets and physical-dice saving throw results are selected at activation. Review warning areas and timers; ongoing events can be ended early without rewards. See [event rules, defaults and timing](activated-events.md).

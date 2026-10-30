@@ -1,5 +1,7 @@
 # Maintenance task template
 
+Start with the [agent instructions](../AGENTS.md); the [README](../README.md) is the player introduction.
+
 Copy this structure when requesting a change from a developer or coding assistant.
 
 ```text
@@ -16,7 +18,8 @@ Data layer:
 Built-in data / saved enemy catalog / scene library / runtime / browser preview.
 
 Read first:
-README.md, relevant docs page, nearest implementation and tests.
+AGENTS.md, relevant docs page, nearest implementation and tests.
+README.md only for player-facing behavior and onboarding.
 
 Preserve:
 IDs, unrelated mechanics, saves and numeric balance unless explicitly changing them.

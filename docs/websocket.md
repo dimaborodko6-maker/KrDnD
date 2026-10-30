@@ -43,7 +43,7 @@ Role changes on an already registered connection are restricted; use separate co
 | `PLAYER_LEAVE` | `name`; remove the character |
 | `PROPOSE_TOWER_ROSTER`, `VOTE_TOWER_ROSTER`, `CANCEL_TOWER_ROSTER_VOTE` | Roster vote; verify current field names in `server.js` and `public/tower-roster-ui.js` before writing another client |
 
-`ability` uses `attack`, `spell_<id>` or `ultimate`. The primary roll is supplied by the client in the existing implementation. Cell targets use `cell_<x>_<y>`, such as `cell_5_2` for Blink or mines. No-target abilities use `targetId:-1`; the server uses the hero's area rather than adding a stale enemy ID. Preview selection is local and is not broadcast. The state includes `mines` and `pendingSpawns`.
+`ability` uses `attack`, `disengage`, `spell_<id>` or `ultimate`. Disengage is available to every hero, uses the action with no mana cost or cooldown, and prevents retreat attacks during movement until the next round; its persistent hero flag is `disengaged`. The primary roll is supplied by the client in the existing implementation; Disengage needs no roll. Cell targets use `cell_<x>_<y>`, such as `cell_5_2` for Blink or mines. No-target abilities use `targetId:-1`; the server uses the hero's area rather than adding a stale enemy ID. Preview selection is local and is not broadcast. The state includes `mines` and `pendingSpawns`.
 
 `gamePeriod` is `preparation` or `game`, independent of turn `phase`. Preparation actual movement restores resources and availability, including revival; current-cell clicks do not. Normal restrictions return in Play. Demolition refunds all recorded investment during Preparation and rounded 60% of current tower cost during Play. Roster types include all their upgrade branches in one slot, with a maximum of five base types.
 
@@ -93,3 +93,7 @@ Live scene commands include `MASTER_ACTIVATE_SCENE`, `MASTER_SAVE_NOTE`, `MASTER
 Revealed player notes include only ID, coordinates, title and public text. GM secrets/checks and private cards are omitted. The active scenario's public projection differs from the GM projection. The test suite covers those omissions; role self-registration still means a reachable untrusted client can request a privileged role.
 
 Combat HP events are managed by `combat-events.js` and rendered by `public/combat-text.js`. Do not infer game state from the animation stream: snapshots remain authoritative. Browser diagnostics POST to `/api/client-logs` and are written locally with server diagnostics.
+
+## Activated combat events
+
+GM-only commands `MASTER_ACTIVATE_EVENT` (`config,requestId`) and `MASTER_FINISH_EVENT` (`id,requestId`) activate or end combat events; `EVENT_RESULT` acknowledges the request. `config.kind` is one of `frost,goldenGoblin,sandstorm,goblinTower,bombardment,ritualTotem,banner,chainLightning`; the shared `public/activated-event-rules.js` validates settings and live targets. Frost includes `playerNames` and `results` mapping each selected name to `pass` or `fail`; no remote dice roll is implied. Live `activeEvents` and event-unit metadata are part of saved world state. Scene templates optionally contain `eventPresets` with unique IDs, titles and settings, without live target selections/results. See [activated event rules](activated-events.md) for defaults and timing.

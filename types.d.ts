@@ -52,6 +52,7 @@ export interface PlayerHero {
     parryRounds?: number;
     parryDamage?: number;
     naniteCloudRounds?: number;
+    frostSlowUntilRound?: number;
 }
 
 export interface EnemyTraits {
@@ -105,6 +106,10 @@ export interface EnemyUnit {
     executeThreshold?: number;
     summonGeneration?: number;
     summonedBy?: number;
+    eventKind?: 'goldenGoblin' | 'goblinTower' | 'ritualTotem';
+    eventStructure?: boolean;
+    eventId?: string;
+    eventSummoner?: string;
 }
 
 export interface SoldierUnit {
@@ -204,6 +209,8 @@ export interface RosterVote {
 }
 
 export interface GameState {
+    activeEvents?: ActivatedCombatEvent[];
+    activatedEventSequence?: number;
     gold: number;
     wave: number;
     phase: 'player' | 'wave';
@@ -229,4 +236,53 @@ export interface GameState {
     sceneMaster?: any;
     adventureMaster?: any;
     masterUndo?: { id: number; label: string; snapshot?: string } | null;
+}
+
+export type ActivatedEventKind = 'frost' | 'goldenGoblin' | 'sandstorm' | 'goblinTower' | 'bombardment' | 'ritualTotem' | 'banner' | 'chainLightning';
+
+export interface ActivatedEventConfig {
+    kind: ActivatedEventKind;
+    title?: string;
+    x?: number;
+    y?: number;
+    radius?: number;
+    duration?: number;
+    damage?: number;
+    damageType?: 'physical' | 'magic' | 'true';
+    side?: 'all' | 'heroes' | 'enemies';
+    hp?: number;
+    speed?: number;
+    reward?: number;
+    dc?: number;
+    playerNames?: string[];
+    results?: Record<string, 'pass' | 'fail'>;
+    interval?: number;
+    maxAlive?: number;
+    enemyType?: string;
+    count?: number;
+    summonReward?: number;
+    spawnX?: number;
+    spawnY?: number;
+    delay?: number;
+    areas?: Array<{ x: number; y: number }>;
+    buff?: 'damage' | 'armor' | 'speed';
+    bonus?: number;
+    sourceId?: string;
+    target?: { kind: 'player' | 'enemy' | 'soldier'; id: string };
+}
+
+export interface ActivatedEventPreset extends ActivatedEventConfig {
+    id: string;
+    title: string;
+}
+
+export interface ActivatedCombatEvent {
+    id: string;
+    kind: ActivatedEventKind;
+    title: string;
+    config: ActivatedEventConfig;
+    createdRound: number;
+    expiresRound?: number;
+    nextRound?: number;
+    entityId?: number;
 }

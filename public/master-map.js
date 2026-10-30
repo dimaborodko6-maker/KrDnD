@@ -57,7 +57,7 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
         }
 
         function startSelectedPresetWave() {
-            if ((lastState?.enemies.length || lastState?.pendingSpawns?.length) && !confirm('There are active enemies or pending reinforcements. Add another wave to them?')) return;
+            if ((lastState?.enemies.length || lastState?.pendingSpawns?.length) && !confirm(_tr('There are active enemies or pending reinforcements. Add another wave to them?'))) return;
             var sel = document.getElementById("preset-wave-select");
             var waveIdx = sel ? sel.value : 0;
             socket.send(JSON.stringify({ type: "MASTER_START_PRESET_WAVE", waveIndex: waveIdx }));
@@ -222,7 +222,7 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
 
         function masterDemolishTower() {
             if (!activeMasterTower) return;
-            if (confirm(_tr("Demolish this tower at (") + activeMasterTower.x + ", " + activeMasterTower.y + _tr(") into an empty slot?"))) {
+            if (confirm(_tr("Demolish this tower at (" + activeMasterTower.x + ", " + activeMasterTower.y + ") into an empty slot?"))) {
                 socket.send(JSON.stringify({
                     type: 'MASTER_SET_TOWER',
                     x: activeMasterTower.x,
@@ -431,6 +431,7 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
                         var enemy = cellEnemies[eIdx];
                         // АВТОМАТИКА РЕНДЕРА ФИШЕК: Тянет цвета и короткие имена прямо из gamedata.js
                         var enemyProto = GAME_DATA.enemies[enemy.type] || { color: "#2e7d32", shortName: enemy.name.substring(0,3) };
+                        if (enemy.eventKind) enemyProto = { color: enemy.eventKind === 'goldenGoblin' ? '#a36b00' : '#69428c', shortName: { goldenGoblin:'💰', goblinTower:'🏚', ritualTotem:'🔮' }[enemy.eventKind] || enemy.name.substring(0,3) };
                         var isSheep = enemy.isPolymorphed || (enemy.polymorphTurns > 0);
                         var bgCol = isSheep ? "#ffffff" : enemyProto.color;
                         var txtCol = isSheep ? "#111111" : "#ffffff";
@@ -509,7 +510,7 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
         }
 
         function kickPlayer(pName) {
-            if (confirm("Really remove character [" + pName + "] from the tactical map?")) {
+            if (confirm(_tr("Really remove character [" + pName + "] from the tactical map?"))) {
                 socket.send(JSON.stringify({ type: 'MASTER_KICK_PLAYER', playerName: pName }));
             }
         }
@@ -518,13 +519,13 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
             var msg = clearTowers 
                 ? "Clear all heroes and enemies AND DEMOLISH ALL TOWERS (return them to slots)? Roads will remain."
                 : "Clear heroes and enemies for a new round? (Terrain and towers will remain.)";
-            if (confirm(msg)) {
+            if (confirm(_tr(msg))) {
                 socket.send(JSON.stringify({ type: 'MASTER_RESET_SESSION', clearTowers: !!clearTowers }));
             }
         }
 
         function resetFullMapConfirm() {
-            if (confirm("WARNING! Completely erase EVERYTHING (roads, castle, spawns, towers, heroes)? The map will become empty grass.")) {
+            if (confirm(_tr("WARNING! Completely erase EVERYTHING (roads, castle, spawns, towers, heroes)? The map will become empty grass."))) {
                 socket.send(JSON.stringify({ type: 'MASTER_RESET_FULL' }));
             }
         }
@@ -533,10 +534,10 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
             var w = parseInt(document.getElementById('map-w-input').value) || 16;
             var h = parseInt(document.getElementById('map-h-input').value) || 16;
             if (w < 8 || w > 40 || h < 8 || h > 40) {
-                alert("Map dimensions must be between 8 and 40 cells!");
+                alert(_tr("Map dimensions must be between 8 and 40 cells!"));
                 return;
             }
-            if (confirm("Resize map to " + w + " × " + h + "? Existing terrain will be preserved.")) {
+            if (confirm(_tr("Resize map to " + w + " × " + h + "? Existing terrain will be preserved."))) {
                 socket.send(JSON.stringify({ type: 'MASTER_RESIZE_MAP', width: w, height: h }));
             }
         }
@@ -544,7 +545,7 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
         function setMapPreset(w, h) {
             document.getElementById('map-w-input').value = w;
             document.getElementById('map-h-input').value = h;
-            if (confirm("Apply map size " + w + " × " + h + "?")) {
+            if (confirm(_tr("Apply map size " + w + " × " + h + "?"))) {
                 socket.send(JSON.stringify({ type: 'MASTER_RESIZE_MAP', width: w, height: h }));
             }
         }
@@ -555,7 +556,7 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
             var pre = document.getElementById('debug-log-box');
             var text = pre ? pre.innerText : "";
             if (!text || text.indexOf("Log is empty") === 0) {
-                alert("The debug log is empty!");
+                alert(_tr("The debug log is empty!"));
                 return;
             }
             navigator.clipboard.writeText(text).then(function() {
@@ -570,7 +571,7 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
                     }, 1800);
                 }
             }).catch(function(err) {
-                alert("Clipboard copy error: " + err);
+                alert(_tr("Clipboard copy error: " + err));
             });
         }
 

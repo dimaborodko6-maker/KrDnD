@@ -13,6 +13,25 @@ function world() {
 }
 const ids = list => list.map(status => status.id);
 
+test('frost expiry and banner bonuses are visible on the correct side only', () => {
+    const { state, hero, enemy } = world();
+    state.roundCounter = 1;
+    hero.frostSlowUntilRound = 3;
+    const bearer = { id:2, name:'Bearer', hp:100, x:4, y:4 };
+    state.enemies.push(bearer);
+    state.activeEvents = [{ kind:'banner', expiresRound:4, config:{ sourceId:'2', buff:'armor', bonus:20, radius:3 } }];
+    let index = statuses.buildIndex(state);
+    assert.equal(index.get(hero).find(status => status.id === 'frost').remaining, 2);
+    assert.ok(ids(index.get(enemy)).includes('banner_armor'));
+    assert.equal(ids(index.get(hero)).includes('banner_armor'), false);
+    assert.equal(ids(index.get(bearer)).includes('banner_armor'), false);
+    state.roundCounter = 4;
+    state.activeEvents = [];
+    index = statuses.buildIndex(state);
+    assert.equal(ids(index.get(hero)).includes('frost'), false);
+    assert.equal(ids(index.get(enemy)).includes('banner_armor'), false);
+});
+
 test('блокировка видна у обоих участников только при реальной связи, а не просто при соседстве', () => {
     const { state, hero, enemy, soldier } = world();
     let index = statuses.buildIndex(state);

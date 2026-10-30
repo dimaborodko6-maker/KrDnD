@@ -14,6 +14,8 @@
 const TOWER_DRAFT_UI = (() => {
     const STORAGE_KEY = 'kr_tower_draft_selection';
     const MAX_SLOTS = 5;
+    const tr = text => typeof window._tr === 'function' ? window._tr(text) :
+        window.KR_I18N?.t ? window.KR_I18N.t(text) : text;
 
     // Внутреннее состояние
     let state = {
@@ -77,7 +79,7 @@ const TOWER_DRAFT_UI = (() => {
             state.selectedIds.splice(idx, 1);
         } else {
             if (state.selectedIds.length >= MAX_SLOTS) {
-                alert(`Arsenal full! Maximum selected: ${MAX_SLOTS} towers. Remove one before adding another.`);
+                alert(tr(`Arsenal full! Maximum selected: ${MAX_SLOTS} towers. Remove one before adding another.`));
                 return;
             }
             state.selectedIds.push(towerId);
@@ -117,7 +119,7 @@ const TOWER_DRAFT_UI = (() => {
 
     function startVoteSimulation() {
         if (state.selectedIds.length === 0) {
-            alert('Select at least one tower for the arsenal first!');
+            alert(tr('Select at least one tower for the arsenal first!'));
             return;
         }
         state.simulatedVote = {
@@ -135,7 +137,7 @@ const TOWER_DRAFT_UI = (() => {
     function simulateVoteAction(voter, agree) {
         if (!state.simulatedVote) return;
         if (agree === false) {
-            alert(`❌ Player ${voter} voted AGAINST. The vote failed; the arsenal is unchanged.`);
+            alert(tr(`❌ Player ${voter} voted AGAINST. The vote failed; the arsenal is unchanged.`));
             state.simulatedVote = null;
             renderModal();
             return;
@@ -148,7 +150,7 @@ const TOWER_DRAFT_UI = (() => {
             if (typeof state.onApplyCallback === 'function') {
                 state.onApplyCallback([...state.selectedIds]);
             }
-            alert(`🎉 The team unanimously approved an arsenal of ${state.selectedIds.length} towers!`);
+            alert(tr(`🎉 The team unanimously approved an arsenal of ${state.selectedIds.length} towers!`));
             state.simulatedVote = null;
         }
         renderModal();
@@ -161,7 +163,7 @@ const TOWER_DRAFT_UI = (() => {
         if (typeof state.onApplyCallback === 'function') {
             state.onApplyCallback([...state.selectedIds]);
         }
-        alert('👑 The GM forced approval of the team arsenal!');
+        alert(tr('👑 The GM forced approval of the team arsenal!'));
         state.simulatedVote = null;
         renderModal();
     }

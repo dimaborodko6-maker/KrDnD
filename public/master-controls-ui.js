@@ -1,4 +1,6 @@
 'use strict';
+const masterControlsTr = text => typeof window._tr === 'function' ? window._tr(text) :
+    window.KR_I18N?.t ? window.KR_I18N.t(text) : text;
 
 var masterEnemyMove = null;
 var masterEnemyArea = null;
@@ -67,10 +69,10 @@ function submitClearEnemies(event) {
 }
 function undoIntervention() {
     const entry = lastState?.masterUndo;
-    if (entry && confirm('Undo intervention “' + entry.label + '” and restore the previous world state?')) sendMaster({ type: 'MASTER_UNDO_INTERVENTION', id: entry.id });
+    if (entry && confirm(masterControlsTr('Undo intervention “' + entry.label + '” and restore the previous world state?'))) sendMaster({ type: 'MASTER_UNDO_INTERVENTION', id: entry.id });
 }
 function getMasterHeroRange(hero, key) {
-    const info = key === 'movement' ? { range: lastState.gamePeriod === 'preparation' ? Infinity : hero.speed + (hero.speedBonus || 0), metric: 'chebyshev' } : BATTLE_ABILITY_RULES.rangeInfo(key, hero);
+    const info = key === 'movement' ? { range: lastState.gamePeriod === 'preparation' ? Infinity : ACTIVATED_EVENT_RULES.heroSpeed(hero, lastState.roundCounter || 0), metric: 'chebyshev' } : BATTLE_ABILITY_RULES.rangeInfo(key, hero);
     return info && { x: hero.x, y: hero.y, ...info };
 }
 function previewMasterHero(hero, key) {
@@ -133,10 +135,11 @@ function renderHeroInspectorExtras(box, hero) {
     const proto = GAME_DATA.heroes[hero.heroKey];
     if (!proto) return;
     const entries = [{ key: 'attack', name: 'Basic attack', desc: formula + '. Base damage before abilities, target defenses and random effects.', cooldown: 0 },
+        BATTLE_ABILITY_RULES.disengage,
         ...proto.skills.filter(skill => (hero.skills || []).includes(skill.id)).map(skill => ({ ...skill, key: 'spell_' + skill.id })),
         { ...proto.ultimate, key: 'ultimate' }];
     entries.forEach(ability => {
-        const passive = ability.key !== 'attack' && ability.key !== 'ultimate' && (!ability.cooldown || ability.desc.includes('Passive'));
+        const passive = ability.key.startsWith('spell_') && (!ability.cooldown || ability.desc.includes('Passive'));
         const card = document.createElement('article'); card.className = 'ability-card';
         const spec = BATTLE_ABILITY_RULES.definition(ability.key, hero.heroKey, hero);
         const range = BATTLE_ABILITY_RULES.rangeInfo(ability.key, hero);
@@ -171,7 +174,7 @@ function renderEnemyInspector(box) {
         objectRow('Reward / base damage', (enemy.reward || 0) + ' G / ' + enemy.livesTaken) + UNIT_STATUSES.renderList(masterStatusIndex.get(enemy) || []);
     const actions = document.createElement('div'); actions.className = 'object-actions';
     actions.append(objectButton('Heal', () => manageEnemies([enemy.id], 'heal')),
-        objectButton('Change HP', () => { const value = prompt('Enemy HP (1–' + enemy.maxHp + ')', enemy.hp); if (value !== null) manageEnemies([enemy.id], 'hp', { hp: Number(value) }); }),
+        objectButton('Change HP', () => { const value = prompt(masterControlsTr('Enemy HP (1–' + enemy.maxHp + ')'), enemy.hp); if (value !== null) manageEnemies([enemy.id], 'hp', { hp: Number(value) }); }),
         objectButton('Relocate', () => { cancelMapAction(); masterEnemyMove = [enemy.id]; ui('map-action').textContent = 'Relocate enemy: select a cell · Esc to cancel'; }),
         objectButton('Effect…', () => openEnemyEffect([enemy.id])), objectButton('Remove effects', () => manageEnemies([enemy.id], 'cleanse')),
         objectButton('Find on map', () => focusMasterUnit(enemy)), objectButton('Remove one', () => manageEnemies([enemy.id], 'remove'), true));
@@ -235,7 +238,7 @@ function moveSelectedEnemies() {
 }
 function manageEnemies(ids, action, extra = {}) {
     if (!ids.length) return;
-    if (action === 'remove' && !confirm('Remove enemies: ' + ids.length + '? No rewards or death effects.')) return;
+    if (action === 'remove' && !confirm(masterControlsTr('Remove enemies: ' + ids.length + '? No rewards or death effects.'))) return;
     sendMaster({ type: 'MASTER_MANAGE_ENEMIES', ids, action, ...extra });
 }
 function manageSelectedEnemies(action) { manageEnemies([...selectedMasterEnemies], action); }
@@ -260,9 +263,9 @@ function renderPendingSpawns() {
     groups.forEach((entries, key) => {
         const e = entries[0], row = document.createElement('div'); row.className = 'queue-row';
         const text = document.createElement('span'); text.textContent = (GAME_DATA.enemies[e.type]?.name || e.type) + ' × ' + entries.length + ' · in ' + Math.max(0, e.round - (lastState.roundCounter || 0)) + ' turns · ' + e.x + ',' + e.y;
-        row.append(text, objectButton('Cancel', () => { if (confirm('Cancel this reinforcement group (' + entries.length + ')?')) sendMaster({ type: 'MASTER_CANCEL_SPAWNS', group: key }); })); box.append(row);
+        row.append(text, objectButton('Cancel', () => { if (confirm(masterControlsTr('Cancel this reinforcement group (' + entries.length + ')?'))) sendMaster({ type: 'MASTER_CANCEL_SPAWNS', group: key }); })); box.append(row);
     });
-    box.append(objectButton('Cancel all reinforcements', () => { if (confirm('Cancel all pending reinforcements?')) sendMaster({ type: 'MASTER_CANCEL_SPAWNS', all: true }); }, true));
+    box.append(objectButton('Cancel all reinforcements', () => { if (confirm(masterControlsTr('Cancel all pending reinforcements?'))) sendMaster({ type: 'MASTER_CANCEL_SPAWNS', all: true }); }, true));
 }
 function filterSpawnCatalog() {
     const select = ui('active-spawn-type'), previous = select.value, search = ui('spawn-search').value.trim().toLocaleLowerCase();
@@ -286,7 +289,7 @@ function toggleSpawnFavorite() {
     filterSpawnCatalog();
 }
 function repeatLastSpawn() {
-    if (lastMasterSpawn && confirm('Repeat group: ' + lastMasterSpawn.count + ' × ' + (GAME_DATA.enemies[lastMasterSpawn.enemyType]?.name || lastMasterSpawn.enemyType) + ' at cell ' + lastMasterSpawn.x + ',' + lastMasterSpawn.y + '?')) sendMaster(lastMasterSpawn);
+    if (lastMasterSpawn && confirm(masterControlsTr('Repeat group: ' + lastMasterSpawn.count + ' × ' + (GAME_DATA.enemies[lastMasterSpawn.enemyType]?.name || lastMasterSpawn.enemyType) + ' at cell ' + lastMasterSpawn.x + ',' + lastMasterSpawn.y + '?'))) sendMaster(lastMasterSpawn);
 }
 function renderMasterControls() {
     const state = lastState;

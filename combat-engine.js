@@ -1,4 +1,5 @@
 'use strict';
+const ACTIVATED_EVENT_RULES = require('./public/activated-event-rules');
 
 module.exports = function createCombatEngine({
     getState, getData, getModifier,
@@ -9,8 +10,24 @@ module.exports = function createCombatEngine({
     refreshHeroBlocks, resetWaveBonuses,
     spawnPendingEnemies, processDwarvenMinesIncome, processPriestessHealPrayer,
     logAction, logDebug, broadcastState,
-    random = () => Math.random()
+    random = () => Math.random(), activatedEvents = null
 }) {
+
+function selectBlockingHero(players, isAvailable) {
+    let chosen;
+    let bestHealth = -Infinity;
+    for (const player of Object.values(players)) {
+        if (!isAvailable(player)) continue;
+        const armor = Math.min(100, Math.max(0, player.armor || 0));
+        const effectiveHealth = armor === 100 ? Infinity : player.hp / (1 - armor / 100);
+        // Strict comparison preserves player order for equal values, including Infinity.
+        if (effectiveHealth > bestHealth) {
+            chosen = player;
+            bestHealth = effectiveHealth;
+        }
+    }
+    return chosen;
+}
 
 function moveEnemies() {
     const gameState = getState();
@@ -189,6 +206,7 @@ function moveEnemies() {
         p.hasMovedThisRound = false; 
         p.hasAttackedThisRound = false;
         p.isReady = false;
+        delete p.disengaged;
     });
 
     // ТАКТИЧЕСКИЙ ТИКТАК СОЛДАТ КАЗАРМ: Сброс блокировок погибших врагов и возрождение павших
@@ -214,6 +232,8 @@ function moveEnemies() {
             }
         }
     });
+
+    activatedEvents?.beginRound();
 
     // --- ФАЗА ПЕРИОДИЧЕСКОГО УРОНА (DoT) И СТАТУСОВ ---
     gameState.enemies.forEach(enemy => {
@@ -334,6 +354,14 @@ function moveEnemies() {
     // ПОШАГОВЫЙ СПУСК ВРАГОВ ПО РЕЛЬСАМ ДОРОГИ
     gameState.enemies.forEach(enemy => {
 
+        if (enemy.eventStructure) return;
+        if (enemy.eventKind === 'goldenGoblin') {
+            const held = [...Object.values(gameState.players), ...(gameState.soldiers || [])].some(unit =>
+                unit.hp > 0 && !(unit.deathTimer > 0) && !(unit.respawnTimer > 0) &&
+                (unit.blockedEnemyIds || []).includes(enemy.id) && Math.max(Math.abs(unit.x - enemy.x), Math.abs(unit.y - enemy.y)) <= 1);
+            if (!held) activatedEvents?.moveSpecial(enemy);
+            return;
+        }
         if (resolveCastleArrival(enemy)) return;
         // Оглушённый или погибший враг пропускает ход
         if (enemy.hp <= 0 || enemy.stunTurns > 0) return;
@@ -402,7 +430,7 @@ function moveEnemies() {
             // СУММИРОВАНИЕ ЛИМИТОВ БЛОКА: ищем защитника (на nextCell или на смежной клетке дороги)
             if (!enemy.isFlying) {
                 // 1. Герой непосредственно на nextCell
-                let directHero = Object.values(gameState.players).find(p => 
+                let directHero = selectBlockingHero(gameState.players, p => 
                     p.x === nextCell.x && p.y === nextCell.y && p.hp > 0 && p.deathTimer === 0 &&
                     (p.blockedEnemyIds || []).length < (p.blockLimit ?? 1)
                 );
@@ -440,7 +468,7 @@ function moveEnemies() {
                 }
 
                 // 3. Перехват героем на смежной полосе дороги (радиус Чебышёва <= 1)
-                let adjacentHero = Object.values(gameState.players).find(p => 
+                let adjacentHero = selectBlockingHero(gameState.players, p => 
                     p.hp > 0 && p.deathTimer === 0 &&
                     Math.max(Math.abs(p.x - nextCell.x), Math.abs(p.y - nextCell.y)) <= 1 &&
                     (p.blockedEnemyIds || []).length < (p.blockLimit ?? 1)
@@ -504,8 +532,11 @@ function moveEnemies() {
         meleeAssignments.set(enemy.id, enemy.aoeCleave ? candidates : chosen ? [chosen] : []);
     }
 
+    activatedEvents?.enemyRound();
+
     // ФАЗА УРОНА ВРАГОВ ПО ГЕРОЯМ
     gameState.enemies.forEach(enemy => {
+        if (enemy.eventKind) return;
         if (enemy.hp <= 0 || enemy.stunTurns > 0) return;
         if (enemy.isPolymorphed || (enemy.polymorphTurns && enemy.polymorphTurns > 0)) {
             logDebug('SHEEP_BLEAT', `Enemy [${enemy.name}] (#${enemy.id}) is a sheep, bleating and unable to attack`);
@@ -659,6 +690,7 @@ function moveEnemies() {
         );
 
         engagedEnemies.forEach(enemy => {
+            if (enemy.eventKind) return;
             if (soldier.hp <= 0 || enemy.hp <= 0 || enemy.stunTurns > 0 || !(meleeAssignments.get(enemy.id) || []).includes(soldier)) return;
             if (enemy.isPolymorphed || (enemy.polymorphTurns && enemy.polymorphTurns > 0)) {
                 logDebug('SHEEP_BLEAT', `Enemy [${enemy.name}] (#${enemy.id}) is a sheep, bleating and unable to attack a soldier`);
@@ -720,7 +752,7 @@ function moveEnemies() {
                     logDebug('ENEMY_DODGE', `[${targetEnemy.name}] (#${targetEnemy.id}) dodged soldier's attack (#${soldier.id})`);
                 } else {
                     let sDmg = soldier.dmg || 3;
-                    let targetArmor = targetEnemy.armor || 0;
+                    let targetArmor = Math.min(100, (targetEnemy.armor || 0) + ACTIVATED_EVENT_RULES.auraBonus(gameState, targetEnemy, 'armor'));
                     let calculatedDmg = Math.max(1, Math.round(sDmg * ((100 - targetArmor) / 100)));
                     mobTraits.damage(targetEnemy,calculatedDmg);
                     logAction(Date.now(), `🗡️ SOLDIER STRIKE: A garrison soldier hit [${targetEnemy.name}] ${calculatedDmg} physical damage!`);
@@ -818,8 +850,9 @@ function moveEnemies() {
     gameState.enemies = gameState.enemies.filter(e => e.hp > 0);
     logAction(Date.now(), "🚶 Wave turn completed. It is now the Heroes' turn.");
     
+    activatedEvents?.endRound();
     gameState.phase = 'player';
-    if (gameState.enemies.length === 0 && !(gameState.pendingSpawns || []).length) {
+    if (!gameState.enemies.some(enemy => enemy.eventKind !== 'goldenGoblin') && !(gameState.pendingSpawns || []).length) {
         resetWaveBonuses();
         logAction(Date.now(), `🎉 WAVE CLEARED: All enemies on the map have been defeated! The team can prepare for the next wave.`);
     }

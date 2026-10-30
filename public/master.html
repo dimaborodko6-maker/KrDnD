@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="unit-statuses.css">
     <link rel="stylesheet" href="tower-roster.css">
     <link rel="stylesheet" href="scene-editor.css">
+    <link rel="stylesheet" href="activated-events.css">
+    <script src="activated-event-rules.js"></script>
+    <script src="activated-event-overlays.js"></script>
     <script src="gamedata.js"></script>
     <script src="tower-rules.js"></script>
     <script src="battle-ability-rules.js"></script>
@@ -31,9 +34,11 @@
     <div class="button-row" role="group" aria-label="Game period"><button id="period-preparation" aria-pressed="false" onclick="setGamePeriod('preparation')" disabled>Preparation</button><button id="period-game" aria-pressed="false" onclick="setGamePeriod('game')" disabled>Play</button><span id="round-label" class="muted">Waiting for state</span></div>
 </nav>
 <div id="master-notice" role="status" aria-live="polite" hidden></div>
-<div class="battle-actions" aria-label="GM quick actions"><div class="button-row"><button onclick="openMasterTool('spawn')">＋ Enemies</button><button onclick="openRestoreDialog()">♡ Restore team</button><button class="danger-outline" onclick="openClearEnemies()">Clear enemies</button><button onclick="openMasterTool('hero')">Parameters</button><button onclick="openMasterTool('gold')">Treasury</button><button onclick="openMasterTool('undo')">Player rollback</button></div><button id="undo-intervention" onclick="undoIntervention()" disabled>↶ Undo intervention</button><button id="focus-map-button" aria-pressed="false" onclick="toggleMapFocus()">⛶ Map only</button></div>
+<div class="battle-actions" aria-label="GM quick actions"><div class="button-row"><button onclick="document.getElementById('activated-events-details').open=true;document.getElementById('activated-events-details').scrollIntoView({behavior:'smooth',block:'start'})">Events</button><button onclick="openMasterTool('spawn')">＋ Enemies</button><button onclick="openRestoreDialog()">♡ Restore team</button><button class="danger-outline" onclick="openClearEnemies()">Clear enemies</button><button onclick="openMasterTool('hero')">Parameters</button><button onclick="openMasterTool('gold')">Treasury</button><button onclick="openMasterTool('undo')">Player rollback</button></div><button id="undo-intervention" onclick="undoIntervention()" disabled>↶ Undo intervention</button><button id="focus-map-button" aria-pressed="false" onclick="toggleMapFocus()">⛶ Map only</button></div>
 <div class="workspace">
 <main class="map-column">
+    <div id="activated-event-picking" class="event-map-picking" role="status" hidden></div>
+    <details class="panel" id="activated-events-details"><summary>Activated events</summary><section id="activated-events-panel"></section></details>
 
     <section class="panel" id="map-editor" hidden><h2>Map Editor</h2><div class="button-row"><button class="tool-btn" id="tool-empty" onclick="changeActiveTool('empty')">Grass</button><button class="tool-btn" id="tool-road" onclick="changeActiveTool('road')">Road</button><button class="tool-btn" id="tool-spawn" onclick="changeActiveTool('spawn')">Spawn</button><button class="tool-btn" id="tool-castle" onclick="changeActiveTool('castle')">Castle</button><button class="tool-btn" id="tool-slot" onclick="changeActiveTool('slot')">Tower slot</button></div><div class="form-row"><label>Width<input id="map-w-input" type="number" min="8" max="40" value="16"></label><label>Height<input id="map-h-input" type="number" min="8" max="40" value="16"></label><button onclick="resizeMapCustom()">Resize</button><button onclick="setMapPreset(16,16)">16 × 16</button><button onclick="setMapPreset(24,24)">24 × 24</button><button onclick="setMapPreset(30,20)">30 × 20</button></div></section>
     <div id="master-demolish-banner" class="panel vote-banner" style="display:none"><div><strong>Demolition vote</strong><div id="master-demolish-text"></div></div><div class="button-row"><button class="danger-outline" onclick="masterResolveDemolish(true)">Force demolition</button><button onclick="masterResolveDemolish(false)">Cancel vote</button></div></div>
@@ -96,5 +101,6 @@
 <script src="planning-ui.js"></script>
 <script src="master-scenes.js"></script>
 <script src="master-planning.js"></script>
+<script src="master-activated-events.js"></script>
 </body>
 </html>

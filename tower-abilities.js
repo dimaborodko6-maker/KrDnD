@@ -18,7 +18,7 @@ function teslaField(ctx) {
 function arcanePassives(ctx) {
     const { state, cell, proto, upgrades, x, y, action, debug } = ctx;
     if (upgrades.includes('arcane_death') && state.roundCounter - (cell.lastArcaneDeathRound || -999) >= 5) {
-        const target = state.enemies.find(en => en.hp > 0 && ctx.inRange(x, y, en, proto.range));
+        const target = state.enemies.find(en => en.hp > 0 && !en.eventStructure && ctx.inRange(x, y, en, proto.range));
         if (target) {
             cell.lastArcaneDeathRound = state.roundCounter;
             const killDebug = `Enemy [${target.name}] (#${target.id}) killed by tower [${proto.name}] (+${target.reward}💰)`;
@@ -41,7 +41,7 @@ function arcanePassives(ctx) {
         }
     }
     if (upgrades.includes('arcane_teleport') && state.roundCounter - (cell.lastTeleportRound || -999) >= 5) {
-        const target = ctx.closestEnemy(en => ctx.inRange(x, y, en, proto.range));
+        const target = ctx.closestEnemy(en => !en.eventStructure && ctx.inRange(x, y, en, proto.range));
         if (target) {
             const path = ctx.findShortestPath(target.x, target.y, 'spawn');
             if (path && path.length > 1) {
@@ -74,7 +74,7 @@ function berthaMissiles(ctx) {
 function musketeerShot(ctx) {
     const { state, cell, shot, upgrades, random, action, debug } = ctx;
     const target = shot.target;
-    if (upgrades.includes('musketeer_sniper') && state.roundCounter - (cell.lastSniperRound || -999) >= 3 && random() < 0.35) {
+    if (!target.eventStructure && upgrades.includes('musketeer_sniper') && state.roundCounter - (cell.lastSniperRound || -999) >= 3 && random() < 0.35) {
         cell.lastSniperRound = state.roundCounter;
         if (target.isBoss || target.isMiniBoss) {
             shot.baseDamage = 150;
@@ -126,7 +126,7 @@ function rangerEffects(ctx) {
 
 function polymorph(ctx) {
     const { upgrades, shot: { target }, random, action, debug } = ctx;
-    if (!upgrades.includes('sorcerer_polymorph') || target.hp <= 0) return;
+    if (!upgrades.includes('sorcerer_polymorph') || target.hp <= 0 || target.eventStructure) return;
     if (target.isBoss || target.isMiniBoss) debug('BOSS_RESIST', `[${target.name}] (#${target.id}) is immune to Polymorph`);
     else if (random() < 0.30 && !target.polymorphTurns) {
         target.isPolymorphed = true; target.polymorphTurns = 2;

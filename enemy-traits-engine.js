@@ -1,5 +1,6 @@
 'use strict';
 const TRAITS = require('./public/enemy-traits.js');
+const EVENT_RULES = require('./public/activated-event-rules');
 
 // Все таймеры привязаны к раунду мира, поэтому сохраняются и откатываются вместе с ним.
 module.exports = function enemyTraitsEngine({ getState, getData, createEnemy, damageDefender, deathDefender, log,
@@ -41,7 +42,7 @@ module.exports = function enemyTraitsEngine({ getState, getData, createEnemy, da
     }
     function auraBonus(enemy) {
         if (enemy.isPolymorphed || enemy.hp <= 0) return 0;
-        let bonus = 0;
+        let bonus = EVENT_RULES.auraBonus(state(), enemy, 'damage');
         for (const leader of state().enemies) {
             if (leader === enemy || !active(leader)) continue;
             const aura = ensure(leader).commander;
@@ -54,7 +55,7 @@ module.exports = function enemyTraitsEngine({ getState, getData, createEnemy, da
         const rage = enemy.rageActive && !enemy.isPolymorphed ? traits.berserk?.damagePercent || 0 : 0;
         return Math.round(amount * (1+rage/100) * (1+auraBonus(enemy)/100));
     }
-    function speedBonus(enemy) { return enemy.rageActive && !enemy.isPolymorphed ? ensure(enemy).berserk?.speedBonus || 0 : 0; }
+    function speedBonus(enemy) { return (enemy.rageActive && !enemy.isPolymorphed ? ensure(enemy).berserk?.speedBonus || 0 : 0) + EVENT_RULES.auraBonus(state(), enemy, 'speed'); }
     function recovery() {
         for (const enemy of state().enemies) {
             const traits = ensure(enemy);

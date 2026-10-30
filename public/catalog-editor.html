@@ -34,7 +34,7 @@
     <label>Description<textarea id="wave-description" rows="2" maxlength="2000"></textarea></label>
     <div class="wave-summary" aria-live="polite"><span>Enemies: <strong id="wave-total">0</strong></span><span>Reward: <strong id="wave-reward">0 G</strong></span><span>Last group: <strong id="wave-delay">immediately</strong></span></div>
     <div class="section-heading"><h3>Enemy groups</h3><button id="add-group">＋ Add group</button></div><div id="wave-groups"></div>
-    <p class="muted">Delay 0 spawns when the wave starts. Delay 1 spawns on the first Wave Turn, 2 on the second. Groups are distributed across the map's spawn points.</p>
+    <p class="muted">Delay sets when a group starts: 0 at wave launch, 1 on the first Wave Turn, 2 on the second. Each group releases one enemy per spawn point per turn until its count is reached. Groups can overlap.</p>
     <div class="button-row wave-order"><button id="move-wave-up">↑ Move up</button><button id="move-wave-down">↓ Move down</button></div>
 </section>
 <section id="tower-detail" hidden>

@@ -1,4 +1,5 @@
 'use strict';
+const EVENT_RULES = require('./public/activated-event-rules');
 
 const BATTLE_ABILITY_RULES = require('./public/battle-ability-rules.js');
 
@@ -26,6 +27,14 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
     if (!player) return;
     if (player.deathTimer > 0 || player.hp <= 0) { logAction(Date.now(), `❌ ${player.heroName} has fallen and is waiting to respawn!`); broadcastState(); return; }
     if (player.hasAttackedThisRound) { logAction(Date.now(), `❌ Unavailable: You have already used an action this round!`); broadcastState(); return; }
+
+    if (abilityType === 'disengage') {
+        player.disengaged = true;
+        player.hasAttackedThisRound = true;
+        player.isReady = false;
+        logAction(Date.now(), `💨 DISENGAGE: ${player.heroName} can move without provoking retreat attacks this round.`);
+        broadcastState(); return;
+    }
 
     // Инициализируем объект cooldowns у игрока, если его нет
     if (!player.cooldowns) player.cooldowns = {};
@@ -633,7 +642,7 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
             if (player.skills.includes('aura')) resist = Math.max(0, resist - 30);
             calcDmg = Math.max(1, Math.round(baseDamage * ((100 - resist) / 100)));
         } else {
-            armor = t.armor || 0;
+            armor = Math.min(100, (t.armor || 0) + EVENT_RULES.auraBonus(gameState, t, 'armor'));
             if (player.heroName.includes("Bolin") && player.skills.includes('rounds')) {
                 armor = Math.max(0, armor - 25);
             }
@@ -654,7 +663,7 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
         }
         if (explosiveDamage > 0) {
             if (t.id !== enemy.id) calcDmg = 0;
-            calcDmg += Math.max(1, Math.round(explosiveDamage * (100 - (t.armor || 0)) / 100));
+            calcDmg += Math.max(1, Math.round(explosiveDamage * (100 - Math.min(100, (t.armor || 0) + EVENT_RULES.auraBonus(gameState, t, 'armor'))) / 100));
         }
 
         mobTraits.damage(t,calcDmg);
@@ -688,7 +697,7 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
         }
     });
 
-    if (skillId === 'obliterate' && enemy.hp > 0) {
+    if (skillId === 'obliterate' && enemy.hp > 0 && !enemy.eventStructure) {
         const pathBack = findShortestPath(enemy.x, enemy.y, 'spawn');
         if (pathBack && pathBack.length > 1) {
             const destination = pathBack[Math.min(2, pathBack.length - 1)];

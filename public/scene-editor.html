@@ -26,6 +26,7 @@
             <details><summary>Team tower roster · up to 5 types</summary><div id="scene-tower-roster" class="button-row"></div></details>
         </section>
         <section class="panel" id="scene-planning"></section>
+        <section class="panel"><div class="section-heading"><h2>Activated event presets</h2><button id="add-event-preset" type="button">＋ Activated event</button></div><p class="muted">Save named event settings and map positions. Choose live targets and enter saving throw results when activating from the GM dashboard.</p><div id="scene-event-presets"></div></section>
         <section class="panel"><div class="section-heading"><h2>Scene events</h2><button id="add-scene-event" type="button">＋ Event</button></div><div id="scene-events"></div></section>
         <section class="panel"><div class="section-heading"><h2>GM cards</h2><div class="button-row"><label>Card type<select id="scene-card-kind"><option value="npc">Character (NPC)</option><option value="tactics">Enemy tactics</option><option value="boss">Boss and phases</option></select></label><button id="add-scene-card" type="button">＋ Card</button></div></div><div id="scene-cards"></div></section>
         <div class="scene-editor-layout">
@@ -37,6 +38,6 @@
     </main>
 </div>
 <dialog id="scene-note-dialog"><form id="scene-note-form"><div class="section-heading"><h2 id="scene-note-title">Map note</h2><button type="button" id="scene-note-close" aria-label="Close">✕</button></div><p class="muted">All notes in a new scene are hidden. The GM can reveal only the title, coordinates and player text. Checks and secrets remain with the GM.</p><div id="scene-note-fields" class="scene-note-fields"></div><div class="button-row"><button type="submit" class="primary">Save in draft</button><button id="scene-note-delete" type="button" class="danger-outline">Delete note</button></div></form></dialog>
-<script src="gamedata.js"></script><script src="tower-rules.js"></script><script src="scene-notes.js"></script><script src="scenario-rules.js"></script><script src="planning-ui.js"></script><script src="scene-editor.js"></script><script src="scene-planning-editor.js"></script>
+<script src="gamedata.js"></script><script src="tower-rules.js"></script><script src="scene-notes.js"></script><script src="scenario-rules.js"></script><script src="activated-event-rules.js"></script><script src="planning-ui.js"></script><script src="scene-editor.js"></script><script src="scene-planning-editor.js"></script><script src="scene-event-presets.js"></script>
 </body>
 </html>

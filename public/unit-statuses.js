@@ -1,7 +1,10 @@
 'use strict';
+/* global ACTIVATED_EVENT_RULES */
 
 // Представление действующих эффектов. Таймеры остаются под управлением боевого движка.
 const UNIT_STATUSES = (() => {
+    const eventRules = typeof module !== 'undefined' && module.exports ? require('./activated-event-rules') :
+        typeof ACTIVATED_EVENT_RULES !== 'undefined' ? ACTIVATED_EVENT_RULES : null;
     const definitions = [
         { id: 'bleeding', polarity: 'negative', icon: '🩸', label: 'Bleeding', turns: ['bleedTurns'] },
         { id: 'poison', polarity: 'negative', icon: '🌿', label: 'Poison', turns: ['poisonTurns'] },
@@ -14,6 +17,7 @@ const UNIT_STATUSES = (() => {
         { id: 'retribution', polarity: 'positive', icon: '🔰', label: 'Retribution shield', amount: 'retributionShield' },
         { id: 'shield_wall', polarity: 'positive', icon: '🧱', label: 'Defensive stance', turns: ['shieldWallRounds'] },
         { id: 'parry', polarity: 'positive', icon: '🤺', label: 'Parry', turns: ['parryRounds'] },
+        { id: 'disengage', polarity: 'positive', icon: '💨', label: 'Disengage', flag: 'disengaged' },
         { id: 'haste', polarity: 'positive', icon: '💨', label: 'Haste', turns: ['speedBonusRounds'], requires: 'speedBonus' },
         { id: 'regeneration', polarity: 'positive', icon: '💚', label: 'Nanite Cloud', turns: ['naniteCloudRounds'] },
         { id: 'vampirism', polarity: 'positive', icon: '🧛', label: 'Life steal', turns: ['vampirismTurns', 'lifestealTurns'] }
@@ -26,6 +30,8 @@ const UNIT_STATUSES = (() => {
     function collect(unit, blockedPeers = [], round = 0, auraBonus = 0) {
         if (!unit || !alive(unit)) return [];
         const statuses = [];
+        if (unit.frostSlowUntilRound > round) statuses.push({ id: 'frost', polarity: 'negative', icon: '❄️', label: 'Frost', remaining: unit.frostSlowUntilRound - round,
+            detail: 'Frost · speed 1 · turns remaining: ' + (unit.frostSlowUntilRound - round) });
         if (blockedPeers.length) statuses.push({ id: 'blocked', polarity: 'negative', icon: '⚔️', label: 'Blocking', remaining: null,
             detail: 'Blocking · combatants: ' + blockedPeers.map(peer => name(peer) + (peer.id != null ? ' #' + peer.id : '')).join(', ') });
         for (const definition of definitions) {
@@ -71,7 +77,12 @@ const UNIT_STATUSES = (() => {
             const auraBonus = enemies.includes(unit) && !unit.isPolymorphed ? Math.max(0,...enemies.filter(leader => leader !== unit && alive(leader) &&
                 !(leader.stunTurns > 0) && !leader.isPolymorphed && leader.traits?.commander &&
                 Math.hypot(leader.x-unit.x,leader.y-unit.y) <= leader.traits.commander.radius).map(leader => leader.traits.commander.damagePercent)) : 0;
-            return [unit,collect(unit,links.get(unit) || [],state?.roundCounter || 0,auraBonus)];
+            const statuses = collect(unit,links.get(unit) || [],state?.roundCounter || 0,Math.max(auraBonus, enemies.includes(unit) ? eventRules?.auraBonus(state, unit, 'damage') || 0 : 0));
+            for (const [kind,label] of [['armor','Armor bonus, percentage points'],['speed','Speed bonus, cells']]) {
+                const bonus = enemies.includes(unit) ? eventRules?.auraBonus(state, unit, kind) || 0 : 0;
+                if (bonus) statuses.push({ id: 'banner_' + kind, polarity: 'positive', icon: '🚩', label, remaining: null, detail: label + ': +' + bonus });
+            }
+            return [unit,statuses];
         }));
     }
 

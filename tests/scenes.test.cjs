@@ -125,7 +125,8 @@ test('сцены изолированы от партии и игроков; о�
     await send(master,{type:'MASTER_REVEAL_NOTE',noteId:'trap',revealed:false,revision:2},'NOTE_SAVED');
     const hidden=await send(player,{type:'TOGGLE_READY'}); assert.deepEqual(hidden.state.revealedNotes,[]);
     await send(master,{type:'MASTER_START_PRESET_WAVE',waveIndex:0});
-    const wave=await send(master,{type:'REGISTER_MASTER'}); assert.equal(wave.state.wave,81); assert.equal(wave.state.enemies.filter(enemy=>enemy.type==='orc_warrior').length,3);
+    const wave=await send(master,{type:'REGISTER_MASTER'}); assert.equal(wave.state.wave,81); assert.equal(wave.state.enemies.filter(enemy=>enemy.type==='orc_warrior').length,1);
+    assert.equal(wave.state.pendingSpawns.filter(enemy=>enemy.type==='orc_warrior').length,2);
     const capture=await send(editor,{type:'SCENE_CAPTURE'},'SCENE_CAPTURED'); assert.equal(capture.scene.waves[0].waveNum,81);
     assert.equal(capture.scene.notes[0].text,'Новый текст'); assert.equal(capture.scene.notes[0].revealed,undefined);
     const broken=scene('broken'); broken.grid[2][4].type='empty';

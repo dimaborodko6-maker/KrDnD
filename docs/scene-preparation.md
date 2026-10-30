@@ -34,3 +34,7 @@ All notes begin hidden. Revealing transmits only ID, coordinates, title and play
 Disconnected drafts remain in the current window, but reloading or closing can lose them. Preserve important draft text before loading the server version. Active scene progress and revealed notes are in `gamestate_save.json`. Back up save, catalog and library together while stopped.
 
 See [scenario-and-adventure.md](scenario-and-adventure.md) for automation and branching.
+
+## Activated event presets
+
+The **Activated event presets** panel saves named configurations for eight combat events alongside the map. Use the event selector and typed fields to set damage, timing, radius and positions; Bombardment supports multiple impact cells. Goblin towers and ritual totems also require a reinforcement road/spawn cell connected to the castle. Live heroes, enemy bearers, lightning targets and saving throw results are selected on the dashboard when activated. Old scenes default to no presets. Copying a live map keeps presets but omits temporary event creatures and objects. See [activated combat events](activated-events.md).

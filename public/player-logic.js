@@ -108,7 +108,7 @@ window.goToStep = function(stepNum) {
         document.getElementById('setup-step-3').style.display = 'none';
         document.getElementById('setup-step-2').style.display = 'block';
     } else if (stepNum === 3) {
-        if (poolPoints !== 0) { alert('Spend all D&D ability points! Remaining: ' + poolPoints); return; }
+        if (poolPoints !== 0) { alert(_tr('Spend all D&D ability points! Remaining: ' + poolPoints)); return; }
         document.getElementById('setup-step-1').style.display = 'none';
         document.getElementById('setup-step-2').style.display = 'none';
         document.getElementById('setup-step-3').style.display = 'block';
@@ -142,7 +142,7 @@ function toggleSkillSelect(skillId) {
         character.skills.splice(idx, 1);
         card.classList.remove('selected');
     } else {
-        if (character.skills.length >= 3) { alert('You can select no more than 3 abilities!'); return; }
+        if (character.skills.length >= 3) { alert(_tr('You can select no more than 3 abilities!')); return; }
         character.skills.push(skillId);
         card.classList.add('selected');
     }
@@ -150,11 +150,11 @@ function toggleSkillSelect(skillId) {
 }
 window.finishCharacterCreation = function() {
     if (Object.values(character.stats).reduce((spent, score) => spent + score - 10, 0) !== 27) {
-        alert('Allocate exactly 27 ability score points.'); return;
+        alert(_tr('Allocate exactly 27 ability score points.')); return;
     }
-    if (character.skills.length !== 3) { alert('Select exactly 3 abilities!'); return; }
+    if (character.skills.length !== 3) { alert(_tr('Select exactly 3 abilities!')); return; }
     myId = document.getElementById('p-name').value.trim();
-    if (!myId) { alert('Enter a player name!'); return; }
+    if (!myId) { alert(_tr('Enter a player name!')); return; }
     try {
         localStorage.setItem('kr_player_id', myId);
         localStorage.setItem('kr_character', JSON.stringify(character));
@@ -171,6 +171,7 @@ function renderBattleAbilitiesButtons() {
     const hero = window.GAME_DATA.heroes[character.heroKey];
     const me = window.lastReceivedState?.players[myId] || { range: hero.baseRange };
     const abilities = [{ key: 'attack', name: 'Basic attack', desc: 'Select an enemy within range. The dice roll happens after confirmation.' }];
+    abilities.push(BATTLE_ABILITY_RULES.disengage);
     activeHeroSkillsPool.forEach(s => {
         if (character.skills.includes(s.id) && s.cooldown > 0 && !s.desc.includes('Passive')) {
             abilities.push({ key: 'spell_' + s.id, ...s });
@@ -260,6 +261,7 @@ function escapeBattleText(value) {
 
 function getAbilityActionTone(abilityKey = activeAbility) {
     if (!abilityKey) return '';
+    if (abilityKey === 'disengage') return 'support';
     const key = abilityKey.replace('spell_', '');
     if (key === 'surgical_laser') return 'mixed';
     if (key === 'blink') return 'move';
@@ -325,7 +327,7 @@ function canMoveHeroTo(state, me, x, y) {
         (me.x === x && me.y === y)) return false;
     if (state.gamePeriod === 'preparation') return true;
     return me.hp > 0 && !(me.deathTimer > 0) && !me.hasMovedThisRound &&
-        Math.max(Math.abs(x - me.x), Math.abs(y - me.y)) <= me.speed + (me.speedBonus || 0);
+        Math.max(Math.abs(x - me.x), Math.abs(y - me.y)) <= (typeof ACTIVATED_EVENT_RULES === 'undefined' ? me.speed + (me.speedBonus || 0) : ACTIVATED_EVENT_RULES.heroSpeed(me, state.roundCounter || 0));
 }
 
 function getRangeContourPath(cellKeys, columns, rows) {
@@ -436,6 +438,7 @@ function getActionBlockReason(me) {
 }
 
 function getBattleDiceSides() {
+    if (activeAbility === 'disengage') return 1;
     if (activeAbility === 'ultimate') return 1;
     const key = activeAbility.replace('spell_', '');
     if (key === 'ground_tremor') return 6;
@@ -472,7 +475,8 @@ function renderBattleControls(state = window.lastReceivedState) {
     }
     const hero = window.GAME_DATA.heroes[character.heroKey];
     const key = activeAbility.replace('spell_', '');
-    const ability = activeAbility === 'ultimate' ? hero?.ultimate : activeHeroSkillsPool.find(s => s.id === key);
+    const ability = activeAbility === 'disengage' ? BATTLE_ABILITY_RULES.disengage :
+        activeAbility === 'ultimate' ? hero?.ultimate : activeHeroSkillsPool.find(s => s.id === key);
     document.getElementById('ability-name').textContent = !activeAbility ? 'No ability selected' : ability?.name || 'Basic attack';
     document.getElementById('ability-description').textContent = !activeAbility ?
         'Select an ability to highlight its range and targets. Click again to clear selection and highlights.' :
@@ -518,7 +522,7 @@ function renderBattleControls(state = window.lastReceivedState) {
     main.hidden = mapMode === 'journal';
     main.disabled = mapMode !== 'action' || !activeAbility || !!reason || (!automatic && !target);
     main.textContent = mapMode !== 'action' ? 'Select an action' : reason || (!automatic && !target ? 'Select a target' :
-        (activeAbility === 'ultimate' ? '⚡ Confirm action' : '🎲 Confirm · d' + getBattleDiceSides()));
+        (activeAbility === 'disengage' ? 'Confirm action' : activeAbility === 'ultimate' ? '⚡ Confirm action' : '🎲 Confirm · d' + getBattleDiceSides()));
     const hint = document.getElementById('map-mode-hint');
     hint.hidden = mapMode === 'journal';
     hint.textContent = mapMode === 'move' ? (state?.gamePeriod === 'preparation' ?
@@ -986,11 +990,11 @@ window.cellClick = function(x, y) {
         let isRoad = (targetCell.type === 'road' || targetCell.type === 'spawn' || targetCell.type === 'castle');
 
         if (!isRoad) {
-            alert('🚩 Soldier rally points can ONLY be placed on roads!');
+            alert(_tr('🚩 Soldier rally points can ONLY be placed on roads!'));
             return;
         }
         if (dist > maxRange) {
-            alert('🚩 Cell too far! Maximum radius from barracks: ' + maxRange + ' cells');
+            alert(_tr('🚩 Cell too far! Maximum radius from barracks: ' + maxRange + ' cells'));
             return;
         }
 
@@ -1123,7 +1127,7 @@ function applyMapZoom() {
 }
 
 window.leaveCharacter = function() {
-    if (confirm("Leave and recreate your character? Your current hero will be removed from the map.")) {
+    if (confirm(_tr("Leave and recreate your character? Your current hero will be removed from the map."))) {
         if (myId) {
             socket.send(JSON.stringify({ type: 'PLAYER_LEAVE', name: myId }));
         }
@@ -1168,9 +1172,9 @@ socket.onmessage = function(e) {
         if (window.lastReceivedState) renderGridAndUI(window.lastReceivedState);
         return;
     }
-    if (rawData.type === 'COMMAND_ERROR') { actionPending = false; updateBattleTargets(); alert(rawData.message); return; }
+    if (rawData.type === 'COMMAND_ERROR') { actionPending = false; updateBattleTargets(); alert(_tr(rawData.message)); return; }
     if (rawData.type === 'KICKED') {
-        alert(rawData.message || 'Your character was removed by the GM.');
+        alert(_tr(rawData.message || 'Your character was removed by the GM.'));
         try {
             localStorage.removeItem('kr_player_id');
             localStorage.removeItem('kr_character');
@@ -1269,7 +1273,7 @@ window.renderGridAndUI = function(state) {
         if (sArmorEl) sArmorEl.innerText = (me.armor || 0) + '%';
         document.getElementById('s-mana').innerText = me.mana + '/' + me.maxMana;
         document.getElementById('s-spd').innerText = state.gamePeriod === 'preparation' ? 'Free' :
-            me.hasMovedThisRound ? '❌ 0 cells' : (me.speed + (me.speedBonus || 0)) + ' cells';
+            me.hasMovedThisRound ? '❌ 0 cells' : (typeof ACTIVATED_EVENT_RULES === 'undefined' ? me.speed + (me.speedBonus || 0) : ACTIVATED_EVENT_RULES.heroSpeed(me, state.roundCounter || 0)) + ' cells';
         if (selectedTowerCoords) updateTowerDemolishButton(state.grid[selectedTowerCoords.y]?.[selectedTowerCoords.x], state);
         document.getElementById('s-base').innerText = state.baseHp;
 
@@ -1456,6 +1460,7 @@ window.renderGridAndUI = function(state) {
             let cellEnemies = state.enemies.filter(en => en.x === x && en.y === y && en.hp > 0);
             cellEnemies.forEach((enemy, idx) => {
                 var enemyProto = (window.GAME_DATA && GAME_DATA.enemies && GAME_DATA.enemies[enemy.type]) || { color: '#2e7d32', shortName: enemy.name.substring(0,3) };
+                if (enemy.eventKind) enemyProto = { color: enemy.eventKind === 'goldenGoblin' ? '#a36b00' : '#69428c', shortName: { goldenGoblin:'💰', goblinTower:'🏚', ritualTotem:'🔮' }[enemy.eventKind] || enemy.name.substring(0,3) };
                 var isSheep = enemy.isPolymorphed || (enemy.polymorphTurns > 0);
                 var bgCol = isSheep ? '#ffffff' : enemyProto.color;
                 var dispText = enemyProto.shortName;
@@ -1571,6 +1576,7 @@ window.renderGridAndUI = function(state) {
     }
 
     applyCoordsVisibility();
+    if (typeof ACTIVATED_EVENT_OVERLAYS !== 'undefined') ACTIVATED_EVENT_OVERLAYS.render(g, state);
 
     updateBattleTargets(state);
     if (selectedBuildSlot && document.getElementById('build-modal-backdrop').style.display === 'flex') {

@@ -23,7 +23,7 @@ module.exports = function createSceneDirector(ctx) {
             case 'defeated': return (runtime.defeated[rule.enemyType] || 0) >= rule.count;
             case 'enemyHp': return state.enemies.some(enemy=>enemy.type === rule.enemyType && enemy.hp > 0 && enemy.hp*100 <= (enemy.maxHp || enemy.hp)*rule.percent);
             case 'goal': return runtime.goals[rule.goalId]?.status === rule.status;
-            case 'clear': return runtime.battleStarted && !state.enemies.some(enemy=>enemy.hp > 0) && !(state.pendingSpawns || []).length &&
+            case 'clear': return runtime.battleStarted && !state.enemies.some(enemy=>enemy.hp > 0 && enemy.eventKind !== 'goldenGoblin') && !(state.pendingSpawns || []).length &&
                 (!forGoal || !state.sceneMaster.scenario.events.some(event=>!['done','skipped'].includes(runtime.events[event.id].status) && event.actions.some(action=>['spawn','wave'].includes(action.kind))));
             default: return false;
         }

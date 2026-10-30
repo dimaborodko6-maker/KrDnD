@@ -145,12 +145,18 @@ test('новая волна сбрасывает Fated Survivor и бонус у
     assert.equal(hero.fatedUsedThisWave,false);assert.equal(g.state.soldiers[0].dmg,20);
     hero.hp=0;g.applyDeathOrSurvival(hero);assert.ok(hero.hp>0);
 });
-test('offsetDelay выпускает группы на соответствующих ходах, не объявляя волну завершённой заранее',()=>{
+test('offsetDelay начинает группы на соответствующих ходах, затем враги выходят по одному за ход',()=>{
     const g=game();g.send(g.master,{type:'MASTER_START_PRESET_WAVE',waveIndex:1});
-    assert.equal(g.state.enemies.length,3);assert.equal(g.state.pendingSpawns.length,4);
-    g.state.enemies=[];g.moveEnemies();assert.equal(g.state.enemies.length,2);assert.equal(g.state.pendingSpawns.length,2);
-    assert.ok(g.state.actionLogs.every(entry=>!entry.text.includes('ВОЛНА ЗАЧИЩЕНА')));
-    g.moveEnemies();assert.equal(g.state.enemies.length,4);assert.equal(g.state.pendingSpawns.length,0);
+    assert.deepEqual(Array.from(g.state.enemies,e=>e.type),['bandit']);
+    assert.equal(g.state.pendingSpawns.length,6);
+    for (const [types,pending] of [[['bandit','shadow_blade'],4],[['bandit','shadow_blade','shadow_archer'],1],[['shadow_archer'],0]]) {
+        g.state.enemies=[];g.moveEnemies();
+        assert.deepEqual(Array.from(g.state.enemies,e=>e.type),types);
+        assert.equal(g.state.pendingSpawns.length,pending);
+        assert.ok(g.state.actionLogs.every(entry=>!entry.text.includes('WAVE CLEARED')));
+    }
+    g.state.enemies=[];g.moveEnemies();
+    assert.ok(g.state.actionLogs.some(entry=>entry.text.includes('WAVE CLEARED')));
 });
 test('сброс сессии удаляет отложенные группы, мины и напалм',()=>{
     const g=game();g.send(g.master,{type:'MASTER_START_PRESET_WAVE',waveIndex:1});g.state.mines.push({x:1,y:2,damage:10});g.state.napalmPuddles=[{x:1,y:2,turns:2}];

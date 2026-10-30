@@ -81,8 +81,8 @@ test('редактор синхронизирует клиентов, не пе�
     const js = await (await fetch(`http://127.0.0.1:${port}/gamedata.js`)).text();
     assert.ok(js.includes('custom_1'));assert.ok(!js.includes('<моб>'));
     const wave = await send(master,{type:'MASTER_START_PRESET_WAVE',waveIndex:draft.presetWaves.length-1},'STATE_UPDATE');
-    assert.equal(wave.state.enemies.length,2);assert.equal(wave.state.enemies[0].hp,77);assert.equal(wave.state.enemies[0].meleeDmg,17);
-    assert.equal(wave.state.pendingSpawns.length,1);
+    assert.equal(wave.state.enemies.length,1);assert.equal(wave.state.enemies[0].hp,77);assert.equal(wave.state.enemies[0].meleeDmg,17);
+    assert.equal(wave.state.pendingSpawns.length,2);
     const spawned = await send(master,{type:'MASTER_SPAWN_ENEMY',enemyType:'custom_1',count:1,x:1,y:1},'STATE_UPDATE');
     assert.equal(spawned.state.enemies.at(-1).hp,77);
     saved.catalog.enemies.custom_1.hp=99;

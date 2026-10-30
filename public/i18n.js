@@ -6,13 +6,23 @@
   const en2ru = dict.en2ru || {};
   const ru2en = dict.ru2en || {};
 
-  // Sort English keys by length descending for greedy substring matching in compound logs
-  let sortedEnKeys = null;
-  function getSortedEnKeys() {
-    if (!sortedEnKeys) {
-      sortedEnKeys = Object.keys(en2ru).filter(k => k.length >= 3).sort((a, b) => b.length - a.length);
+  // Match original text once, longest phrase first. Never translate inside words
+  // or feed a translated fragment back through the dictionary.
+  const compoundPatterns = {};
+  function translateCompound(text, lang) {
+    const translations = lang === 'ru' ? en2ru : ru2en;
+    if (!compoundPatterns[lang]) {
+      const word = '[\\p{L}\\p{N}_]';
+      const keys = Object.keys(translations).filter(key => key.length >= 3)
+        .sort((a, b) => b.length - a.length);
+      if (!keys.length) return text;
+      compoundPatterns[lang] = new RegExp(keys.map(key => {
+        const escaped = key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        return (/^[\p{L}\p{N}_]/u.test(key) ? `(?<!${word})` : '') + escaped +
+          (/[\p{L}\p{N}_]$/u.test(key) ? `(?!${word})` : '');
+      }).join('|'), 'gu');
     }
-    return sortedEnKeys;
+    return text.replace(compoundPatterns[lang], match => translations[match]);
   }
 
   function getLang() {
@@ -51,8 +61,8 @@
       if ((m = trimmed.match(/^Мобы (\d+)$/))) return text.replace(trimmed, `Enemies ${m[1]}`);
       if ((m = trimmed.match(/^Раунд (\d+)$/))) return text.replace(trimmed, `Round ${m[1]}`);
       if ((m = trimmed.match(/^ход (\d+)$/))) return text.replace(trimmed, `turn ${m[1]}`);
-      if ((m = trimmed.match(/^(\d+) игроков$/))) return text.replace(trimmed, `${m[1]} players`);
-      return text;
+      if ((m = trimmed.match(/^(\d+) (?:игрок|игрока|игроков)$/))) return text.replace(trimmed, `${m[1]} ${Number(m[1]) === 1 ? 'player' : 'players'}`);
+      return translateCompound(text, lang);
     }
 
     // lang === 'ru'
@@ -67,19 +77,14 @@
     if ((m = trimmed.match(/^Enemies (\d+)$/))) return text.replace(trimmed, `Мобы ${m[1]}`);
     if ((m = trimmed.match(/^Round (\d+)$/))) return text.replace(trimmed, `Раунд ${m[1]}`);
     if ((m = trimmed.match(/^turn (\d+)$/))) return text.replace(trimmed, `ход ${m[1]}`);
-    if ((m = trimmed.match(/^(\d+) players$/))) return text.replace(trimmed, `${m[1]} игроков`);
-    if ((m = trimmed.match(/^1 player$/))) return text.replace(trimmed, `1 игрок`);
-
-    // Substring replacement for compound action/debug logs
-    let res = text;
-    const keys = getSortedEnKeys();
-    for (let i = 0; i < keys.length; i++) {
-      const k = keys[i];
-      if (res.includes(k)) {
-        res = res.split(k).join(en2ru[k]);
-      }
+    if ((m = trimmed.match(/^(\d+) players?$/))) {
+      const count = Number(m[1]);
+      const lastTwo = count % 100;
+      const last = count % 10;
+      const noun = lastTwo >= 11 && lastTwo <= 14 ? 'игроков' : last === 1 ? 'игрок' : last >= 2 && last <= 4 ? 'игрока' : 'игроков';
+      return text.replace(trimmed, `${m[1]} ${noun}`);
     }
-    return res;
+    return translateCompound(text, lang);
   }
 
   // Translate dynamic game data in memory
@@ -123,7 +128,7 @@
           h.description = h._orig_desc;
         }
 
-        (h.skills || []).forEach(s => {
+        [...(h.skills || []), ...(h.ultimate ? [h.ultimate] : [])].forEach(s => {
           if (!s._orig_name) s._orig_name = s.name;
           if (!s._orig_desc) s._orig_desc = s.desc;
           if (lang === 'ru') {
@@ -136,6 +141,14 @@
         });
       });
     }
+
+    (data.presetWaves || []).forEach(wave => {
+      for (const prop of ['title', 'desc']) {
+        const original = '_orig_' + prop;
+        if (!Object.hasOwn(wave, original)) wave[original] = wave[prop];
+        wave[prop] = t(wave[original], lang);
+      }
+    });
 
     // Towers
     function translateTowerMap(towers) {
@@ -260,34 +273,44 @@
   }
 
   // Translate all marked or suitable static elements in the DOM
+  const domTranslations = new WeakMap();
+  function translateValue(node, key, value, lang) {
+    let records = domTranslations.get(node);
+    if (!records) {
+      records = {};
+      domTranslations.set(node, records);
+    }
+    let record = records[key];
+    if (!record || value !== record.rendered) record = { source: value };
+    record.rendered = t(record.source, lang);
+    records[key] = record;
+    return record.rendered;
+  }
+
   function translateDOM(root, lang) {
     if (!root || typeof document === 'undefined') return;
+    function excluded(node) {
+      for (let current = node; current; current = current.parentNode) {
+        if (['SCRIPT', 'STYLE', 'PRE', 'CODE', 'TEXTAREA'].includes((current.tagName || '').toUpperCase()) ||
+            current.id === 'log-box' || current.id === 'debug-log-box' ||
+            (current.classList && (current.classList.contains('no-i18n') || current.classList.contains('no-translate')))) return true;
+      }
+      return false;
+    }
+    // Textareas keep their user-entered value; their placeholder can be translated.
+    if (excluded(root) && (root.tagName || '').toUpperCase() !== 'TEXTAREA') return;
 
     if (root.nodeType === 1) {
-      // Elements with data-i18n
-      root.querySelectorAll('[data-i18n]').forEach(el => {
-        if (!el._orig_text) el._orig_text = el.textContent.trim();
-        el.textContent = lang === 'ru' ? (en2ru[el._orig_text] || t(el._orig_text, 'ru')) : el._orig_text;
-      });
-
-      // Placeholders
-      root.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(inp => {
-        if (!inp._orig_placeholder) inp._orig_placeholder = inp.placeholder;
-        inp.placeholder = lang === 'ru' ? (en2ru[inp._orig_placeholder] || t(inp._orig_placeholder, 'ru')) : inp._orig_placeholder;
-      });
-
-      // Titles / tooltips
-      root.querySelectorAll('[title]').forEach(el => {
-        if (!el._orig_title) el._orig_title = el.getAttribute('title');
-        const val = el._orig_title;
-        el.setAttribute('title', lang === 'ru' ? (en2ru[val] || t(val, 'ru')) : val);
-      });
-
-      // aria-label
-      root.querySelectorAll('[aria-label]').forEach(el => {
-        if (!el._orig_aria) el._orig_aria = el.getAttribute('aria-label');
-        const val = el._orig_aria;
-        el.setAttribute('aria-label', lang === 'ru' ? (en2ru[val] || t(val, 'ru')) : val);
+      // Include the root: observers often receive a newly inserted input/button.
+      const elements = [root, ...root.querySelectorAll('[placeholder], [title], [aria-label]')];
+      elements.forEach(el => {
+        if (excluded(el) && (el.tagName || '').toUpperCase() !== 'TEXTAREA') return;
+        for (const attr of ['placeholder', 'title', 'aria-label']) {
+          if (!el.hasAttribute(attr)) continue;
+          const value = el.getAttribute(attr);
+          const translated = translateValue(el, attr, value, lang);
+          if (translated !== value) el.setAttribute(attr, translated);
+        }
       });
     }
 
@@ -295,31 +318,11 @@
     walkTextNodes(root, (node, isOption) => {
       const raw = isOption ? node.textContent : node.nodeValue;
       if (!raw) return;
-      const trimmed = raw.trim();
-      if (!trimmed || !/[a-zA-Zа-яА-ЯёЁ]/.test(trimmed)) return;
-
-      if (lang === 'ru') {
-        if (!node._orig_text) node._orig_text = raw;
-        const origTrimmed = node._orig_text.trim();
-        const tr = en2ru[origTrimmed] || en2ru[trimmed] || t(trimmed, 'ru');
-        if (tr && tr !== trimmed) {
-          const updated = raw.replace(trimmed, tr);
-          if (isOption) node.textContent = updated;
-          else node.nodeValue = updated;
-        }
-      } else {
-        if (node._orig_text) {
-          if (isOption) node.textContent = node._orig_text;
-          else node.nodeValue = node._orig_text;
-        } else {
-          const tr = ru2en[trimmed] || t(trimmed, 'en');
-          if (tr && tr !== trimmed) {
-            const updated = raw.replace(trimmed, tr);
-            if (isOption) node.textContent = updated;
-            else node.nodeValue = updated;
-          }
-        }
-      }
+      if (!raw.trim() || !/[a-zA-Zа-яА-ЯёЁ]/.test(raw)) return;
+      const updated = translateValue(node, 'text', raw, lang);
+      if (updated === raw) return;
+      if (isOption) node.textContent = updated;
+      else node.nodeValue = updated;
     });
   }
 
@@ -334,7 +337,8 @@
       isTranslating = true;
       try {
         for (const m of mutations) {
-          for (const added of m.addedNodes) {
+          if (m.type === 'characterData' || m.type === 'attributes') translateDOM(m.target, 'ru');
+          for (const added of m.addedNodes || []) {
             if (added.nodeType === 1 || added.nodeType === 3) {
               translateDOM(added, 'ru');
             }
@@ -345,7 +349,8 @@
       }
     });
     if (document.body) {
-      observer.observe(document.body, { childList: true, subtree: true });
+      observer.observe(document.body, { childList: true, subtree: true, characterData: true,
+        attributes: true, attributeFilter: ['placeholder', 'title', 'aria-label'] });
     }
   }
 
@@ -354,6 +359,7 @@
     if (typeof document === 'undefined') return;
 
     document.documentElement.lang = lang;
+    document.title = translateValue(document, 'title', document.title, lang);
 
     // 1. Update Game Data
     applyGameDataLanguage(lang);

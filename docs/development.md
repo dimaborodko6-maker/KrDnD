@@ -1,5 +1,7 @@
 # Architecture and development
 
+Start with [AGENTS.md](../AGENTS.md) for maintenance instructions, routing and the balance design model. [README.md](../README.md) introduces the game to players and hosts.
+
 Node.js/CommonJS, Express and `ws`; ordinary HTML/CSS/JavaScript with no frontend build. HTTP and WebSocket share one port. A process owns one in-memory world, with JSON persistence rather than a database.
 
 ## Sources of truth
@@ -42,7 +44,7 @@ npm ci --ignore-scripts
 npm run check
 ```
 
-The suite covers mechanics, role restrictions, atomic commands, saves, rollback, editor validation, scenes, adventures and UI behavior. Tests use temporary files or in-memory harnesses; they do not require a user's live save. There is no configured general-purpose style linter.
+The suite covers mechanics, role restrictions, atomic commands, saves, rollback, editor validation, scenes, adventures and UI behavior. Tests use temporary files or in-memory harnesses; they do not require a user's live save. ESLint is configured via `npm run lint`; it is separate from `npm run check`.
 
 Use targeted tests during development, then run the full check after executable changes. For UI changes also inspect the actual browser, including long English labels, small viewports, invalid actions and disconnected states. Test names/comments and Unicode fixtures retained from the source may be Russian; executable product text is English.
 
@@ -55,7 +57,7 @@ $env:KR_LOG_FILE = 'C:\Games\Kr6DnD-test\game.log'
 npm start
 ```
 
-The launcher creates missing data directories and copies starter catalog/library files only if missing. Use a separate browser profile if its cached hero belongs to a different test. Check GM and player sync, movement, tower building, ability use, a wave round, scene editing and restart recovery. Do not use a real campaign file as scratch data.
+The example assumes that the save directory already exists. `scripts/start.cjs` can create data directories and copy missing starter catalog/library files, but the current `npm start` and platform launchers run `server.js` directly; they do not perform that seeding step. Use a separate browser profile if its cached hero belongs to a different test. Check GM and player sync, movement, tower building, ability use, a wave round, scene editing and restart recovery. Do not use a real campaign file as scratch data.
 
 ## Documentation
 

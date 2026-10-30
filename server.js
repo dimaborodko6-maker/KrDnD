@@ -17,6 +17,8 @@ const GAME_DATA = require('./public/gamedata.js');
 const TOWER_RULES = require('./public/tower-rules.js');
 const BATTLE_ABILITY_RULES = require('./public/battle-ability-rules.js');
 const MASTER_CONTROLS = require('./master-controls');
+const ACTIVATED_EVENT_RULES = require('./public/activated-event-rules');
+Object.assign(MASTER_CONTROLS.labels, { MASTER_ACTIVATE_EVENT: 'Activate event', MASTER_FINISH_EVENT: 'Finish event' });
 const TOWER_CATALOG_DATA = require('./public/tower-catalog-data.js');
 const BALANCE = require('./balance');
 if (!process.env.NODE_TEST_CONTEXT) {
@@ -71,6 +73,7 @@ let gameState = {
     players: {},
     enemies: [],
     pendingSpawns: [],
+    activeEvents: [],
     mines: [],
     napalmPuddles: [],
     poisonPuddles: [],
@@ -222,11 +225,11 @@ function getModifier(score) {
 }
 
 // Все атаки по защитникам используют один порядок: иммунитет, броня, барьер, ХП.
-function applyIncomingDamage(target, rawDamage, { attacker = null, melee = false } = {}) {
+function applyIncomingDamage(target, rawDamage, { attacker = null, melee = false, damageType = null } = {}) {
     if (target.invulnerableRounds > 0 || target.hp <= 0) return 0;
     if (melee && target.parryRounds > 0 && attacker) {
         target.parryRounds = 0;
-        const counter = Math.max(1, Math.round((target.parryDamage || 1) * (100 - (attacker.armor || 0)) / 100));
+        const counter = Math.max(1, Math.round((target.parryDamage || 1) * (100 - Math.min(100, (attacker.armor || 0) + ACTIVATED_EVENT_RULES.auraBonus(gameState, attacker, 'armor'))) / 100));
         mobTraits.damage(attacker,counter);
         target.parryDamage = 0;
         logAction(Date.now(), `⚔️ PARRY: ${target.heroName} parried the attack from [${attacker.name}] and dealt ${counter} physical damage!`);
@@ -238,7 +241,8 @@ function applyIncomingDamage(target, rawDamage, { attacker = null, melee = false
     }
     let damage = Math.max(0, attacker ? mobTraits.attackDamage(attacker,rawDamage) : rawDamage);
     if (target.heroKey === 'torghar' && (target.skills || []).includes('flat_reduction')) damage = Math.max(0, damage - 3);
-    const armor = Math.min(100, Math.max(target.armor || 0, target.heroKey === 'gerald' ? 30 : 0));
+    const armor = damageType === 'pure' ? 0 : damageType === 'magic' ? Math.min(100, Math.max(0, target.magicRes || 0)) :
+        Math.min(100, Math.max(target.armor || 0, target.heroKey === 'gerald' ? 30 : 0));
     damage = Math.max(0, Math.round(damage * (100 - armor) / 100));
     if (melee && attacker && target.retributionShield > 0) {
         const reflected = Math.min(damage, target.retributionShield);
@@ -296,6 +300,8 @@ function isTowerTypeAvailable(type) {
 }
 
 function restorePreparationHero(player) {
+    delete player.frostSlowUntilRound;
+    delete player.disengaged;
     player.hp = player.maxHp;
     player.mana = player.maxMana;
     player.deathTimer = 0;
@@ -342,7 +348,7 @@ function triggerMinesAt(x, y) {
     gameState.mines = gameState.mines.filter(mine => !mines.includes(mine));
     for (const mine of mines) {
         for (const enemy of gameState.enemies.filter(e => e.hp > 0 && !e.isFlying && e.x === x && e.y === y)) {
-            const damage = Math.max(1, Math.round(mine.damage * (100 - (enemy.armor || 0)) / 100));
+            const damage = Math.max(1, Math.round(mine.damage * (100 - Math.min(100, (enemy.armor || 0) + ACTIVATED_EVENT_RULES.auraBonus(gameState, enemy, 'armor'))) / 100));
             mobTraits.damage(enemy,damage);
             logAction(Date.now(), `💣 MINE: [${enemy.name}] took ${damage} physical damage at (${x}, ${y})!`);
             if (enemy.hp <= 0) gameState.gold += enemy.reward || 0;
@@ -352,6 +358,7 @@ function triggerMinesAt(x, y) {
 }
 
 function resolveCastleArrival(enemy) {
+    if (enemy.eventKind) return false;
     if (enemy.hp <= 0 || gameState.grid[enemy.y]?.[enemy.x]?.type !== 'castle') return false;
     const old = gameState.baseHp;
     const penalty = enemy.livesTaken || 1;
@@ -521,7 +528,8 @@ function checkNecromancerRaiseSkeleton(enemy) {
 }
 
 function resolveEnemyDeath(enemy) {
-    sceneDirector.enemyDied(enemy);
+    if (!enemy.eventKind) sceneDirector.enemyDied(enemy);
+    if (enemy.eventStructure) return;
     mobTraits.onDeath(enemy);
     checkAndSpawnDismount(enemy);
     checkNecromancerRaiseSkeleton(enemy);
@@ -711,7 +719,30 @@ function processPriestessHealPrayer() {
 }
 
 
+function damageFromActivatedEvent(unit, amount, type) {
+    if (unit.hp <= 0) return;
+    if (gameState.enemies.includes(unit)) {
+        const armor = Math.min(100, (unit.armor || 0) + ACTIVATED_EVENT_RULES.auraBonus(gameState, unit, 'armor'));
+        const resist = type === 'magic' ? (unit.magicRes || 0) : type === 'physical' ? armor : 0;
+        mobTraits.damage(unit, Math.max(0, Math.round(amount * (100 - Math.min(100, Math.max(0, resist))) / 100)));
+        if (unit.hp <= 0) gameState.gold += unit.reward || 0;
+    } else {
+        applyIncomingDamage(unit, amount, { damageType: type === 'true' ? 'pure' : type });
+        if (Object.values(gameState.players).includes(unit)) applyDeathOrSurvival(unit);
+        else if (unit.hp <= 0) {
+            unit.blockedEnemyIds = [];
+            if (!unit.isSkeleton && !unit.isTemporary) unit.respawnTimer = GAME_DATA.towers[unit.towerType]?.respawnTurns || 2;
+        }
+    }
+}
+const activatedEvents = require('./activated-events')({
+    getState: () => gameState, getData: () => GAME_DATA, createEnemy,
+    damage: damageFromActivatedEvent, removeDeadEnemies, refreshBlocks: refreshHeroBlocks, triggerMinesAt,
+    log: text => logAction(Date.now(), text), random: () => Math.random()
+});
+
 const combatEngine = require('./combat-engine')({
+    activatedEvents,
     getState: () => gameState,
     getData: () => GAME_DATA,
     getModifier,
@@ -775,7 +806,7 @@ function startScenarioWave(waveDef) {
     }
     if (spawnPoints.length === 0) spawnPoints.push({ x: 0, y: 0 });
 
-    // offsetDelay измеряется ходами волны и сохраняется вместе с миром.
+    // Задержка задаёт начало группы; каждый вход выпускает одного её врага за ход.
     resetWaveBonuses();
     Object.values(gameState.players).forEach(player => {
         player.fatedUsedThisWave = false; player.bolinShotCount = 0;
@@ -786,7 +817,7 @@ function startScenarioWave(waveDef) {
         if (!GAME_DATA.enemies[group.type]) return;
         for (let i = 0; i < group.count; i++) {
             const sp = spawnPoints[i % spawnPoints.length];
-            const delay = Math.max(0, group.offsetDelay || 0);
+            const delay = Math.max(0, group.offsetDelay || 0) + Math.floor(i / spawnPoints.length);
             if (delay === 0) gameState.enemies.push(createEnemy(group.type, sp.x, sp.y));
             else gameState.pendingSpawns.push({ type: group.type, x: sp.x, y: sp.y, round: (gameState.roundCounter || 0) + delay });
             spawnedCount++;
@@ -794,7 +825,7 @@ function startScenarioWave(waveDef) {
     });
 
     gameState.phase = 'player';
-    logAction(Date.now(), `🚨 WAVE START: The GM launched [${waveDef.title}]! This wave contains ${spawnedCount} enemies; delayed groups will appear on subsequent turns.`);
+    logAction(Date.now(), `🚨 WAVE START: The GM launched [${waveDef.title}]! This wave contains ${spawnedCount} enemies; each group releases one enemy per spawn point per turn.`);
 }
 
 function activatePreparedScene(sceneId, adventure = null) {
@@ -802,8 +833,8 @@ function activatePreparedScene(sceneId, adventure = null) {
     const players = gameState.players;
     gameState = {gold:scene.gold,baseHp:scene.baseHp,wave:1,roundCounter:0,phase:'player',gamePeriod:'preparation',
         grid:scene.grid,gridWidth:scene.gridWidth,gridHeight:scene.gridHeight,availableTowerTypes:scene.availableTowerTypes,
-        players,enemies:[],pendingSpawns:[],soldiers:[],mines:[],napalmPuddles:[],demolishVote:null,actionLogs:[],debugLogs:[],
-        sceneMaster:{id:scene.id,kind:scene.kind,scenario:scene.scenario,cards:scene.cards,title:scene.title,description:scene.description,objectives:scene.objectives,waves:scene.waves,
+        players,enemies:[],pendingSpawns:[],activeEvents:[],soldiers:[],mines:[],napalmPuddles:[],demolishVote:null,actionLogs:[],debugLogs:[],
+        sceneMaster:{id:scene.id,kind:scene.kind,scenario:scene.scenario,cards:scene.cards,eventPresets:scene.eventPresets || [],title:scene.title,description:scene.description,objectives:scene.objectives,waves:scene.waves,
             noteRevision:0,notes:scene.notes.map(note => ({...note,revealed:false}))}};
     const spawn = scene.grid.flat().find(cell => cell.type === 'spawn') || {x:0,y:0};
     for (const player of Object.values(players)) {
@@ -811,7 +842,7 @@ function activatePreparedScene(sceneId, adventure = null) {
         if (player.shieldWallRounds > 0) player.armor = Math.max(0,(player.armor || 0)-(player.shieldWallArmorBonus ?? 25));
         if (player.blockLimitBeforeUltimate !== undefined) player.blockLimit = player.blockLimitBeforeUltimate;
         for (const field of ['shieldWallRounds','shieldWallArmorBonus','blockLimitBeforeUltimate','invulnerableRounds','shieldHp',
-            'retributionShield','parryRounds','parryDamage','speedBonus','speedBonusRounds','naniteCloudRounds','godDamageOverride']) delete player[field];
+            'retributionShield','parryRounds','parryDamage','speedBonus','speedBonusRounds','naniteCloudRounds','godDamageOverride','frostSlowUntilRound']) delete player[field];
         player.blockedEnemyIds = [];
         restorePreparationHero(player);
     }
@@ -888,6 +919,7 @@ wss.on('connection', (ws, request) => {
             if (msg.type === 'EDITOR_GET_CATALOG') { sendCatalog(ws); return; }
             try {
                 const neededTypes = [...(gameState.pendingSpawns || []).map(entry => entry.type),
+                    ...(gameState.activeEvents || []).filter(event => ['goblinTower','ritualTotem'].includes(event.kind)).map(event => event.config.enemyType),
                     ...gameState.enemies.filter(enemy => enemy.hp > 0).map(enemy => enemy.traits?.summoning?.type).filter(Boolean)];
                 catalogStore.save(msg.catalog,msg.revision,neededTypes);
                 playerHistory = [];
@@ -908,6 +940,25 @@ wss.on('connection', (ws, request) => {
         processingCommand = true;
         try {
         switch (msg.type) {
+            case 'MASTER_ACTIVATE_EVENT':
+            case 'MASTER_FINISH_EVENT': {
+                let result;
+                if (clientRole !== 'master') result = { ok: false, error: 'Only the GM can manage this' };
+                else {
+                    try {
+                        if (msg.type === 'MASTER_ACTIVATE_EVENT') activatedEvents.activate(msg.config);
+                        else activatedEvents.finish(msg.id);
+                        result = { ok: true };
+                        broadcastState();
+                    } catch (error) {
+                        gameState = JSON.parse(before);
+                        combatEvents.clear();
+                        result = { ok: false, error: error.message };
+                    }
+                }
+                ws.send(JSON.stringify({ type: 'EVENT_RESULT', requestId: msg.requestId, ...result }));
+                break;
+            }
             case 'MASTER_CLEAR_ENEMIES':
             case 'MASTER_MANAGE_ENEMIES':
             case 'MASTER_RESTORE_HEROES':
@@ -1120,6 +1171,7 @@ wss.on('connection', (ws, request) => {
                 gameState.demolishVote = null;
                 gameState.rosterVote = null;
                 Object.values(gameState.players).forEach(player => {
+                    delete player.disengaged;
                     player.hasMovedThisRound = false;
                     player.hasAttackedThisRound = false;
                     player.isReady = false;
@@ -1292,6 +1344,9 @@ wss.on('connection', (ws, request) => {
                     let newH = parseInt(msg.height);
                     if (isNaN(newW) || newW < 8 || newW > 40) newW = 16;
                     if (isNaN(newH) || newH < 8 || newH > 40) newH = 16;
+                    if ((gameState.activeEvents || []).length && (newW < gameState.gridWidth || newH < gameState.gridHeight)) {
+                        sendError(ws, 'End active events before shrinking the map'); return;
+                    }
 
                     let oldGrid = gameState.grid || [];
                     let newGrid = [];
@@ -1348,6 +1403,7 @@ wss.on('connection', (ws, request) => {
 
             case 'MASTER_RESET_SESSION':
                 if (clientRole === 'master') {
+                    gameState.activeEvents = [];
                     gameState.players = {};
                     gameState.enemies = [];
                     gameState.pendingSpawns = [];
@@ -1383,6 +1439,7 @@ wss.on('connection', (ws, request) => {
 
             case 'MASTER_RESET_FULL':
                 if (clientRole === 'master') {
+                    gameState.activeEvents = [];
                     let gwFull = gameState.gridWidth || 16;
                     let ghFull = gameState.gridHeight || 16;
                     gameState.players = {};
@@ -1542,14 +1599,15 @@ wss.on('connection', (ws, request) => {
                 const distance = Math.max(Math.abs(player.x - msg.x), Math.abs(player.y - msg.y));
                 const preparation = gameState.gamePeriod === 'preparation';
                 if (clientRole !== 'master' && !preparation) {
-                    if (player.hp <= 0 || player.deathTimer > 0 || player.hasMovedThisRound || distance > player.speed + (player.speedBonus || 0)) {
+                    if (player.hp <= 0 || player.deathTimer > 0 || player.hasMovedThisRound || distance > ACTIVATED_EVENT_RULES.heroSpeed(player, gameState.roundCounter || 0)) {
                         sendError(ws, 'Movement unavailable or cell too far away'); return;
                     }
                     player.hasMovedThisRound = true;
                     player.isReady = false;
                     for (const enemyId of [...(player.blockedEnemyIds || [])]) {
+                        if (player.disengaged) break;
                         const enemy = gameState.enemies.find(e => e.id === enemyId && e.hp > 0);
-                        if (!enemy || enemy.stunTurns > 0 || enemy.isPolymorphed) continue;
+                        if (!enemy || enemy.eventKind || enemy.stunTurns > 0 || enemy.isPolymorphed) continue;
                         const oldDistance = Math.max(Math.abs(player.x - enemy.x), Math.abs(player.y - enemy.y));
                         const newDistance = Math.max(Math.abs(msg.x - enemy.x), Math.abs(msg.y - enemy.y));
                         if (oldDistance > 1 || newDistance <= oldDistance) continue;

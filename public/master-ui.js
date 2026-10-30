@@ -100,6 +100,7 @@ function setTreasury() {
 
 clickCell = function(x, y) {
     if (!lastState) return;
+    if (typeof MASTER_ACTIVATED_EVENTS !== 'undefined' && MASTER_ACTIVATED_EVENTS.pickCell(x, y)) return;
     if (masterEnemyMove) {
         sendMaster({ type: 'MASTER_MANAGE_ENEMIES', action: 'move', ids: masterEnemyMove, x, y });
         masterEnemyMove = null; cancelMapAction(); return;
@@ -324,6 +325,8 @@ function renderMasterPanels(state) {
     if (typeof renderWaveDescription === 'function') renderWaveDescription();
     if (typeof applyMasterZoom === 'function') applyMasterZoom();
     if (typeof renderMasterControls === 'function') renderMasterControls();
+    if (typeof MASTER_ACTIVATED_EVENTS !== 'undefined') MASTER_ACTIVATED_EVENTS.render(state);
+    if (typeof ACTIVATED_EVENT_OVERLAYS !== 'undefined') ACTIVATED_EVENT_OVERLAYS.render(ui('game-grid'), state);
     if (activeMasterTower && !state.grid[activeMasterTower.y]?.[activeMasterTower.x]) closeMasterTowerModal();
 }
 function applyMasterZoom() {

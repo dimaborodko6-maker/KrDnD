@@ -76,6 +76,8 @@ Enemies wait: the GM must enable Play before advancing a wave turn. The GM can s
 
 Normal speed, movement, mana and cooldown limits apply. A hero normally has one movement and one action per round. Moving away from an engaged enemy may provoke an attack. A fallen hero waits for revival according to the current rules or is restored by a supported ability or GM intervention.
 
+Every hero has **Disengage**. Select it and confirm without choosing a target. It uses your action instead of attacking, costs no mana and has no cooldown. Until the next round, moving away from engaged enemies provokes no retreat attacks. Disengage does not grant extra movement or protect against normal enemy attacks.
+
 Demolition refunds **60% of the current tower level's cost**, rounded by the server. This is not 60% of everything invested. To reorganize freely between fights, the GM can explicitly return to Preparation.
 
 ## 5. Take a player turn
@@ -131,6 +133,8 @@ The chronicle records outcomes; the debug log contains detailed calculations. HP
 
 Blocking appears only for a real, current link between a living ground enemy and a living defender. Simply standing near an enemy does not guarantee a block. A hero's block limit matters; flying enemies and invalid old links do not create normal blocking icons.
 
+When a ground enemy steps toward the castle, it checks for a defender with free block capacity in this order: a hero on the next cell, a soldier on that cell, an adjacent hero, then an adjacent soldier. Adjacent cells include diagonals. Within each hero group, the hero with the highest effective health takes the block: current HP / (1 - armor / 100). Zero armor uses current HP; 100% armor has infinite priority. Ties preserve the server's player order. Shields, dodge and temporary invulnerability do not affect this comparison. Existing blocks remain with their current defender.
+
 Common effects include bleeding, poison, stun, slow, polymorph, barriers, parry and invulnerability. Status details show remaining turns, shield durability and linked combatants. The display itself does not advance timers.
 
 Some original tower descriptions disagreed with the engine. This edition corrects the verified Musketeer, Arcane Wizard and Tesla upgrade descriptions. The detailed rules and timing are in the developer reference `docs/tower-combat.md`. The game is turn based: cooldowns use the shared round counter, not elapsed real time.
@@ -156,6 +160,8 @@ Open **Prepare Scenes** in a separate tab. Create a new scene or copy the curren
 Set a title, scene type, GM description, starting gold and base health. For combat, create at least one spawn and a castle, connect every spawn to the castle using an unbroken edge-connected road, and place ground enemies on connected road cells. Maps range from 8×8 to 40×40.
 
 Place tower slots and optional prebuilt towers. Include their families in the selected roster. Add enemy groups, copies of catalog waves and map notes. A wave's composition and delays are copied into the scene; enemy stats still use the current catalog when enemies are created.
+
+Wave enemies arrive gradually: each group releases one enemy per spawn point at launch, then another per spawn point on each Wave Turn, starting after its configured delay. Groups can overlap. The wave remains active while enemies are waiting to appear; the saved queue resumes after a server restart.
 
 Save the template. Saving an unfinished combat draft is allowed, but opening it requires a valid playable route. Conversation and exploration scenes can be opened without a combat route. Editing a template does not change an already active scene.
 
@@ -201,3 +207,9 @@ Logs are local at `logs/game.log` unless configured otherwise. They can contain 
 | Unexpected old party | Check the save path and which server process/port you opened |
 
 For a bug report include the release version, Node version, device/browser, exact steps, expected and observed behavior, and a reviewed log excerpt. Keep the original save backed up before trying a fix.
+
+## Activated combat events
+
+During Play the GM can activate Frost, Golden goblin, Sandstorm, Goblin tower, Bombardment, Ritual totem, Warlord banner and Chain lightning. Players see ongoing hazards and warning areas. For Frost, roll Constitution saves at the table and let the GM enter every selected hero's pass/fail result; failed saves deal damage and cap movement at one cell for two player phases. A golden goblin offers 50 G for a kill before it escapes. Goblin towers repeatedly attack and summon, while ritual totems create a one-time reinforcement unless destroyed. Banners strengthen nearby enemies; destroying their bearer removes the aura. Bombardment and delayed lightning give time to move before resolution.
+
+The GM can configure event damage, circular radius and timing, end ongoing events early, or save named settings in Scene Preparation. Live targets are always reselected when activating a preset. Event timers advance with Wave Turn and persist with the party. See [full event defaults and rules](activated-events.md).

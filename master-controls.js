@@ -7,6 +7,7 @@ const labels = {
 };
 const negativeFields = ['bleedTurns', 'poisonTurns', 'paralysisTurns', 'paralyzeTurns', 'stunTurns', 'slowTurns'];
 function cleanse(unit) {
+    delete unit.frostSlowUntilRound;
     negativeFields.forEach(field => { if (field in unit) unit[field] = 0; });
     if (unit.isPolymorphed || unit.polymorphTurns > 0) {
         unit.isPolymorphed = false; unit.polymorphTurns = 0;
@@ -79,6 +80,7 @@ function execute(state, msg, { data, refreshBlocks }) {
         if (!['remove', 'heal', 'hp', 'move', 'cleanse', 'effect'].includes(msg.action)) fail('Unknown action');
         if (msg.action === 'hp' && (!integer(msg.hp, 1, 1000000) || units.some(e => msg.hp > e.maxHp))) fail('HP must be between 1 and each enemy\'s maximum; use the separate command to remove enemies');
         if (msg.action === 'move' && (!integer(msg.x, 0, state.gridWidth - 1) || !integer(msg.y, 0, state.gridHeight - 1))) fail('Cell is outside the map');
+        if (msg.action === 'move' && units.some(unit => unit.eventStructure)) fail('Event structures cannot be relocated');
         const effects = { stun: ['stunTurns'], slow: ['slowTurns'], bleed: ['bleedTurns', 'bleedDmg'], poison: ['poisonTurns', 'poisonDmg'] };
         if (msg.action === 'effect' && (!Object.hasOwn(effects, msg.effect) || !integer(msg.turns, 0, 100) || !integer(msg.power, 1, 1000000))) fail('Invalid effect');
         if (msg.action === 'remove') state.enemies = state.enemies.filter(e => !ids.has(e.id));

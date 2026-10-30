@@ -26,7 +26,7 @@ function sceneSend(message) {
     sceneSocket.send(JSON.stringify(message)); return true;
 }
 function sceneChanged() { sceneDirty = true; sceneControls(); }
-function discardSceneChanges() { return !sceneDirty || confirm('Discard unsaved scene changes?'); }
+function discardSceneChanges() { return !sceneDirty || confirm(_tr('Discard unsaved scene changes?')); }
 function connectSceneEditor() {
     sceneSocket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://')+location.host);
     window.KR_DIAGNOSTICS?.trackSocket(sceneSocket);
@@ -96,6 +96,7 @@ function renderScene() {
     sceneEl('scene-heading').textContent = sceneDraft.title;
     renderSceneRoster(); renderSceneMap(); renderSceneCell(); renderSceneWaves();
     if(typeof renderScenePlanning === 'function')renderScenePlanning();
+    if(typeof renderSceneEventPresets === 'function')renderSceneEventPresets();
 }
 function renderSceneRoster() {
     sceneEl('scene-tower-roster').replaceChildren();
@@ -185,7 +186,7 @@ function openDraftNote(note) {
     sceneEl('scene-note-dialog').showModal();
 }
 function closeDraftNote() {
-    if (notePending && !confirm('Discard note changes?')) return;
+    if (notePending && !confirm(_tr('Discard note changes?'))) return;
     notePending = false; sceneEl('scene-note-dialog').close();
 }
 sceneEl('scene-note-fields').oninput = () => { notePending = true; };
@@ -199,7 +200,7 @@ sceneEl('scene-note-form').onsubmit = event => {
 sceneEl('scene-note-close').onclick = closeDraftNote;
 sceneEl('scene-note-dialog').addEventListener('cancel',event => { event.preventDefault(); closeDraftNote(); });
 sceneEl('scene-note-delete').onclick = () => {
-    if (!confirm('Delete note from draft?')) return;
+    if (!confirm(_tr('Delete note from draft?'))) return;
     sceneDraft.notes = sceneDraft.notes.filter(note => note.id !== noteEditor.id); notePending = false;
     sceneEl('scene-note-dialog').close(); sceneChanged(); renderSceneMap(); renderSceneCell();
 };
@@ -226,13 +227,13 @@ for (const [field,key,numeric] of [['title','title'],['description','description
 sceneEl('new-scene').onclick = () => {
     if (!discardSceneChanges()) return;
     sceneDraft = {id:sceneNewId(),title:'New scene',description:'',objectives:'',gold:300,baseHp:20,gridWidth:16,gridHeight:16,
-        grid:Array.from({length:16},(_,y) => Array.from({length:16},(_,x) => ({x,y,type:'empty'}))),enemies:[],waves:[],notes:[],availableTowerTypes:TOWER_RULES.getBaseTypes(GAME_DATA.towers).slice(0,5)};
+        grid:Array.from({length:16},(_,y) => Array.from({length:16},(_,x) => ({x,y,type:'empty'}))),enemies:[],waves:[],notes:[],eventPresets:[],availableTowerTypes:TOWER_RULES.getBaseTypes(GAME_DATA.towers).slice(0,5)};
     selectedCell = null; sceneDirty = true; renderScene(); sceneNotify('Draft created. Add a map, enemies and notes.');
 };
 sceneEl('capture-scene').onclick = () => { if (discardSceneChanges() && sceneSend({type:'SCENE_CAPTURE'})) { sceneSaving = true; sceneControls(); } };
 sceneEl('duplicate-scene').onclick = () => { sceneDraft = sceneClone(sceneDraft); sceneDraft.id = sceneNewId(); sceneDraft.title = (sceneDraft.title+' — copy').slice(0,160); sceneDirty = true; renderScene(); sceneNotify('Copy created. Save it to the library.'); };
 sceneEl('delete-scene').onclick = () => {
-    if (!confirm('Delete saved scene “'+sceneDraft.title+'”? The current game will continue unchanged.')) return;
+    if (!confirm(_tr('Delete saved scene “'+sceneDraft.title+'”? The current game will continue unchanged.'))) return;
     if (sceneSend({type:'SCENE_DELETE',sceneId:sceneDraft.id,revision:libraryRevision})) { sceneSaving = true; sceneControls(); }
 };
 sceneEl('save-scene').onclick = () => {
@@ -250,7 +251,7 @@ sceneEl('reload-scenes').onclick = () => {
 sceneEl('resize-scene').onclick = () => {
     if (!sceneEl('scene-width').reportValidity() || !sceneEl('scene-height').reportValidity()) return;
     const width = Number(sceneEl('scene-width').value), height = Number(sceneEl('scene-height').value);
-    if ((width < sceneDraft.gridWidth || height < sceneDraft.gridHeight) && !confirm('Shrink the map? Cells outside the new boundary will be removed from the draft.')) return;
+    if ((width < sceneDraft.gridWidth || height < sceneDraft.gridHeight) && !confirm(_tr('Shrink the map? Cells outside the new boundary will be removed from the draft.'))) return;
     sceneDraft.grid = Array.from({length:height},(_,y) => Array.from({length:width},(_,x) => {
         const cell = sceneClone(sceneDraft.grid[y]?.[x] || {x,y,type:'empty'});
         if (cell.rallyPoint && (cell.rallyPoint.x >= width || cell.rallyPoint.y >= height)) delete cell.rallyPoint;
