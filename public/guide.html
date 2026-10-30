@@ -1,0 +1,265 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kr6DnD — Host and Player Guide</title><style>:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#24362e;background:#edf1e9}*{box-sizing:border-box}body{margin:0}main{max-width:960px;margin:32px auto;background:white;padding:54px 64px;border-radius:16px;box-shadow:0 12px 45px #17302612}h1{font-size:42px;line-height:1.12;letter-spacing:-.035em;color:#1a3f2e;margin:12px 0 24px}h2{font-size:25px;margin-top:48px;padding-top:18px;border-top:1px solid #dfe7dc;color:#24513b}h3{font-size:19px;margin-top:28px}p,li{line-height:1.75}li{margin:7px 0}a{color:#25694a;text-underline-offset:3px}table{border-collapse:collapse;width:100%;font-size:14px;display:block;overflow:auto;margin:24px 0}th,td{text-align:left;vertical-align:top;padding:12px 14px;border:1px solid #dfe6da}th{background:#edf3e9}code{font-size:.88em;background:#edf2ea;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}pre{background:#14281e;color:#e3efdf;padding:20px;border-radius:8px;overflow:auto;line-height:1.65}pre code{padding:0;background:none}strong{color:#173d2a}blockquote{border-left:4px solid #8da965;padding:2px 18px;background:#f2f6ed;margin:20px 0}.top{display:flex;gap:16px;font-size:13px;align-items:center;justify-content:space-between;color:#5f7666}.print{border:1px solid #b9ccb7;border-radius:6px;padding:8px 12px;background:#f5f8f1;color:#284c35;cursor:pointer}.map{background:#13241d;padding:22px;border-radius:10px;color:#dcebd4;text-align:center;margin:24px 0}.map svg{max-width:100%;height:auto}.caption{font-size:13px;color:#b5c9b0}.toc{columns:2;column-gap:32px;background:#f2f6ee;padding:18px 24px;border-radius:8px}.toc a{display:block;font-size:14px;padding:5px 0;text-decoration:none;break-inside:avoid}.toc a:hover{text-decoration:underline}@media(max-width:700px){main{margin:0;padding:28px 22px;border-radius:0}h1{font-size:32px}.toc{columns:1}}@media print{:root{background:white}main{box-shadow:none;margin:0;padding:0;border:0;max-width:none}h1{font-size:28pt}h2{break-after:avoid;font-size:18pt}h3{break-after:avoid}p,li,td{font-size:10pt}.top,.toc{display:none}table{display:table}pre{white-space:pre-wrap;color:black;background:#eee}.map{break-inside:avoid}a{color:inherit}}
+</style></head><body><main><div class="top"><a href="index.html">Back to start</a><button class="print" onclick="window.print()">Print / Save PDF</button></div><h1>Kr6DnD: host and player guide</h1><nav class="toc" aria-label="Contents"><a href="#section-1">1. Get everyone connected</a><a href="#section-2">2. Run the supplied training map</a><a href="#section-3">3. Create a hero</a><a href="#section-4">4. Understand Preparation and Play</a><a href="#section-5">5. Take a player turn</a><a href="#section-6">6. Build, upgrade and demolish towers</a><a href="#section-7">7. Read statuses and combat messages</a><a href="#section-8">8. GM tools during a session</a><a href="#section-9">9. Prepare your own scene</a><a href="#section-10">10. Notes, objectives and adventures</a><a href="#section-11">11. Save, back up and recover</a><a href="#section-12">12. Troubleshooting</a></nav>
+<p><strong>English local-play edition · 0.1.0-en.1</strong></p>
+<p>Kr6DnD combines a shared tower defense battlefield with hero abilities and a human game master. Players protect the castle together. The GM sets up the map, decides when the action moves forward and manages the surrounding adventure.</p>
+<h2 id="section-1">1. Get everyone connected</h2>
+<p>One computer runs the server. That computer needs Node.js 24 LTS; the other devices need only a browser. Install dependencies and start using <code>Start-Game.cmd</code> on Windows, <code>sh start-game.sh</code> on macOS/Linux, or <code>npm ci --ignore-scripts</code> followed by <code>npm start</code>.</p>
+<p>Open <code>http://localhost:3000/</code> on the host. Choose <strong>Host a game</strong> for the GM or <strong>Join as a player</strong> for a hero. On other devices use the local network address printed in the server window. For example, if the host is <code>192.168.1.10</code>, a player opens <code>http://192.168.1.10:3000/player.html</code>.</p>
+<p>Keep the host awake and the server window open. All devices must be connected to the same network. A guest Wi-Fi network may prevent devices from reaching one another. If the page will not open, check the address, port and Windows Firewall permission for Node.js on the private network. Never send a friend a <code>localhost</code> address to use on another device.</p>
+<p>The app assumes a trusted group. It has no GM password or accounts. Use one GM tab; open editors separately. Use different browser profiles for different players on one computer so their saved identities do not collide.</p>
+<h2 id="section-2">2. Run the supplied training map</h2>
+<ol>
+<li>On the GM dashboard, find <strong>Adventure scenes</strong> below the map.</li>
+<li>Select <strong>Roadside Defense — Quick Start</strong> and choose <strong>Open scene</strong>. Opening a scene replaces the current map and resources, so confirm only when you intend to switch scenes.</li>
+<li>The road runs from the green spawn on the left to the purple castle on the right. The five yellow slots are build locations. The scene starts with 300 gold and 20 base health, using the original seven wave scenarios.</li>
+<li>Ask players to open their player screen and create heroes.</li>
+<li>Stay in <strong>Preparation</strong> while placing heroes and buying the first towers.</li>
+<li>Switch to <strong>Play</strong>. In the <strong>Wave</strong> panel select the first scenario and choose <strong>Launch wave</strong>.</li>
+<li>Let players act. When they finish, they click <strong>End turn</strong>. Advance <strong>Wave Turn</strong> when the group is ready.</li>
+<li>Repeat until the wave is cleared. Prepare for and launch the next wave when appropriate.</li>
+</ol>
+<p>Readiness is a signal to the GM. The server does not require every player to be ready before the GM advances. Launching another wave while enemies remain <strong>adds</strong> enemies to the battlefield. It does not replace the old wave.</p>
+<h3>Read the battlefield</h3>
+<table>
+<thead>
+<tr>
+<th>Map element</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Green spawn</td>
+<td>Enemies enter here</td>
+</tr>
+<tr>
+<td>Brown road</td>
+<td>Ground enemies travel along it</td>
+</tr>
+<tr>
+<td>Purple castle</td>
+<td>Enemies reaching it reduce base health</td>
+</tr>
+<tr>
+<td>Yellow tower slot</td>
+<td>Build a tower here</td>
+</tr>
+<tr>
+<td>Blue hero token</td>
+<td>A player-controlled defender</td>
+</tr>
+<tr>
+<td>Health-filled token</td>
+<td>The colored fill shows remaining health</td>
+</tr>
+<tr>
+<td>Status icons</td>
+<td>Click a player&#39;s status icons for full details</td>
+</tr>
+</tbody></table>
+<p>Ground paths connect through cell edges. Diagonal contact does not make a continuous road. Flying enemies follow their own movement rules and cannot be stopped by ordinary ground blockers.</p>
+<figure class="map"><svg viewBox="0 0 760 142" role="img" aria-label="A road from a spawn to a castle, with tower slots on either side"><path d="M65 80 H690" stroke="#735741" stroke-width="36"/><rect x="32" y="56" width="48" height="48" rx="7" fill="#4d9d68"/><rect x="678" y="56" width="48" height="48" rx="7" fill="#795da0"/><g fill="#d1ac52"><rect x="185" y="10" width="34" height="34" rx="5"/><rect x="345" y="105" width="34" height="34" rx="5"/><rect x="505" y="10" width="34" height="34" rx="5"/></g><g fill="#e7efdf" font-family="system-ui" font-size="14" text-anchor="middle"><text x="56" y="43">SPAWN</text><text x="700" y="43">CASTLE</text><text x="375" y="86">Enemies travel along the road →</text><text x="202" y="61">Build</text><text x="522" y="61">Build</text></g></svg><figcaption class="caption">Build beside the road. Hold enemies in range. Protect the castle together.</figcaption></figure><h2 id="section-3">3. Create a hero</h2>
+<p>Enter a unique player name, choose a hero, allocate exactly <strong>27 ability-score points</strong>, then choose exactly <strong>three normal abilities</strong>. The ultimate is shown separately during play. Complete all three creation steps before entering the battlefield.</p>
+<table>
+<thead>
+<tr>
+<th>Hero</th>
+<th>General role</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Gerald Lightbringer</td>
+<td>Shield-based melee tank and party support</td>
+</tr>
+<tr>
+<td>Zefira</td>
+<td>Ranged magic, area attacks and mobility</td>
+</tr>
+<tr>
+<td>Malik Hammerfury</td>
+<td>Durable melee area fighter</td>
+</tr>
+<tr>
+<td>Bolin</td>
+<td>Ranged artillery and mines</td>
+</tr>
+<tr>
+<td>Connor</td>
+<td>Melee bleeding, parry and Grail revival</td>
+</tr>
+<tr>
+<td>Illiana and Sparky</td>
+<td>Mobile ranged duo with physical and magic attacks</td>
+</tr>
+<tr>
+<td>Torghar the Unbreakable</td>
+<td>Heavy armor, thorns and multi-enemy blocking</td>
+</tr>
+<tr>
+<td>Ratchet</td>
+<td>Healing, shields, recovery and energy attacks</td>
+</tr>
+</tbody></table>
+<p>STR affects melee damage, DEX affects ranged attacks and defensive mechanics, CON affects maximum health, INT affects maximum mana, WIS strengthens some effects, and CHA affects some command/support abilities. Individual abilities use different formulas; inspect their descriptions and the current combat rules. Existing prototype descriptions are not a promise that every number represents a new rule.</p>
+<p>The browser remembers your player identity. Refreshing normally reconnects that identity. Two clients using the same name compete for one character record. <strong>Recreate hero</strong> removes your current character; use it deliberately.</p>
+<h2 id="section-4">4. Understand Preparation and Play</h2>
+<p>The GM controls this switch manually. Starting or clearing a wave does not change it automatically. The dashboard&#39;s <strong>Combat / Map Editor</strong> switch chooses tools; it does not choose the game period.</p>
+<h3>Preparation</h3>
+<p>Move freely to available cells. A real move to a <strong>different</strong> cell fully restores HP, mana, cooldowns and action availability, including revival and relevant once-used abilities. Merely clicking the current cell does not trigger restoration. The same preparation recovery applies to GM relocation, Astral Blink and Ambulance Rush when they change the hero&#39;s cell.</p>
+<p>Choose the shared tower roster and build or adjust defenses. Demolition refunds <strong>100% of the tower&#39;s recorded build and upgrade investment</strong>, including purchased specializations.</p>
+<p>Enemies wait: the GM must enable Play before advancing a wave turn. The GM can still manage scene notes and narrative decisions.</p>
+<h3>Play</h3>
+<p>Normal speed, movement, mana and cooldown limits apply. A hero normally has one movement and one action per round. Moving away from an engaged enemy may provoke an attack. A fallen hero waits for revival according to the current rules or is restored by a supported ability or GM intervention.</p>
+<p>Demolition refunds <strong>60% of the current tower level&#39;s cost</strong>, rounded by the server. This is not 60% of everything invested. To reorganize freely between fights, the GM can explicitly return to Preparation.</p>
+<h2 id="section-5">5. Take a player turn</h2>
+<p>Use the four modes near the map: <strong>Action</strong>, <strong>Move</strong>, <strong>Towers</strong> and <strong>Journal</strong>.</p>
+<h3>Attack or use an ability</h3>
+<ol>
+<li>In Action mode select a basic attack or ability.</li>
+<li>Read the range and target preview. Red highlights indicate attacks; green indicates healing/support. Some abilities can affect several units or include nearby units outside the selectable target range.</li>
+<li>Select a highlighted target or cell. If several units share the cell, choose the intended one using the target buttons.</li>
+<li>Confirm the action. Dice are rolled automatically, then damage, costs and effects resolve.</li>
+</ol>
+<p>Self and area-around-hero abilities do not need an enemy target. Check the highlighted participants and confirm directly. Clicking the selected ability again clears the selection and its preview. New server states update the preview; the start of a new turn clears the selection.</p>
+<p>A disabled confirmation button can mean insufficient mana, cooldown, a fallen hero, a used action, an invalid target or a lost connection. Select an available target rather than clicking an unhighlighted cell repeatedly.</p>
+<p>Astral Blink chooses a destination cell. Mine Field chooses a valid road cell; the mine waits for a ground enemy to step on it. Ratchet&#39;s Surgical Laser can select an ally to heal or an enemy to damage. Revive abilities can highlight fallen heroes.</p>
+<h3>Move</h3>
+<p>Choose Move mode, then a highlighted blue cell. Play limits movement by the hero&#39;s speed and round availability. Preparation permits repeated free moves. Towers, occupied cells and other invalid destinations are excluded by the current movement rules.</p>
+<h3>Finish</h3>
+<p>Choose <strong>End turn</strong> after completing your actions. The readiness marker informs the GM. You can cancel readiness if you need to continue and the round has not advanced.</p>
+<h2 id="section-6">6. Build, upgrade and demolish towers</h2>
+<p>The team shares one treasury. Select up to <strong>five base tower families</strong> during Preparation. Every level and branch of a family counts as that one type. All players see the shared selection. A family with existing towers cannot be removed until its towers have been demolished.</p>
+<p>In Towers mode, click a yellow slot to build. Click an existing tower to inspect range, upgrade paths, specializations and garrison details. Gold is spent when a construction or upgrade command succeeds, not when previewing the catalog.</p>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Main purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Archers</td>
+<td>Long-range physical fire; Ranger or Musketeer branches</td>
+</tr>
+<tr>
+<td>Mage towers</td>
+<td>Magic damage; Arcane Wizard or Sorcerer branches</td>
+</tr>
+<tr>
+<td>Artillery</td>
+<td>Heavy fire; Bertha or Tesla branches</td>
+</tr>
+<tr>
+<td>Barracks</td>
+<td>Soldiers holding the road; Paladin or Barbarian branches</td>
+</tr>
+<tr>
+<td>Dwarven Outpost</td>
+<td>Infantry and gold mining when the area is clear</td>
+</tr>
+<tr>
+<td>Necromancer</td>
+<td>Magic fire and raised skeleton defenders</td>
+</tr>
+<tr>
+<td>Royal Mage</td>
+<td>Court Mage damage support or Priestess healing</td>
+</tr>
+</tbody></table>
+<p>Barracks create soldiers automatically. Use <strong>Select rally point</strong> and choose a road cell within the permitted radius. A purchased Stone Golem also has rally controls. Range previews cost nothing and do not apply an attack.</p>
+<p>With one character, a demolition request can complete immediately. With several characters, it requires unanimous approval of the characters in the world, including disconnected characters. One rejection cancels it. The GM can force a decision. A GM map-edit replacement is different from a treasury-funded player construction or refund operation.</p>
+<p>The catalog editor&#39;s <strong>Towers</strong> section is a <strong>browser-local design preview</strong>. Its saved numbers do not change the server&#39;s combat rules. Actual new tower mechanics require changes to the shared definitions and server implementation.</p>
+<h2 id="section-7">7. Read statuses and combat messages</h2>
+<p>The chronicle records outcomes; the debug log contains detailed calculations. HP loss and healing can also appear as floating combat numbers. Positive status icons appear on the left of a token; negative effects and blocking appear on the right. An overflow indicator opens the full list.</p>
+<p>Blocking appears only for a real, current link between a living ground enemy and a living defender. Simply standing near an enemy does not guarantee a block. A hero&#39;s block limit matters; flying enemies and invalid old links do not create normal blocking icons.</p>
+<p>Common effects include bleeding, poison, stun, slow, polymorph, barriers, parry and invulnerability. Status details show remaining turns, shield durability and linked combatants. The display itself does not advance timers.</p>
+<p>Some original tower descriptions disagreed with the engine. This edition corrects the verified Musketeer, Arcane Wizard and Tesla upgrade descriptions. The detailed rules and timing are in the developer reference <code>docs/tower-combat.md</code>. The game is turn based: cooldowns use the shared round counter, not elapsed real time.</p>
+<h2 id="section-8">8. GM tools during a session</h2>
+<p>Use <strong>Object</strong>, <strong>Team</strong>, <strong>Enemies</strong> and <strong>Wave</strong> tabs in the inspector. <strong>Map only</strong> hides extra panels; the same button restores them. <strong>Fit</strong> adjusts the map to the available space.</p>
+<p>Select a hero to inspect their current stats, abilities and legal targets. GM ability previews do not cast the ability. Restore HP, mana, revival, cooldowns, action and movement independently. Healing alone does not revive a fallen hero unless revival is selected. The hero editor changes maxima separately from CON/INT and can force the next attack&#39;s damage.</p>
+<p>Find enemies by name or ID, type, injury, negative effects, distance from the castle or selected cell. Select matching enemies or a rectangle on the map. You can heal, relocate, apply effects, clear effects or remove the selected group. Enemy HP editing accepts values from 1 to the maximum; use Remove to delete.</p>
+<p><strong>Clear enemies</strong> and manual removal do not award gold or trigger death effects. Decide whether to cancel pending reinforcements too. Otherwise those groups can appear later. Individual spawn groups allow counts from 1 to 20.</p>
+<p><strong>Undo intervention</strong> restores the world before the last supported bulk enemy operation, hero restoration or reinforcement cancellation. It expires on the next world change. It is not an unlimited editor undo history. Player rollback restores the whole world before a selected current-round player action and removes every later action, including other players&#39; actions. A new round, GM world changes and a server restart invalidate the relevant history.</p>
+<p>Session reset and full map reset are destructive tools with confirmations. A full map reset removes roads, spawns, castle, towers and heroes. Make a stopped-server backup before experimenting with them.</p>
+<h2 id="section-9">9. Prepare your own scene</h2>
+<p>Open <strong>Prepare Scenes</strong> in a separate tab. Create a new scene or copy the current battlefield. Copying captures map setup and enemy types/positions, not players or enemies&#39; temporary combat condition. The live party continues while you edit.</p>
+<p>Set a title, scene type, GM description, starting gold and base health. For combat, create at least one spawn and a castle, connect every spawn to the castle using an unbroken edge-connected road, and place ground enemies on connected road cells. Maps range from 8×8 to 40×40.</p>
+<p>Place tower slots and optional prebuilt towers. Include their families in the selected roster. Add enemy groups, copies of catalog waves and map notes. A wave&#39;s composition and delays are copied into the scene; enemy stats still use the current catalog when enemies are created.</p>
+<p>Save the template. Saving an unfinished combat draft is allowed, but opening it requires a valid playable route. Conversation and exploration scenes can be opened without a combat route. Editing a template does not change an already active scene.</p>
+<p>Opening a saved scene replaces battlefield and resources, removes old field effects and pending spawns, resets round progress and enters Preparation. Heroes remain in the party, recover, and move to the initial spawn. Their permanent build is preserved; temporary combat effects are cleared.</p>
+<h2 id="section-10">10. Notes, objectives and adventures</h2>
+<p>Notes have player-facing text plus GM-only secrets, checks, DC and success/failure guidance. Reveal a note to send its title, coordinates and player text to players. Secret fields remain in the GM view. Narrative checks are reminders: this app does not automatically roll the check or apply a written consequence.</p>
+<p>Counters track narrative quantities such as rescued villagers. Objectives can be manual or depend on rounds, counters, base HP, defeated enemies and other supported conditions. If automatic outcomes are enabled, all primary objectives completed means full success; mixed resolved primary objectives mean partial success; all primary objectives failed means defeat. The GM can choose an outcome manually.</p>
+<p>Events can spawn reinforcements, launch a saved scene wave, change a cell, update counters or objectives, reveal notes, end a scene or send a message. By default they wait for GM confirmation. Review the listed actions before applying. Events execute once; invalid actions reject the operation rather than partially applying it.</p>
+<p>NPC cards record role, motivation, voice and knowledge. Tactics cards are reminders. Boss cards have descending HP thresholds; phase reminders can advance as the boss loses health, but <strong>do not change its combat stats automatically</strong>.</p>
+<p>In <strong>Session Plan</strong>, arrange saved scenes as Required, Optional or Backup. Add outcome-based branches where needed. Without branches, Next skips backup scenes. With branches, the available transition must match the scene outcome. Transitions always need a GM decision; opening the next scene replaces the map and restores heroes. Save the plan, then start it from the GM dashboard.</p>
+<h2 id="section-11">11. Save, back up and recover</h2>
+<p>World changes schedule a save approximately 500 ms after the latest update. Wait at least a second after the last action, then stop the server using Ctrl+C. Copy <code>gamestate_save.json</code>, <code>gamecatalog.json</code> and <code>scenes.json</code> into a dated backup folder. Include any custom configured paths. Back up browser-only tower drafts separately if you need them.</p>
+<p>To restore, stop the server, preserve the current files in another folder, copy the chosen backup files into place, restart and refresh all clients. Do not edit live files expecting the running process to reload them. To start a genuinely new party, use a new save folder through <code>KR_SAVE_FILE</code> instead of deleting the only save.</p>
+<p>Logs are local at <code>logs/game.log</code> unless configured otherwise. They can contain player names and session details; inspect them before sharing. There is no remote analytics service added by this edition.</p>
+<h2 id="section-12">12. Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>What to check</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Node.js not found</td>
+<td>Install Node.js 24 LTS, then reopen the terminal/launcher</td>
+</tr>
+<tr>
+<td>Initial dependency install fails</td>
+<td>Check internet access and the displayed npm error; keep the lockfile</td>
+</tr>
+<tr>
+<td>Port already in use / EADDRINUSE</td>
+<td>Stop the other game process or set a different PORT</td>
+</tr>
+<tr>
+<td>Phone cannot open the game</td>
+<td>Use the host&#39;s LAN IP, same network, configured port and private-network firewall permission</td>
+</tr>
+<tr>
+<td>Page opened as a file and will not connect</td>
+<td>Open the HTTP address printed by the running server</td>
+</tr>
+<tr>
+<td>Enemy does not move</td>
+<td>Verify continuous road, edge connections, spawn and castle; check stun and blocking</td>
+</tr>
+<tr>
+<td>Wave Turn is unavailable</td>
+<td>Switch the game period from Preparation to Play</td>
+</tr>
+<tr>
+<td>Everyone ready but nothing happens</td>
+<td>The GM must advance Wave Turn manually</td>
+</tr>
+<tr>
+<td>Lost connection</td>
+<td>Restart the server if needed, then refresh clients</td>
+</tr>
+<tr>
+<td>Catalog/library conflict</td>
+<td>Preserve your draft text, then load the latest server version before editing again</td>
+</tr>
+<tr>
+<td>Scene will not open</td>
+<td>Check route, enemy references and the server&#39;s validation message</td>
+</tr>
+<tr>
+<td>Tower preview changes do not affect combat</td>
+<td>They are local prototypes; edit server/shared definitions to implement rules</td>
+</tr>
+<tr>
+<td>Old Russian hero acts incorrectly after upgrade</td>
+<td>Convert built-in names in the save and test with a fresh browser profile</td>
+</tr>
+<tr>
+<td>Unexpected old party</td>
+<td>Check the save path and which server process/port you opened</td>
+</tr>
+</tbody></table>
+<p>For a bug report include the release version, Node version, device/browser, exact steps, expected and observed behavior, and a reviewed log excerpt. Keep the original save backed up before trying a fix.</p>
+</main></body></html>

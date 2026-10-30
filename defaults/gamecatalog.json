@@ -1,0 +1,566 @@
+{
+  "version": 1,
+  "revision": 2,
+  "catalog": {
+    "enemies": {
+      "bandit": {
+        "name": "Bandit",
+        "shortName": "Bandit",
+        "description": "Melee (damage 3, initiative 12).",
+        "color": "#2e7d32",
+        "hp": 40,
+        "speed": 1,
+        "initiative": 12,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 5,
+        "meleeDmg": 3,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 40,
+        "baseSpeed": 1
+      },
+      "goblin": {
+        "name": "Goblin",
+        "shortName": "Gobl",
+        "description": "A fast, fragile goblin (speed 2, damage 2–3, initiative 14).",
+        "color": "#388e3c",
+        "hp": 20,
+        "speed": 2,
+        "initiative": 14,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 3,
+        "meleeDmg": 3,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 20,
+        "baseSpeed": 2
+      },
+      "wulf": {
+        "name": "Wulf",
+        "shortName": "Wolf",
+        "description": "A swift predator. Speed 2, initiative 16, 30% dodge chance!",
+        "color": "#8d6e63",
+        "hp": 40,
+        "speed": 2,
+        "initiative": 16,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 10,
+        "meleeDmg": 3,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 30,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 40,
+        "baseSpeed": 2
+      },
+      "orc_warrior": {
+        "name": "Orc Warrior",
+        "shortName": "OrcW",
+        "description": "A hulking brute (180 HP, 30% armor, damage 9–14, initiative 7).",
+        "color": "#4caf50",
+        "hp": 180,
+        "speed": 1,
+        "initiative": 7,
+        "armor": 30,
+        "magicRes": 0,
+        "reward": 15,
+        "meleeDmg": 11,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 180,
+        "baseSpeed": 1
+      },
+      "orc_shaman": {
+        "name": "Orc Shaman",
+        "shortName": "Sham",
+        "description": "An orc healer (80% magic resistance, initiative 9). Uses magic attacks and heals allies.",
+        "color": "#009688",
+        "hp": 100,
+        "speed": 1,
+        "initiative": 9,
+        "armor": 0,
+        "magicRes": 80,
+        "reward": 12,
+        "meleeDmg": 4,
+        "rangedDmg": 5,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": true,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "healing": {
+            "radius": 2,
+            "amount": 25,
+            "interval": 3,
+            "maxTargets": 100,
+            "healSelf": true
+          }
+        },
+        "maxHp": 100,
+        "baseSpeed": 1
+      },
+      "crowcaller": {
+        "name": "Crowcaller",
+        "shortName": "Call",
+        "description": "A dark mage (300 HP, 60% magic resistance, initiative 8). Summons Crows while not blocked!",
+        "color": "#673ab7",
+        "hp": 300,
+        "speed": 1,
+        "initiative": 8,
+        "armor": 0,
+        "magicRes": 60,
+        "reward": 40,
+        "meleeDmg": 4,
+        "rangedDmg": 10,
+        "range": 1,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": true,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "summoning": {
+            "type": "crow",
+            "count": 1,
+            "interval": 3,
+            "maxAlive": 8,
+            "reward": 0,
+            "blockedStops": true
+          }
+        },
+        "maxHp": 300,
+        "baseSpeed": 1
+      },
+      "blackguard": {
+        "name": "Blackguard",
+        "shortName": "Grd",
+        "description": "Melee (damage 5, 30% armor, initiative 10).",
+        "color": "#795548",
+        "hp": 80,
+        "speed": 1,
+        "initiative": 10,
+        "armor": 30,
+        "magicRes": 0,
+        "reward": 8,
+        "meleeDmg": 5,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 80,
+        "baseSpeed": 1
+      },
+      "shadow_archer": {
+        "name": "Shadow Archer",
+        "shortName": "Arch",
+        "description": "Ranged: 6 damage (range 2–4, initiative 11). Melee: 2 damage.",
+        "color": "#ff9800",
+        "hp": 110,
+        "speed": 1,
+        "initiative": 11,
+        "armor": 0,
+        "magicRes": 30,
+        "reward": 15,
+        "meleeDmg": 2,
+        "rangedDmg": 6,
+        "range": 2,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": true,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 110,
+        "baseSpeed": 1
+      },
+      "shadow_blade": {
+        "name": "Shadow Blade",
+        "shortName": "Blde",
+        "description": "A cunning infiltrator. Speed 2, damage 4, initiative 15.",
+        "color": "#9c27b0",
+        "hp": 70,
+        "speed": 2,
+        "initiative": 15,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 10,
+        "meleeDmg": 4,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 70,
+        "baseSpeed": 2
+      },
+      "crow": {
+        "name": "Crow",
+        "shortName": "Crow",
+        "description": "A flying harbinger of misfortune. Speed 2, damage 2, initiative 15.",
+        "color": "#37474f",
+        "hp": 20,
+        "speed": 2,
+        "initiative": 15,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 2,
+        "meleeDmg": 2,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": true,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 20,
+        "baseSpeed": 2
+      },
+      "worg": {
+        "name": "Worg",
+        "shortName": "Worg",
+        "description": "A fierce predator (110 HP, 50% magic resistance, speed 2, damage 12, 30% dodge, initiative 17).",
+        "color": "#6d4c41",
+        "hp": 110,
+        "speed": 2,
+        "initiative": 17,
+        "armor": 0,
+        "magicRes": 50,
+        "reward": 10,
+        "meleeDmg": 12,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 30,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 110,
+        "baseSpeed": 2
+      },
+      "orc_wildling": {
+        "name": "Orc Wildling",
+        "shortName": "Wild",
+        "description": "An armored wildling (260 HP, 60% armor, damage 8). Accelerates to speed 2 near a pack of worgs/riders!",
+        "color": "#33691e",
+        "hp": 260,
+        "speed": 1,
+        "initiative": 13,
+        "armor": 60,
+        "magicRes": 0,
+        "reward": 20,
+        "meleeDmg": 8,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 260,
+        "baseSpeed": 1
+      },
+      "headhunter": {
+        "name": "Headhunter",
+        "shortName": "Hunt",
+        "description": "A merciless executioner (650 HP, 50% armor, damage 28, initiative 8). Executes targets at <=25% HP!",
+        "color": "#bf360c",
+        "hp": 650,
+        "speed": 1,
+        "initiative": 8,
+        "armor": 50,
+        "magicRes": 0,
+        "reward": 80,
+        "meleeDmg": 28,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0.25,
+        "traits": {},
+        "maxHp": 650,
+        "baseSpeed": 1
+      },
+      "goblin_rider": {
+        "name": "Goblin Rider",
+        "shortName": "Ride",
+        "description": "A swift rider (130 HP, 50% magic resistance, speed 2, damage 12). On death, dismounts into a regular goblin!",
+        "color": "#558b2f",
+        "hp": 130,
+        "speed": 2,
+        "initiative": 16,
+        "armor": 0,
+        "magicRes": 50,
+        "reward": 10,
+        "meleeDmg": 12,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 130,
+        "baseSpeed": 2
+      },
+      "ogre": {
+        "name": "Ogre (Mini-Boss)",
+        "shortName": "Ogre",
+        "description": "A devastating mini-boss (1100 HP, damage 45, cleaves all defenders in the cell, immune to polymorph/instant kills, costs the base 2 lives)!",
+        "color": "#b71c1c",
+        "hp": 1100,
+        "speed": 1,
+        "initiative": 5,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 120,
+        "meleeDmg": 45,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 2,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": true,
+        "aoeCleave": true,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 1100,
+        "baseSpeed": 1
+      }
+    },
+    "presetWaves": [
+      {
+        "waveNum": 1,
+        "title": "Wave 1: Bandit Scouts",
+        "desc": "The first band of lightly armed bandits tries to break through to the Citadel.",
+        "enemies": [
+          {
+            "type": "bandit",
+            "count": 4,
+            "offsetDelay": 1
+          }
+        ]
+      },
+      {
+        "waveNum": 2,
+        "title": "Wave 2: Shadow Infiltrators",
+        "desc": "Fast Shadow Blades and archers attack from the flanks.",
+        "enemies": [
+          {
+            "type": "bandit",
+            "count": 3,
+            "offsetDelay": 0
+          },
+          {
+            "type": "shadow_blade",
+            "count": 2,
+            "offsetDelay": 1
+          },
+          {
+            "type": "shadow_archer",
+            "count": 2,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 3,
+        "title": "Wave 3: Blackguards and Crows",
+        "desc": "Armored guards advance under cover of a flock of flying crows.",
+        "enemies": [
+          {
+            "type": "crow",
+            "count": 4,
+            "offsetDelay": 0
+          },
+          {
+            "type": "blackguard",
+            "count": 3,
+            "offsetDelay": 1
+          },
+          {
+            "type": "shadow_archer",
+            "count": 2,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 4,
+        "title": "Wave 4: Assault Column",
+        "desc": "A dense formation of Blackguards and Shadow Blades.",
+        "enemies": [
+          {
+            "type": "blackguard",
+            "count": 5,
+            "offsetDelay": 0
+          },
+          {
+            "type": "shadow_blade",
+            "count": 3,
+            "offsetDelay": 1
+          },
+          {
+            "type": "crow",
+            "count": 3,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 5,
+        "title": "Wave 5: Goblin and Wolf Raid",
+        "desc": "Fast goblin riders and a pack of dodging wolves attack at speed!",
+        "enemies": [
+          {
+            "type": "goblin",
+            "count": 6,
+            "offsetDelay": 0
+          },
+          {
+            "type": "wulf",
+            "count": 4,
+            "offsetDelay": 1
+          },
+          {
+            "type": "bandit",
+            "count": 3,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 6,
+        "title": "Wave 6: Orc Vanguard and Shamans",
+        "desc": "Powerful Orc Warriors protected by Orc Shamans' healing auras.",
+        "enemies": [
+          {
+            "type": "orc_warrior",
+            "count": 3,
+            "offsetDelay": 0
+          },
+          {
+            "type": "orc_shaman",
+            "count": 2,
+            "offsetDelay": 1
+          },
+          {
+            "type": "wulf",
+            "count": 3,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 7,
+        "title": "Wave 7: Dark Summoning and the Crowcaller",
+        "desc": "A deadly sorcerer summons endless flocks of crows under the protection of guards!",
+        "enemies": [
+          {
+            "type": "crowcaller",
+            "count": 1,
+            "offsetDelay": 0
+          },
+          {
+            "type": "orc_warrior",
+            "count": 4,
+            "offsetDelay": 1
+          },
+          {
+            "type": "orc_shaman",
+            "count": 2,
+            "offsetDelay": 1
+          },
+          {
+            "type": "crow",
+            "count": 4,
+            "offsetDelay": 2
+          }
+        ]
+      }
+    ]
+  }
+}

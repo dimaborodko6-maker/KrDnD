@@ -1,0 +1,26 @@
+{
+  "name": "kr6dnd",
+  "version": "1.0.0-en",
+  "description": "A GM-led cooperative tower defense game with D&D mechanics.",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test tests/*.test.cjs",
+    "check:content": "node scripts/check-content.cjs",
+    "benchmark:towers": "node scripts/benchmark-towers.cjs",
+    "check:syntax": "node scripts/check-syntax.cjs",
+    "check:english": "node scripts/check-english.cjs",
+    "check": "npm run check:syntax && npm run check:content && npm run check:english && npm test",
+    "migrate:english": "node scripts/migrate-english.cjs",
+    "lint": "eslint ."
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "ws": "^8.22.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.0.0"
+  }
+}

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="diagnostics.js"></script>
+    <title>Scene Preparation — Kr6DnD</title>
+    <link rel="stylesheet" href="master.css"><link rel="stylesheet" href="master-layout.css"><link rel="stylesheet" href="scene-editor.css">
+    <script src="i18n-dict.js"></script>
+    <script src="i18n.js"></script>
+</head>
+<body>
+<header class="app-header"><div><h1>Adventure Preparation</h1><div class="muted">Scene library · <span id="scene-connection">connecting…</span></div></div><div class="button-row"><div class="lang-switcher-slot" style="display:inline-flex; align-items:center;"></div><a class="editor-link" href="adventure-editor.html">Session Plan ↗</a><a class="editor-link" href="master.html">GM Dashboard ↗</a></div></header>
+<div class="preparation-banner">Only the GM can see the draft. Players continue the current scene. Open a saved scene from the GM dashboard.</div>
+<nav class="app-toolbar"><div class="button-row"><button id="new-scene">＋ New scene</button><button id="capture-scene">Copy current map</button></div><div class="button-row"><span id="scene-save-state" class="muted" role="status">Loading…</span><button id="reload-scenes">Load from server</button><button id="save-scene" class="primary" disabled>Save scene</button></div></nav>
+<p id="scene-notice" class="scene-notice" role="status" aria-live="polite" hidden></p>
+<div class="scene-workspace">
+    <aside class="panel scene-library"><h2>Library <span id="scene-count" class="muted"></span></h2><div id="scene-list"></div><p class="muted">Saves the map, enemy placement, waves, starting resources and notes. Heroes and current combat are not included in the template.</p></aside>
+    <main>
+    <p id="scene-empty" class="panel muted">Create a scene or copy the current map.</p>
+    <fieldset id="scene-fields" hidden disabled>
+        <section class="panel"><div class="section-heading"><h2 id="scene-heading">Scene</h2><div class="button-row"><button id="duplicate-scene" type="button">Duplicate</button><button id="delete-scene" type="button" class="danger-outline">Delete from library</button></div></div>
+            <label>Name<input id="scene-title" maxlength="160" required></label>
+            <label>Scene type<select id="scene-kind"><option value="combat">Combat</option><option value="social">Conversation</option><option value="exploration">Exploration</option></select></label>
+            <div class="scene-text-fields"><label>Description and GM notes<textarea id="scene-description" rows="3" maxlength="8000"></textarea></label><label>Victory and defeat conditions<textarea id="scene-objectives" rows="3" maxlength="4000"></textarea></label></div>
+            <div class="form-row"><label>Starting gold<input id="scene-gold" type="number" min="0" max="1000000" value="300" required></label><label>Base health<input id="scene-base-hp" type="number" min="1" max="1000000" value="20" required></label><label>Width<input id="scene-width" type="number" min="8" max="40" required></label><label>Height<input id="scene-height" type="number" min="8" max="40" required></label><button id="resize-scene" type="button">Resize</button></div>
+            <details><summary>Team tower roster · up to 5 types</summary><div id="scene-tower-roster" class="button-row"></div></details>
+        </section>
+        <section class="panel" id="scene-planning"></section>
+        <section class="panel"><div class="section-heading"><h2>Scene events</h2><button id="add-scene-event" type="button">＋ Event</button></div><div id="scene-events"></div></section>
+        <section class="panel"><div class="section-heading"><h2>GM cards</h2><div class="button-row"><label>Card type<select id="scene-card-kind"><option value="npc">Character (NPC)</option><option value="tactics">Enemy tactics</option><option value="boss">Boss and phases</option></select></label><button id="add-scene-card" type="button">＋ Card</button></div></div><div id="scene-cards"></div></section>
+        <div class="scene-editor-layout">
+            <section class="panel scene-map-panel"><h2>Scene map</h2><div class="form-row"><label class="grow">Tool<select id="scene-brush"><option value="inspect">Select cell</option><option value="empty">Grass</option><option value="road">Road</option><option value="spawn">Spawn</option><option value="castle">Castle</option><option value="slot">Tower slot</option><option value="enemy">Place enemies</option><option value="note">Add note</option></select></label><button id="scene-fit" type="button">Fit</button></div><p class="muted" id="scene-map-hint">Click a cell to see its contents.</p><div id="scene-map-viewport"><div id="scene-grid" class="grid"></div></div><p class="muted">Coordinates start at 0. To launch, connect all spawns to the castle with a road; no diagonals.</p></section>
+            <aside class="panel scene-cell-panel"><h2 id="scene-cell-title">Select a cell</h2><div id="scene-cell-detail"></div><hr><h3>Enemy placement</h3><label>Enemy type<select id="scene-enemy-type"></select></label><div class="form-row"><label>Count<input id="scene-enemy-count" type="number" min="1" max="200" value="1" required></label><button id="place-scene-enemy" type="button">Place in cell</button></div><p class="muted">This placement is separate from wave launches. When the scene opens, enemies wait during preparation.</p></aside>
+        </div>
+        <section class="panel"><h2>Scene waves</h2><p class="muted">Add copies of catalog waves. Their composition and order are saved in the scene separately from the current game.</p><div class="form-row"><label class="grow">Wave from catalog<select id="scene-wave-choice"></select></label><button id="add-scene-wave" type="button">Add wave</button></div><div id="scene-waves"></div></section>
+    </fieldset>
+    </main>
+</div>
+<dialog id="scene-note-dialog"><form id="scene-note-form"><div class="section-heading"><h2 id="scene-note-title">Map note</h2><button type="button" id="scene-note-close" aria-label="Close">✕</button></div><p class="muted">All notes in a new scene are hidden. The GM can reveal only the title, coordinates and player text. Checks and secrets remain with the GM.</p><div id="scene-note-fields" class="scene-note-fields"></div><div class="button-row"><button type="submit" class="primary">Save in draft</button><button id="scene-note-delete" type="button" class="danger-outline">Delete note</button></div></form></dialog>
+<script src="gamedata.js"></script><script src="tower-rules.js"></script><script src="scene-notes.js"></script><script src="scenario-rules.js"></script><script src="planning-ui.js"></script><script src="scene-editor.js"></script><script src="scene-planning-editor.js"></script>
+</body>
+</html>

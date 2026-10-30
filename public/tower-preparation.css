@@ -1,0 +1,58 @@
+#tower-preparation-menu {
+    color-scheme: dark;
+    position: fixed; inset: 0; margin: 0; padding: 0;
+    width: 100%; max-width: none; height: 100vh; height: 100dvh; max-height: none;
+    border: 0; background: #12161c; color: #edf1f5;
+    font-family: "Segoe UI", sans-serif; font-size: 14px; line-height: 1.45;
+}
+#tower-preparation-menu:not([hidden])[open] { display: flex; flex-direction: column; }
+#tower-preparation-menu[hidden] { display: none; }
+#tower-preparation-menu * { box-sizing: border-box; }
+#tower-preparation-menu button, #tower-preparation-menu input { font: inherit; color: #edf1f5; }
+#tower-preparation-menu button {
+    min-height: 44px; padding: 10px; border: 1px solid #363e48; border-radius: 6px;
+    background: #242b34; cursor: pointer; touch-action: manipulation;
+}
+#tower-preparation-menu button:focus-visible, #tower-preparation-menu input:focus-visible { outline: 3px solid #a1cfff; outline-offset: 2px; }
+#tower-preparation-menu button:disabled { cursor: default; color: #a9b5c3; opacity: .7; }
+#tower-preparation-menu button[aria-pressed=true] { background: #3c3926; color: #ffdb82; border-color: #ffcc00; }
+#tower-preparation-menu h2, #tower-preparation-menu h3, #tower-preparation-menu p { margin: 0; }
+#tower-preparation-menu .tp-shell { width: 100%; max-width: 600px; margin: 0 auto; }
+#tower-preparation-menu .tp-header { padding: 10px 12px; background: #20252c; border-bottom: 1px solid #363e48; flex-shrink: 0; }
+#tower-preparation-menu .tp-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+#tower-preparation-menu .tp-back { color: #edf1f5; background: #2a323d; }
+#tower-preparation-menu .tp-period { font-size: 12px; color: #f7cc66; }
+#tower-preparation-menu .tp-tabs { display: flex; gap: 3px; margin-top: 10px; padding: 3px; background: #13181f; border-radius: 8px; }
+#tower-preparation-menu .tp-tabs button { flex: 1; background: transparent; border-color: transparent; color: #a9b5c3; font-size: 13px; }
+#tower-preparation-menu .tp-tabs button[aria-pressed=true] { background: #3a4655; color: #fff; }
+#tower-preparation-content { flex: 1; min-height: 0; overflow: auto; padding: 14px 12px; overscroll-behavior: contain; }
+#tower-preparation-menu .tp-heading { color: #f7cc66; font-size: 18px; margin-bottom: 8px; }
+#tower-preparation-menu .tp-name { color: #edf1f5; font-size: 14px; font-weight: 600; }
+#tower-preparation-menu .tp-help { color: #a9b5c3; font-size: 12px; line-height: 1.5; margin-top: 8px; }
+#tower-preparation-menu .tp-price { color: #f7cc66; white-space: nowrap; }
+#tower-preparation-menu .tp-slots { display: flex; gap: 6px; margin: 14px 0; }
+#tower-preparation-menu .tp-slot { flex: 1; text-align: center; border: 1px solid #363e48; border-radius: 6px; background: #242b34; font-size: 24px; padding: 6px; }
+#tower-preparation-menu .tp-empty { background: transparent; border-style: dashed; color: #a9b5c3; }
+#tower-preparation-menu .tp-tower { background: #242b34; border: 1px solid #444; border-radius: 6px; padding: 10px; margin-bottom: 8px; }
+#tower-preparation-menu .tp-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+#tower-preparation-menu .tp-actions button { flex: 1 1 130px; }
+#tower-preparation-menu .tp-explore { background: #2a323d; color: #edf1f5; }
+#tower-preparation-menu .tp-families, #tower-preparation-menu .tp-levels, #tower-preparation-menu .tp-branches { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+#tower-preparation-menu .tp-family { flex: 1 1 44px; font-size: 22px; }
+#tower-preparation-menu .tp-level { flex: 1; min-width: 52px; }
+#tower-preparation-menu .tp-level small { display: block; font-size: 11px; margin-top: 3px; color: #a9b5c3; }
+#tower-preparation-menu .tp-branch { flex: 1 1 130px; font-size: 12px; }
+#tower-preparation-menu .tp-detail { padding: 12px; border: 1px solid #363e48; border-radius: 8px; background: #20252c; }
+#tower-preparation-menu .tp-cost { margin: 8px 0; }
+#tower-preparation-menu .tp-cost .tp-help { margin: 0; }
+#tower-preparation-menu .tp-stats { width: 100%; border-collapse: collapse; color: #edf1f5; font-size: 13px; }
+#tower-preparation-menu .tp-stats th, #tower-preparation-menu .tp-stats td { border-top: 1px solid #363e48; padding: 8px 0; color: #edf1f5; background: transparent; }
+#tower-preparation-menu .tp-stats th { text-align: left; font-weight: 400; color: #a9b5c3; }
+#tower-preparation-menu .tp-stats td { text-align: right; }
+#tower-preparation-menu .tp-section-label { color: #f7cc66; font-size: 12px; margin: 16px 0 8px; }
+#tower-preparation-menu .tp-ability { display: block; background: #22252a; color: #edf1f5; border: 1px solid #444; border-radius: 6px; padding: 12px; margin-bottom: 8px; }
+#tower-preparation-menu .tp-ability input { width: 20px; height: 20px; margin: 0; flex-shrink: 0; accent-color: #f7cc66; }
+#tower-preparation-menu .tp-ability-name { flex: 1; color: #63dfac; font-size: 13px; }
+#tower-preparation-footer { flex-shrink: 0; background: #1a2028; border-top: 1px solid #363e48; padding: 12px 12px max(12px, env(safe-area-inset-bottom)); font-size: 12px; }
+#tower-preparation-footer .tp-select { width: 100%; margin-top: 10px; }
+#tower-preparation-footer .tp-help { margin: 4px 0 0; }

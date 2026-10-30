@@ -1,0 +1,7 @@
+.range-contours { position: absolute; inset: 0; pointer-events: none; z-index: 110; }
+.range-contours svg { position: absolute; inset: 0; overflow: visible; width: 100%; height: 100%; }
+.range-outline { fill: none; stroke: #ffd55a; stroke-width: calc(3px / var(--range-zoom, 1)); stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; filter: drop-shadow(0 0 2px #000); }
+.range-outline.cast-range { stroke-width: calc(2px / var(--range-zoom, 1)); stroke-dasharray: 7 5; }
+.range-outline.tone-attack { stroke: #ff465d; }
+.range-outline.tone-heal { stroke: #29ff80; }
+.range-outline.tone-support, .range-outline.tone-move { stroke: #70d5ff; }

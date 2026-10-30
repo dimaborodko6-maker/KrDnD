@@ -1,0 +1,45 @@
+{
+  "enemies": {
+    "crypt_guard": {
+      "name": "Crypt Guard",
+      "shortName": "Crypt",
+      "description": "A slow armored guard with a shield that does not regenerate.",
+      "color": "#607D8B",
+      "hp": 90,
+      "speed": 1,
+      "initiative": 8,
+      "armor": 30,
+      "magicRes": 10,
+      "reward": 12,
+      "meleeDmg": 9,
+      "isFlying": false,
+      "isRanged": false,
+      "traits": {
+        "shield": {
+          "percent": 25,
+          "recharge": false,
+          "rechargeDelay": 2
+        }
+      }
+    }
+  },
+  "presetWaves": [
+    {
+      "waveNum": 9001,
+      "title": "Crypt Guards",
+      "desc": "Two groups arriving one wave turn apart.",
+      "enemies": [
+        {
+          "type": "crypt_guard",
+          "count": 2,
+          "offsetDelay": 0
+        },
+        {
+          "type": "crypt_guard",
+          "count": 2,
+          "offsetDelay": 1
+        }
+      ]
+    }
+  ]
+}

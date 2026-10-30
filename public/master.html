@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="diagnostics.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>GM Dashboard — Kr6DnD</title>
+    <link rel="stylesheet" href="master.css">
+    <link rel="stylesheet" href="master-layout.css">
+    <link rel="stylesheet" href="map-range-contours.css">
+    <link rel="stylesheet" href="unit-statuses.css">
+    <link rel="stylesheet" href="tower-roster.css">
+    <link rel="stylesheet" href="scene-editor.css">
+    <script src="gamedata.js"></script>
+    <script src="tower-rules.js"></script>
+    <script src="battle-ability-rules.js"></script>
+    <script src="map-range-contours.js"></script>
+    <script src="unit-statuses.js"></script>
+    <script src="tower-roster-ui.js"></script>
+    <script src="i18n-dict.js"></script>
+    <script src="i18n.js"></script>
+</head>
+<body class="master-page">
+<header class="app-header">
+    <div><h1>🏰 Kr6DnD</h1><div class="muted">GM Dashboard <span id="connection-status">· connecting…</span></div></div>
+    <div class="metrics">
+        <div class="lang-switcher-slot" style="display:flex; align-items:center;"></div><div><span>Wave</span><strong id="metric-wave">—</strong></div><div><span>Base health</span><strong id="metric-hp">—</strong></div><button class="metric-button" onclick="openMasterTool('gold')"><span>Treasury · edit</span><strong id="metric-gold">—</strong></button></div>
+</header>
+<nav class="app-toolbar" aria-label="GM mode">
+    <div class="button-row"><button id="mode-battle" class="active" aria-pressed="true" onclick="setMasterMode('battle')">Combat</button><button id="mode-editor" aria-pressed="false" onclick="setMasterMode('editor')">Map Editor</button></div>
+    <div class="button-row" role="group" aria-label="Game period"><button id="period-preparation" aria-pressed="false" onclick="setGamePeriod('preparation')" disabled>Preparation</button><button id="period-game" aria-pressed="false" onclick="setGamePeriod('game')" disabled>Play</button><span id="round-label" class="muted">Waiting for state</span></div>
+</nav>
+<div id="master-notice" role="status" aria-live="polite" hidden></div>
+<div class="battle-actions" aria-label="GM quick actions"><div class="button-row"><button onclick="openMasterTool('spawn')">＋ Enemies</button><button onclick="openRestoreDialog()">♡ Restore team</button><button class="danger-outline" onclick="openClearEnemies()">Clear enemies</button><button onclick="openMasterTool('hero')">Parameters</button><button onclick="openMasterTool('gold')">Treasury</button><button onclick="openMasterTool('undo')">Player rollback</button></div><button id="undo-intervention" onclick="undoIntervention()" disabled>↶ Undo intervention</button><button id="focus-map-button" aria-pressed="false" onclick="toggleMapFocus()">⛶ Map only</button></div>
+<div class="workspace">
+<main class="map-column">
+
+    <section class="panel" id="map-editor" hidden><h2>Map Editor</h2><div class="button-row"><button class="tool-btn" id="tool-empty" onclick="changeActiveTool('empty')">Grass</button><button class="tool-btn" id="tool-road" onclick="changeActiveTool('road')">Road</button><button class="tool-btn" id="tool-spawn" onclick="changeActiveTool('spawn')">Spawn</button><button class="tool-btn" id="tool-castle" onclick="changeActiveTool('castle')">Castle</button><button class="tool-btn" id="tool-slot" onclick="changeActiveTool('slot')">Tower slot</button></div><div class="form-row"><label>Width<input id="map-w-input" type="number" min="8" max="40" value="16"></label><label>Height<input id="map-h-input" type="number" min="8" max="40" value="16"></label><button onclick="resizeMapCustom()">Resize</button><button onclick="setMapPreset(16,16)">16 × 16</button><button onclick="setMapPreset(24,24)">24 × 24</button><button onclick="setMapPreset(30,20)">30 × 20</button></div></section>
+    <div id="master-demolish-banner" class="panel vote-banner" style="display:none"><div><strong>Demolition vote</strong><div id="master-demolish-text"></div></div><div class="button-row"><button class="danger-outline" onclick="masterResolveDemolish(true)">Force demolition</button><button onclick="masterResolveDemolish(false)">Cancel vote</button></div></div>
+    <div id="master-roster-banner" class="panel vote-banner" style="display:none"><div><strong>Tower arsenal vote</strong><div id="master-roster-text"></div></div><div class="button-row"><button class="primary" onclick="masterResolveRoster(true)">Force approval</button><button onclick="masterResolveRoster(false)">Cancel vote</button></div></div>
+    <section class="panel map-panel"><div class="map-heading"><div class="map-title"><h2>Tactical map</h2><span id="map-size-label" class="muted">—</span></div><div class="map-turn-status"><strong id="ready-summary">Waiting for players</strong><div id="waiting-players" class="muted">The GM advances the turn</div></div><div class="button-row"><button onclick="changeMasterZoom(-0.1)" aria-label="Zoom out">−</button><span id="zoom-label">100%</span><button onclick="changeMasterZoom(0.1)" aria-label="Zoom in">＋</button><button onclick="fitMasterMap()">Fit</button><button id="btn-move-enemies" class="primary" onclick="moveEnemies()">Wave Turn →</button></div></div><div id="map-action" class="map-action" aria-live="polite">Select a hero, enemy or tower</div><div id="map-viewport"><div id="map-stage"><div class="grid" id="game-grid"></div></div></div><div class="map-legend"><span>🟫 Road</span><span>🟩 Spawn</span><span>🟪 Castle</span><span>🟨 Slot</span><span>Blue token = hero</span></div></section>
+    <details class="panel journal"><summary>Battle chronicle</summary><div class="log-box" id="log-box"></div><details class="technical-log"><summary>Debug log</summary><div class="button-row"><button id="btn-copy-debug-log" onclick="copyDebugLogToClipboard()">Copy log</button><button onclick="clearDebugLog()">Clear</button></div><pre id="debug-log-box"></pre></details></details>
+</main>
+<aside class="inspector" aria-label="Current battle controls">
+<nav class="inspector-tabs" aria-label="Battle panel"><button data-inspector-tab="object" aria-pressed="true" onclick="setInspectorTab('object')">Object</button><button data-inspector-tab="team" aria-pressed="false" onclick="setInspectorTab('team')">Team <span id="tab-team-count"></span></button><button data-inspector-tab="enemies" aria-pressed="false" onclick="setInspectorTab('enemies')">Enemies <span id="tab-enemy-count"></span></button><button data-inspector-tab="wave" aria-pressed="false" onclick="setInspectorTab('wave')">Wave</button></nav>
+
+    <section class="panel" id="inspector-object"><h2>Selected object</h2><div id="selected-object" class="muted">Click an object on the map or a hero in the team list.</div></section>
+    <div id="inspector-wave" hidden><div id="master-scenario-slot"></div>
+    <section class="panel"><h2>Wave scenario</h2><label class="sr-only" for="preset-wave-select">Scenario</label><select id="preset-wave-select" onchange="renderWaveDescription()"></select><p id="wave-description" class="muted"></p><button class="primary full-width" onclick="startSelectedPresetWave()">Launch wave</button><p class="muted">Switch game periods manually. During preparation, enemies wait for play to begin.</p></section>
+
+    <details class="panel" id="active-scene-details"><summary id="active-scene-title">Current map</summary><p id="active-scene-description" class="scene-private-text"></p><p id="active-scene-objectives" class="scene-private-text"></p><div id="active-scene-notes"></div></details>
+</div>    <section class="panel" id="inspector-team" hidden><div class="section-heading"><h2>Team</h2><span class="muted" id="team-count">0 players</span></div><div class="button-row"><button onclick="openRestoreDialog()">Restore team</button></div><div id="heroes-list"></div></section><section class="panel" id="inspector-enemies" hidden>
+<div class="section-heading"><h2>Enemies on map</h2><button onclick="openMasterTool('spawn')">＋ Add</button></div>
+<label>Search<input id="enemy-search" type="search" placeholder="Name or ID" oninput="renderEnemyRoster()"></label>
+<div class="form-row"><label class="grow">Filter<select id="enemy-filter" onchange="renderEnemyRoster()"><option value="all">All</option><option value="wounded">Wounded</option><option value="effects">With negative effects</option><option value="castle">Near castle (≤ 3 cells)</option><option value="cell">In selected cell</option></select></label><label class="grow">Type<select id="enemy-type-filter" onchange="renderEnemyRoster()"><option value="">All types</option></select></label></div>
+<div class="button-row"><button onclick="selectVisibleEnemies()">Select matches</button><button onclick="armEnemyArea()">Map area</button><button onclick="clearEnemySelection()">Clear selection</button></div>
+<div id="enemy-roster" class="enemy-roster"></div>
+<div class="bulk-actions"><strong id="enemy-selection-count">Selected: 0</strong><div class="button-row"><button data-enemy-bulk onclick="moveSelectedEnemies()">Relocate…</button><button data-enemy-bulk onclick="manageSelectedEnemies('heal')">Heal</button><button data-enemy-bulk onclick="manageSelectedEnemies('cleanse')">Remove effects</button><button data-enemy-bulk onclick="openEnemyEffect()">Effect…</button><button data-enemy-bulk class="danger-outline" onclick="manageSelectedEnemies('remove')">Delete</button></div></div>
+</section></aside>
+</div>
+<details class="panel preparation-panel" id="session-preparation">
+<summary>Adventure preparation and management</summary>
+<div class="preparation-grid">
+<section class="panel game-period-panel" aria-label="Period rules and tower roster">
+    <h2>Team preparation</h2>
+    <details><summary>Current period rules</summary><p id="game-period-hint" class="muted" role="status">Waiting for game state…</p></details>
+    <details><summary>Team tower roster · <span id="master-tower-type-count">—/5</span></summary><p class="tower-roster-help">During preparation, any player and the GM can edit the shared roster: up to 5 types with all upgrades. Demolish a type's towers before removing it.</p><div id="master-tower-roster" class="tower-roster"></div></details>
+    <div class="button-row preparation-links"><a class="editor-link" href="catalog-editor.html">Enemies and Waves ↗</a><button onclick="document.getElementById('session-dialog').showModal()">Session controls ⋯</button></div>
+</section>
+<section class="panel master-scene-panel" aria-label="Adventure scenes">
+    <div class="section-heading"><h2>Adventure scenes</h2><a class="editor-link" href="scene-editor.html" target="_blank" rel="noopener">Prepare Scenes ↗</a></div>
+    <div class="form-row"><label class="grow">Saved scene<select id="master-scene-select" disabled></select></label><button id="activate-scene" class="primary" disabled>Open scene</button></div>
+    <p class="muted">Opening replaces the map, enemies and resources. Heroes stay in the game and recover during preparation.</p>
+</section>
+<div id="master-plan-slot"></div>
+</div>
+</details>
+<dialog id="session-dialog"><div class="section-heading"><h2>Session controls</h2><button aria-label="Close" onclick="this.closest('dialog').close()">✕</button></div><div class="form-row"><label>Base health<input id="god-base-hp" type="number" min="0" value="20"></label><button onclick="godEdit('baseHp','god-base-hp')">Apply</button></div><hr><div class="session-actions"><button onclick="resetSessionConfirm(false)">Remove heroes and enemies · reset resources</button><button class="danger-outline" onclick="resetSessionConfirm(true)">Reset session and demolish towers</button><button class="danger-outline" onclick="resetFullMapConfirm()">Completely clear map</button></div></dialog>
+<div id="master-tower-modal" style="display:none" role="dialog" aria-modal="true" aria-labelledby="mtm-title"><div class="panel tower-dialog"><div class="section-heading"><h2 id="mtm-title">Tower controls</h2><button onclick="closeMasterTowerModal()" aria-label="Close">✕</button></div><div id="mtm-info"></div><div class="button-row"><button onclick="masterChangeLevel(1)">Upgrade</button><button onclick="masterChangeLevel(-1)">Downgrade</button></div><label for="mtm-quick-select">Tower type</label><select id="mtm-quick-select" onchange="onMasterQuickSelectChange()"></select><button class="primary full-width" onclick="masterApplyQuickTower()">Place selected</button><button class="danger-outline full-width" onclick="masterDemolishTower()">Demolish into empty slot</button></div></div>
+<dialog id="master-tools-dialog" class="master-tools-dialog" aria-label="GM tools"><section class="master-tools" id="master-tools-panel">
+    <div class="section-heading"><h2>GM tools</h2><button onclick="openMasterTool(null)" aria-label="Close tools">✕</button></div>
+    <div class="button-row tool-tabs"><button data-master-tool="spawn" aria-pressed="false" onclick="openMasterTool('spawn')">＋ Individual enemy</button><button data-master-tool="gold" aria-pressed="false" onclick="openMasterTool('gold')">Grant gold</button><button data-master-tool="hero" aria-pressed="false" onclick="openMasterTool('hero')">Hero parameters</button><button data-master-tool="undo" aria-pressed="false" onclick="openMasterTool('undo')">↶ Player rollback</button><button id="close-master-tool" hidden onclick="openMasterTool(null)">Collapse ↑</button></div>
+    <div id="master-tool-spawn" class="tool-content" hidden><label>Search catalog<input id="spawn-search" type="search" oninput="filterSpawnCatalog()" placeholder="Enemy name"></label><div class="button-row"><button id="spawn-favorite" onclick="toggleSpawnFavorite()">☆ Add to favorites</button><label class="check-label"><input id="spawn-only-favorites" type="checkbox" onchange="filterSpawnCatalog()"> Favorites only</label><button id="repeat-spawn" onclick="repeatLastSpawn()" disabled>Repeat last group</button></div><p id="spawn-preview" class="muted"></p><div class="form-row"><label class="grow">Enemy type<select id="active-spawn-type" onchange="renderSpawnPreview()"></select></label><label>Count<input id="spawn-count" type="number" min="1" max="20" value="1"></label><button id="tool-spawn-click" class="tool-btn" onclick="armSpawn()">Select cell on map</button><button id="tool-erase-enemy" class="tool-btn danger-outline" onclick="armErase()">Remove enemies in cell</button><button onclick="cancelMapAction()">Cancel</button></div><p class="muted">Count from 1 to 20. Selecting a cell creates the group once.</p></div>
+    <div id="master-tool-gold" class="tool-content" hidden><div class="form-row"><button onclick="addGold(50)">+50 G</button><button onclick="addGold(100)">+100 G</button><button onclick="addGold(-50)">−50 G</button><label>Amount<input id="gold-amount" type="number" min="0" max="1000000" value="100"></label><button class="primary" onclick="grantGold()">Grant to team</button><label>Treasury balance<input id="god-gold" type="number" min="0"></label><button onclick="setTreasury()">Set balance</button></div></div>
+    <div id="master-tool-hero" class="tool-content" hidden><div class="form-row"><label class="grow">Character<select id="edit-hero-select" onchange="loadHeroEditor(true)"></select></label><button onclick="loadHeroEditor(true)">Refresh values</button></div><form id="hero-editor-form" onsubmit="saveHeroEditor(event)"><div id="hero-editor-fields" class="hero-fields"></div><div class="form-row hero-flags"><label><input type="checkbox" id="hero-moved"> Movement used</label><label><input type="checkbox" id="hero-attacked"> Action used</label><label><input type="checkbox" id="hero-ready"> Ready</label><button class="primary" type="submit" id="save-hero">Apply parameters</button></div></form><p class="muted" id="hero-editor-hint">Select a character. Changes are applied in one command.</p></div>
+    <div id="master-tool-undo" class="tool-content" hidden><div class="form-row"><label class="grow">Current round actions<select id="rollback-select" onchange="showRollbackPreview()"></select></label><button id="rollback-button" class="danger-outline" onclick="confirmRollback()" disabled>Roll back to this action</button></div><p id="rollback-preview" class="muted">No snapshots available yet.</p><p class="muted">Undoes the selected action and everything after it. History clears when the GM changes the world, a new round starts or the server restarts.</p></div>
+</section></dialog>
+<dialog id="restore-dialog" aria-labelledby="restore-title"><form onsubmit="submitHeroRestore(event)"><div class="section-heading"><h2 id="restore-title">Restore team</h2><button type="button" onclick="this.closest('dialog').close()" aria-label="Close">✕</button></div><p class="muted" id="restore-targets"></p><div class="restore-options"><label><input type="checkbox" name="hp" checked> HP to maximum</label><label><input type="checkbox" name="mana" checked> Mana to maximum</label><label><input type="checkbox" name="revive" checked> Revive fallen heroes in their cells</label><label><input type="checkbox" name="cleanse" checked> Remove negative effects</label><label><input type="checkbox" name="cooldowns" checked> Reset cooldowns</label><label><input type="checkbox" name="action" checked> Restore action</label><label><input type="checkbox" name="movement" checked> Restore movement</label><label><input type="checkbox" name="waveUses"> Restore once-per-wave abilities</label></div><button type="submit" class="primary full-width">Restore</button></form></dialog>
+<dialog id="clear-enemies-dialog" aria-label="Clear enemies"><form onsubmit="submitClearEnemies(event)"><div class="section-heading"><h2>Clear enemies</h2><button type="button" onclick="this.closest('dialog').close()" aria-label="Close">✕</button></div><p id="clear-enemies-count"></p><label class="check-label"><input id="clear-pending" type="checkbox" checked> Also cancel pending reinforcements</label><p class="muted">No rewards or death effects. Heroes, towers and resources are preserved.</p><button type="submit" class="danger-outline full-width">Remove enemies</button></form></dialog>
+<dialog id="enemy-effect-dialog" aria-label="Enemy effect"><form onsubmit="submitEnemyEffect(event)"><div class="section-heading"><h2>Enemy effect</h2><button type="button" onclick="this.closest('dialog').close()" aria-label="Close">✕</button></div><p id="effect-targets" class="muted"></p><label>Effect<select id="enemy-effect"><option value="stun">Stun</option><option value="slow">Slow</option><option value="bleed">Bleeding</option><option value="poison">Poison</option></select></label><div class="form-row"><label>Turns (0 = remove)<input id="enemy-effect-turns" type="number" min="0" max="100" value="2" required></label><label>Damage per turn for poison / bleeding<input id="enemy-effect-power" type="number" min="1" max="1000000" value="6" required></label></div><button class="primary full-width" type="submit">Apply to selected</button></form></dialog>
+<script src="master-map.js"></script>
+<script src="master-ui.js"></script>
+<script src="master-controls-ui.js"></script>
+<script src="scene-notes.js"></script>
+<script src="scenario-rules.js"></script>
+<script src="planning-ui.js"></script>
+<script src="master-scenes.js"></script>
+<script src="master-planning.js"></script>
+</body>
+</html>

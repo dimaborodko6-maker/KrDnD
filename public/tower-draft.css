@@ -1,0 +1,979 @@
+/* =========================================================================
+   СТИЛИ МОКАПА И ПРОТОТИПА ВЫБОРА БАШЕН (TOWER DRAFT & ARSENAL MOCKUP)
+   ========================================================================= */
+
+.draft-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(8, 12, 18, 0.88);
+    backdrop-filter: blur(6px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #e0e6ed;
+}
+
+.draft-window {
+    background: #121824;
+    border: 1px solid #2d3b52;
+    border-radius: 12px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    width: 100%;
+    max-width: 1140px;
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: draftFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes draftFadeIn {
+    from { opacity: 0; transform: scale(0.97) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Верхняя панель заголовка */
+.draft-header {
+    background: linear-gradient(180deg, #1e293b 0%, #151d2c 100%);
+    border-bottom: 1px solid #283548;
+    padding: 14px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.draft-header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.draft-header-title h2 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: #f1f5f9;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.draft-badge-proto {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #0f172a;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.draft-header-desc {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.draft-close-btn {
+    background: transparent;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    border-radius: 8px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.draft-close-btn:hover {
+    background: #334155;
+    color: #fff;
+    border-color: #64748b;
+}
+
+/* Панель выбранного арсенала (Слоты башен команды) */
+.draft-slots-bar {
+    background: #0d131f;
+    border-bottom: 1px solid #222e42;
+    padding: 12px 20px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.draft-slots-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.draft-slots-count {
+    color: #f59e0b;
+    font-weight: 700;
+}
+
+.draft-slots-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.draft-slot-card {
+    background: #172133;
+    border: 2px dashed #334155;
+    border-radius: 8px;
+    padding: 8px 10px;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.draft-slot-card.filled {
+    background: linear-gradient(135deg, #1e2b42 0%, #162133 100%);
+    border: 2px solid #3b82f6;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.draft-slot-empty {
+    width: 100%;
+    text-align: center;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.draft-slot-icon {
+    font-size: 24px;
+    line-height: 1;
+}
+
+.draft-slot-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.draft-slot-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #f8fafc;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.draft-slot-meta {
+    font-size: 11px;
+    color: #94a3b8;
+    display: flex;
+    gap: 6px;
+    margin-top: 2px;
+}
+
+.draft-slot-remove {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+}
+
+.draft-slot-remove:hover {
+    opacity: 1;
+}
+
+/* Пресеты быстрой сборки */
+.draft-presets-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-top: 4px;
+}
+
+.draft-preset-label {
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.draft-preset-chip {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #cbd5e1;
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.draft-preset-chip:hover {
+    background: #334155;
+    color: #f8fafc;
+    border-color: #64748b;
+}
+
+/* Центральное тело: фильтры + сетка карточек + боковая панель осмотра */
+.draft-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    overflow: hidden;
+}
+
+/* Левая часть: список каталога */
+.draft-catalog-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    border-right: 1px solid #222e42;
+}
+
+/* Панель фильтров */
+.draft-filter-bar {
+    padding: 10px 18px;
+    background: #141b29;
+    border-bottom: 1px solid #222e42;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+}
+
+.draft-search-input {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: #f1f5f9;
+    font-size: 12px;
+    min-width: 140px;
+    flex: 1;
+}
+
+.draft-search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.draft-tabs {
+    display: flex;
+    gap: 4px;
+}
+
+.draft-tab-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #94a3b8;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.draft-tab-btn:hover {
+    background: #1e293b;
+    color: #f8fafc;
+}
+
+.draft-tab-btn.active {
+    background: #2563eb;
+    color: #fff;
+}
+
+/* Сетка карточек башен */
+.draft-grid {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    align-content: start;
+}
+
+.draft-card {
+    background: #162033;
+    border: 1px solid #2a3952;
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    position: relative;
+    user-select: none;
+}
+
+.draft-card:hover {
+    border-color: #475569;
+    background: #1c2840;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.draft-card.active-preview {
+    border-color: #38bdf8;
+    box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.3);
+}
+
+.draft-card.in-roster {
+    border-color: #10b981;
+    background: linear-gradient(180deg, #162938 0%, #15222e 100%);
+}
+
+.draft-card.in-roster::after {
+    content: "✓ В АРСЕНАЛЕ";
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #10b981;
+    color: #042f2e;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+
+.draft-card-head {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.draft-card-icon {
+    font-size: 32px;
+    line-height: 1;
+    background: #0f172a;
+    border: 1px solid #2a3952;
+    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.draft-card-title-box {
+    flex: 1;
+    min-width: 0;
+}
+
+.draft-card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f8fafc;
+    line-height: 1.25;
+}
+
+.draft-card-subtitle {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+.draft-card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: #0f172a;
+    border-radius: 6px;
+    padding: 6px 8px;
+    gap: 6px;
+    font-size: 11px;
+}
+
+.draft-stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.draft-stat-label {
+    color: #64748b;
+    font-size: 9px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.draft-stat-val {
+    color: #e2e8f0;
+    font-weight: 700;
+    margin-top: 1px;
+}
+
+/* Бейджи эффектов */
+.draft-effects-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.draft-effect-badge {
+    background: #1a2538;
+    border-left: 3px solid #38bdf8;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+.draft-effect-name {
+    font-weight: 700;
+    color: #38bdf8;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.draft-effect-desc {
+    color: #cbd5e1;
+    font-size: 10px;
+    margin-top: 2px;
+    line-height: 1.3;
+}
+
+.draft-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 6px;
+}
+
+.draft-btn-select {
+    flex: 1;
+    background: #2563eb;
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.draft-btn-select:hover {
+    background: #1d4ed8;
+}
+
+.draft-btn-select.selected {
+    background: #dc2626;
+}
+
+.draft-btn-select.selected:hover {
+    background: #b91c1c;
+}
+
+.draft-btn-inspect {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #cbd5e1;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.draft-btn-inspect:hover {
+    background: #334155;
+    color: #fff;
+}
+
+/* Правая панель детального осмотра башни и броска кубика */
+.draft-detail-pane {
+    width: 380px;
+    background: #0f172a;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    flex-shrink: 0;
+    padding: 18px;
+    gap: 14px;
+    border-left: 1px solid #222e42;
+}
+
+.draft-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.draft-detail-icon {
+    font-size: 40px;
+    line-height: 1;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.draft-detail-title-box h3 {
+    margin: 0;
+    font-size: 17px;
+    color: #f8fafc;
+}
+
+.draft-detail-subtitle {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 3px;
+}
+
+.draft-detail-section {
+    background: #162033;
+    border: 1px solid #28374d;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.draft-detail-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #f59e0b;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.draft-detail-desc {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.45;
+}
+
+/* Интерактивный симулятор кубиков D&D */
+.draft-dice-roller {
+    background: linear-gradient(135deg, #1e2b42 0%, #151e2e 100%);
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.draft-dice-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #60a5fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.draft-dice-formula {
+    background: #0f172a;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: monospace;
+    color: #f59e0b;
+}
+
+.draft-dice-result-box {
+    background: #0b111c;
+    border-radius: 6px;
+    padding: 10px;
+    text-align: center;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.draft-dice-number {
+    font-size: 26px;
+    font-weight: 900;
+    color: #38bdf8;
+    line-height: 1;
+}
+
+.draft-dice-crit {
+    color: #ef4444 !important;
+    text-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+}
+
+.draft-dice-breakdown {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.draft-dice-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    border: none;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+}
+
+.draft-dice-btn:hover {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+}
+
+/* Нижний колонтитул с кнопками сохранения/применения */
+.draft-footer {
+    background: #141b29;
+    border-top: 1px solid #222e42;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.draft-footer-hint {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.draft-footer-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.draft-btn-apply {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.draft-btn-apply:hover {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Адаптивность для мобильных телефонов и узких экранов */
+@media (max-width: 860px) {
+    .draft-body {
+        flex-direction: column;
+    }
+    .draft-detail-pane {
+        width: 100%;
+        border-left: none;
+        border-top: 1px solid #222e42;
+        max-height: 280px;
+    }
+    .draft-slots-container {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    }
+}
+
+
+/* =========================================================================
+   ДОПОЛНИТЕЛЬНЫЕ СТИЛИ: ПРОКАЧКА, РЕЖИМ МАСТЕРА, ГОЛОСОВАНИЕ И УРОВНИ I-IV
+   ========================================================================= */
+
+.draft-badge-progression {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.draft-badge-progression.single {
+    background: rgba(14, 165, 233, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+}
+
+.draft-badge-progression.branch {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.draft-role-toggle {
+    background: #1e293b;
+    border: 1px solid #3b82f6;
+    color: #93c5fd;
+    padding: 5px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.15s;
+}
+
+.draft-role-toggle:hover {
+    background: #2563eb;
+    color: #fff;
+}
+
+.draft-role-toggle.master-active {
+    background: #f59e0b;
+    border-color: #d97706;
+    color: #0f172a;
+}
+
+.draft-master-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #f87171;
+    background: rgba(239, 68, 68, 0.1);
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    cursor: pointer;
+    margin-top: 6px;
+}
+
+.draft-master-checkbox-label input {
+    cursor: pointer;
+    margin: 0;
+}
+
+.draft-card.is-hidden-from-players {
+    border-color: #ef4444;
+    opacity: 0.65;
+}
+
+.draft-card.is-hidden-from-players::after {
+    content: "СКРЫТО ОТ ИГРОКОВ";
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+}
+
+.draft-levels-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0;
+    font-size: 11px;
+}
+
+.draft-levels-table th {
+    background: #1e293b;
+    color: #94a3b8;
+    text-align: left;
+    padding: 4px 6px;
+    border-bottom: 1px solid #334155;
+    font-weight: 600;
+}
+
+.draft-levels-table td {
+    padding: 4px 6px;
+    border-bottom: 1px solid #1e293b;
+    color: #cbd5e1;
+}
+
+.draft-levels-table tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.draft-cooldown-badge {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: 600;
+    display: inline-block;
+    margin-left: 6px;
+}
+
+/* Панель голосования за арсенал */
+.draft-vote-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(10, 15, 26, 0.92);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.draft-vote-card {
+    background: #172133;
+    border: 1px solid #3b82f6;
+    border-radius: 12px;
+    box-shadow: 0 12px 36px rgba(0,0,0,0.6);
+    max-width: 520px;
+    width: 100%;
+    padding: 24px;
+    text-align: center;
+}
+
+.draft-vote-card h3 {
+    margin: 0 0 10px;
+    font-size: 18px;
+    color: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.draft-vote-meta {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 16px;
+}
+
+.draft-vote-towers-preview {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.draft-vote-tower-chip {
+    background: #0f172a;
+    border: 1px solid #334155;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.draft-vote-tally {
+    background: #0d131f;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-around;
+}
+
+.draft-vote-player-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+}
+
+.draft-vote-btn-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.draft-btn-vote-yes {
+    background: #10b981;
+    border: none;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.draft-btn-vote-no {
+    background: #ef4444;
+    border: none;
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.draft-btn-vote-cancel {
+    background: #475569;
+    border: none;
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.draft-btn-master-force {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: none;
+    color: #0f172a;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 12px;
+}

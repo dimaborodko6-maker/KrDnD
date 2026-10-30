@@ -1,0 +1,14 @@
+.tower-roster { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 8px; margin-top: 10px; }
+.tower-type-choice { display: grid; gap: 5px; width: 100%; text-align: left; padding: 10px; border: 1px solid #444; border-radius: 6px; background: #242b34; color: #edf1f5; }
+.tower-type-choice strong { font-size: 13px; }
+.tower-type-choice span { font-size: 11px; font-weight: normal; }
+.tower-type-choice[aria-pressed=true] { background: #3c3926; color: #ffdb82; border-color: #ffcc00; }
+.tower-type-choice:disabled { cursor: default; opacity: .65; }
+.tower-type-choice[aria-pressed=true]:disabled { opacity: .85; }
+.tower-roster-help { color: #a9b5c3; font-size: 12px; line-height: 1.5; margin: 10px 0; }
+#tower-roster-controls[hidden] { display: none; }
+.map-tower-badge { position: absolute; inset: 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; border-radius: 3px; background: #0007; color: #fff; font-weight: 900; text-align: center; text-shadow: 1px 1px 2px #000; z-index: 5; pointer-events: none; }
+.map-tower-icon { font-size: 40px; line-height: 1; }
+.map-tower-level { font-size: 20px; line-height: 1; }
+.map-panel .map-tower-icon { font-size: 44px; }
+.map-panel .map-tower-level { font-size: 22px; }

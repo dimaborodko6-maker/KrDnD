@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script src="diagnostics.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Hero Screen — Kr6DnD</title>
+    <link rel="stylesheet" href="player.css">
+    <link rel="stylesheet" href="player-layout.css">
+    <link rel="stylesheet" href="map-range-contours.css">
+    <link rel="stylesheet" href="unit-statuses.css">
+    <link rel="stylesheet" href="tower-roster.css">
+    <link rel="stylesheet" href="tower-preparation.css">
+</head>
+
+<body>
+    <!-- DEFENDER CREATION WINDOW -->
+    <div id="screen-login" class="screen active" style="position:relative;">
+        <div class="lang-switcher-slot" style="position: absolute; top: 12px; right: 12px; z-index: 100;"></div>
+        <h3 style="margin-top:0; color:#ffcc00; text-align:center;">🛡️ CREATE A DEFENDER</h3>
+        <input type="text" id="p-name" placeholder="Enter player name"
+            style="width:100%; padding:12px; box-sizing:border-box; margin-bottom:15px; background:#222; color:#fff; border:1px solid #444; border-radius:4px; font-size:14px;">
+
+        <div id="setup-step-1">
+            <div class="step-title">Step 1: Choose a Hero</div>
+            <div id="h-list"></div>
+        </div>
+
+        <div id="setup-step-2" style="display:none;">
+            <div class="step-title">Step 2: D&D Ability Scores (8 to 20)</div>
+            <div class="points-pool">Unspent points: <span id="points-left">27</span></div>
+            <div id="stats-dist-box"></div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <button class="btn" style="background:#555; color:#fff; width:40%;" onclick="goToStep(1)">⬅ BACK</button>
+                <button class="btn" style="background:#ff9800; width:60%;" onclick="goToStep(3)">NEXT ➔</button>
+            </div>
+        </div>
+
+        <div id="setup-step-3" style="display:none;">
+            <div class="step-title">Step 3: Choose 3 Abilities</div>
+            <div class="points-pool" style="background:#00e676;">Available slots: <span id="skills-left">3</span></div>
+            <div id="skills-pick-box"></div>
+            <div style="display:flex; gap:8px; margin-top:10px;">
+                <button class="btn" style="background:#555; color:#fff; width:35%;" onclick="goToStep(2)">⬅ BACK</button>
+                <button class="btn" style="width:65%;" onclick="finishCharacterCreation()">⚔️ TO BATTLE</button>
+            </div>
+        </div>
+        </div>
+    <!-- MAIN GAME SCREEN -->
+    <div id="screen-game" class="screen">
+      <header class="battle-header">
+        <div class="hero-heading">
+          <div class="eyebrow"><span id="phase-title">Play period</span><span id="phase-wave-badge">Wave 1</span><div class="lang-switcher-slot" style="display:inline-block; margin-left:10px;"></div></div>
+          <strong id="hero-name">Your hero</strong>
+        </div>
+        <div class="stats">
+            <div>❤️ HP<br><b id="s-hp">0</b></div>
+            <div>🛡️ Armor<br><b id="s-armor">0%</b></div>
+            <div>🧪 Mana<br><b id="s-mana">0</b></div>
+            <div>🏃 Move<br><b id="s-spd">0</b></div>
+            <div style="color:#ff5252;">👑 Base<br><b id="s-base">20</b></div>
+            <div class="gold-stat">💰 Gold<br><b id="team-gold-val">300</b></div>
+        </div>
+      </header>
+      <main class="battle-map">
+
+        <!-- BARRACKS RALLY POINT NOTICE -->
+        <div id="rally-mode-banner" style="display:none; background:#1b3322; border:1px solid #00e676; padding:8px 12px; border-radius:6px; margin-bottom:10px; font-size:12px; justify-content:space-between; align-items:center;">
+            <div>
+                <b style="color:#00e676;">🚩 RALLY POINT MODE:</b><br>
+                <span id="rally-mode-text" style="color:#ddd; font-size:11px;">Click a road cell within barracks range.</span>
+            </div>
+            <button onclick="cancelRallySelection()" style="background:#555; border:none; color:#fff; padding:5px 10px; border-radius:4px; cursor:pointer; font-size:11px; font-weight:bold;">Cancel</button>
+        </div>
+
+        <!-- NEW TOWER CONSTRUCTION DIALOG (EMPTY SLOT) -->
+        <div id="build-modal-backdrop" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.78); z-index:9998; align-items:center; justify-content:center; padding:15px; box-sizing:border-box;">
+            <div style="background:#1e2227; border:2px solid #ffcc00; border-radius:8px; width:100%; max-width:380px; padding:16px; box-shadow:0 8px 24px rgba(0,0,0,0.9); color:#fff; box-sizing:border-box;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #444; padding-bottom:8px; margin-bottom:12px;">
+                    <h4 id="bm-title" style="margin:0; color:#ffcc00; font-size:16px;">🏗️ Build a Tower</h4>
+                    <button onclick="closeBuildModal()" style="background:none; border:none; color:#aaa; font-size:18px; cursor:pointer;">✖</button>
+                </div>
+                <div style="font-size:12px; color:#aaa; margin-bottom:10px;">Choose a defensive structure:</div>
+                
+                <div id="bm-cards-list" style="display:flex; flex-direction:column; gap:8px;"></div>
+
+                <button class="btn" style="margin-top:10px; background:#444; color:#fff; font-size:12px; padding:8px;" onclick="closeBuildModal()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- EXISTING TOWER ACTIONS DIALOG -->
+        <div id="tower-modal-backdrop" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.75); z-index:9999; align-items:center; justify-content:center; padding:15px; box-sizing:border-box;">
+            <div style="background:#1e2227; border:2px solid #ffcc00; border-radius:8px; width:100%; max-width:360px; padding:16px; box-shadow:0 8px 24px rgba(0,0,0,0.8); color:#fff; box-sizing:border-box;">
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #444; padding-bottom:8px; margin-bottom:12px;">
+                    <h4 id="tm-title" style="margin:0; color:#ffcc00; font-size:16px;">🏰 Tower</h4>
+                    <button onclick="closeTowerModal()" style="background:none; border:none; color:#aaa; font-size:18px; cursor:pointer;">✖</button>
+                </div>
+                <div id="tm-info" style="font-size:12px; color:#ddd; margin-bottom:14px; line-height:1.5;"></div>
+                
+                <div id="tm-actions" style="display:flex; flex-direction:column; gap:8px;">
+                    <div id="tm-upgrades-box" style="display:flex; flex-direction:column; gap:6px;"></div>
+                    <button id="tm-btn-range-preview" class="btn" style="margin-top:0; background:#263238; color:#00e5ff; font-size:12px; padding:9px; border:1px solid #00e5ff;" onclick="previewTowerRange()">
+                        👁️ Show range on map
+                    </button>
+                    <button id="tm-btn-rally" class="btn" style="display:none; margin-top:0; background:#00e676; color:#111; font-size:13px; padding:10px;" onclick="startRallySelection()">
+                        🚩 Select rally point
+                    </button>
+                    <button id="tm-btn-demolish" class="btn" style="margin-top:0; background:#b71c1c; color:#fff; font-size:12px; padding:9px; border:1px solid #ef5350;" onclick="requestDemolishCurrentTower()">
+                        🧨 Demolish tower (request team approval)
+                    </button>
+                    <button class="btn" style="margin-top:4px; background:#444; color:#fff; font-size:12px; padding:8px;" onclick="closeTowerModal()">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FLOATING TOWER RANGE CHIP -->
+        <div id="range-preview-bar" style="display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:9999; background:rgba(20,24,30,0.95); border:2px solid #00e5ff; border-radius:30px; padding:8px 18px; box-shadow:0 6px 20px rgba(0,0,0,0.85); align-items:center; gap:14px; color:#fff; font-size:13px; font-weight:bold;">
+            <span id="range-preview-text">👁️ Tower range preview</span>
+            <button onclick="closeTowerRangePreview()" style="background:#00e5ff; color:#111; border:none; border-radius:18px; padding:6px 14px; font-weight:bold; cursor:pointer; font-size:12px;">✖ Hide range</button>
+        </div>
+
+        
+        
+
+        <!-- TOWER DEMOLITION VOTE DIALOG -->
+        <div id="demolish-vote-backdrop" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.82); z-index:10000; align-items:center; justify-content:center; padding:15px; box-sizing:border-box;">
+            <div style="background:#261819; border:2px solid #ff5252; border-radius:8px; width:100%; max-width:380px; padding:16px; box-shadow:0 8px 24px rgba(0,0,0,0.9); color:#fff; box-sizing:border-box;">
+                <h4 style="margin:0 0 10px 0; color:#ff5252; font-size:16px; display:flex; align-items:center; gap:6px;">
+                    🧨 VOTE: TOWER DEMOLITION
+                </h4>
+                <div id="dv-info" style="font-size:13px; color:#ddd; margin-bottom:10px; line-height:1.4;"></div>
+                <div id="dv-status" style="font-size:12px; color:#ffcc00; margin-bottom:12px; font-weight:bold; background:#371c1f; padding:6px 10px; border-radius:4px; border-left:3px solid #ff5252;"></div>
+                
+                <div id="dv-actions" style="display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+        </div>
+
+        <details id="scene-progress-panel" class="revealed-scene-panel" hidden open><summary>Scene objectives · <span id="scene-progress-round"></span></summary><div id="scene-progress-content"></div></details>
+        
+        <!-- TEAM TOWER ARSENAL VOTE DIALOG -->
+        <div id="roster-vote-backdrop" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.82); z-index:10000; align-items:center; justify-content:center; padding:15px; box-sizing:border-box;">
+            <div style="background:#151e2e; border:2px solid #3b82f6; border-radius:8px; width:100%; max-width:420px; padding:16px; box-shadow:0 8px 24px rgba(0,0,0,0.9); color:#fff; box-sizing:border-box;">
+                <h4 style="margin:0 0 10px 0; color:#60a5fa; font-size:16px; display:flex; align-items:center; gap:6px;">
+                    🗳️ VOTE: TOWER ARSENAL
+                </h4>
+                <div id="rv-info" style="font-size:13px; color:#ddd; margin-bottom:10px; line-height:1.4;"></div>
+                <div id="rv-status" style="font-size:12px; color:#ffcc00; margin-bottom:12px; font-weight:bold; background:#1b283d; padding:6px 10px; border-radius:4px; border-left:3px solid #3b82f6;"></div>
+                <div id="rv-actions" style="display:flex; flex-direction:column; gap:8px;"></div>
+            </div>
+        </div>
+        <section id="revealed-scene-panel" class="revealed-scene-panel" hidden aria-label="Scene notes"><h3>Map discoveries</h3><div id="revealed-scene-notes"></div></section>
+        <div class="map-zoom-bar">
+            <div style="display:flex; align-items:center; gap:8px;">
+                <span id="map-title-label">🗺️ Tactical Map</span>
+                <label style="display:flex; align-items:center; gap:4px; font-size:11px; color:#aaa; cursor:pointer; background:#22252a; padding:2px 6px; border-radius:3px; border:1px solid #444;">
+                    <input type="checkbox" id="coords-toggle" onchange="toggleCoordsDisplay(this.checked)" checked style="cursor:pointer; accent-color:#ffcc00;">
+                    <span style="color:#ffcc00; font-weight:bold;">📍 Coordinates</span>
+                </label>
+            </div>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <button class="zoom-btn" onclick="changeMapZoom(-0.15)">🔍 -</button>
+                <span id="zoom-level-val" style="min-width:34px; text-align:center; color:#fff;">100%</span>
+                <button class="zoom-btn" onclick="changeMapZoom(0.15)">🔍 +</button>
+                <button class="zoom-btn" onclick="fitMapToView()">Fit</button>
+                <button class="zoom-btn" onclick="focusHeroOnMap()" aria-label="Focus hero" title="Focus hero">◎</button>
+            </div>
+        </div>
+
+        <div class="map-wrapper" id="p-map-container">
+            <div id="map-surface"><div class="grid" id="p-grid"></div><div id="combat-text-layer" class="combat-text-layer" aria-hidden="true"></div></div>
+        </div>
+      </main>
+      <aside class="battle-dock" aria-label="Hero controls">
+          <div class="map-modes" role="group" aria-label="Map mode">
+            <button id="mode-action" class="mode-btn active" aria-pressed="true" onclick="setMapMode('action')">⚔ Action</button>
+            <button id="mode-move" class="mode-btn" aria-pressed="false" onclick="setMapMode('move')">↗ Move</button>
+            <button id="mode-build" class="mode-btn" aria-pressed="false" onclick="setMapMode('build')">🏗 Towers</button>
+            <button id="mode-journal" class="mode-btn" aria-pressed="false" onclick="setMapMode('journal')">📖 Journal</button>
+          </div>
+        <div class="dock-scroll">
+          <div id="action-controls">
+            <div class="section-label"><span>01 · Ability</span><span id="action-status">Action available</span></div>
+            <div id="ab-box"></div>
+            <section class="ability-details" aria-labelledby="ability-name"><h3 id="ability-name">Basic attack</h3><p id="ability-description"></p></section>
+            <section id="target-step" hidden aria-label="Target selection">
+              <div class="section-label"><span>02 · Target</span><button class="text-btn" id="clear-target-btn" onclick="clearBattleTarget()">Reset</button></div>
+              <div id="target-choices" aria-label="Available targets"></div>
+            </section>
+          </div>
+          <section id="tower-roster-controls" hidden aria-label="Team tower roster">
+            <div class="section-label"><span>Team tower roster</span><span id="player-tower-type-count">—/5</span></div>
+            <p id="tower-roster-hint" class="tower-roster-help"></p>
+            <div id="player-tower-roster" class="tower-roster"></div>
+          </section>
+          <div id="preparation-roster-box" style="display:none; margin:8px 0 10px 0;">
+            <button type="button" class="btn" style="background:#ffcc00; color:#111; font-weight:bold; width:100%; padding:12px; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; border-radius:6px; border:none; cursor:pointer;" onclick="openPreparationTowerMenu()">
+              <span>🏰</span>
+              <span>Choose team towers (<span id="dock-roster-count">5/5</span>)</span>
+            </button>
+            <div style="font-size:11px; color:#a9b5c3; margin-top:5px; text-align:center;">
+              Preparation period: configure the team tower roster
+            </div>
+          </div>
+          <p id="map-mode-hint" role="status">Select an ability, then a target on the map.</p>
+          <section id="journal-controls" hidden aria-label="Passive abilities and journal">
+            <h3 class="section-label">Passive abilities</h3>
+            <div id="passives-box"></div>
+            <h3 class="section-label">Battle journal</h3>
+            <div id="player-log-box"></div>
+            <button class="text-btn leave-btn" onclick="leaveCharacter()">Recreate hero</button>
+          </section>
+        </div>
+        <div class="dock-footer">
+          <button class="btn" id="attack-main-btn" onclick="attack()" disabled>Select a target</button>
+          <button id="btn-toggle-ready" class="btn ready-btn" onclick="toggleReady()">✓ End turn</button>
+        </div>
+      </aside>
+    </div>
+
+    <dialog id="tower-preparation-menu" hidden aria-label="Preparation tower selection">
+        <header class="tp-header"><div class="tp-shell">
+            <div class="tp-row"><button type="button" id="tower-preparation-back" class="tp-back">← Back to map</button><span class="tp-period">Preparation period</span></div>
+            <nav class="tp-tabs" aria-label="Team towers">
+                <button type="button" id="tower-preparation-roster-tab" aria-pressed="true">Team roster · <span id="tower-preparation-count">0/5</span></button>
+                <button type="button" id="tower-preparation-plan-tab" aria-pressed="false">Tower progression</button>
+            </nav>
+        </div></header>
+        <div id="tower-preparation-content" class="tp-shell"></div>
+        <footer id="tower-preparation-footer" class="tp-shell" aria-live="polite"></footer>
+    </dialog>
+
+    <!-- EXTERNAL LOGIC SCRIPT -->
+    <script src="gamedata.js"></script>
+    <script src="battle-ability-rules.js"></script>
+    <script src="map-range-contours.js"></script>
+    <script src="tower-rules.js"></script>
+    <script src="unit-statuses.js"></script>
+    <script src="tower-roster-ui.js"></script>
+    <script src="tower-preparation.js"></script>
+    <script src="scene-notes.js"></script>
+    <script src="scenario-rules.js"></script>
+    <link rel="stylesheet" href="combat-text.css">
+    <script src="combat-text.js"></script>
+    <script src="tower-catalog-data.js"></script>
+    <script src="tower-draft-catalog.js"></script>
+    <script src="i18n-dict.js"></script>
+    <script src="i18n.js"></script>
+    <script src="player-logic.js"></script>
+</body>
+
+</html>

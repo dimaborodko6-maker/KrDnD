@@ -1,0 +1,186 @@
+* { box-sizing: border-box; }
+body { margin: 0; padding: 24px; max-width: 1800px; margin-inline: auto; font-size: 14px; }
+h1 { font-size: 23px; margin: 0 0 4px; } h2 { font-size: 16px; margin: 0 0 12px; color: #ffcc00; } h3 { font-size: 14px; }
+button, input, select { font-family: inherit; font-size: 14px; }
+button { width: auto; margin: 0; padding: 9px 13px; background: #2c2f30; color: #e8e6e3; border: 1px solid #444; border-radius: 5px; }
+button:hover { border-color: #ffcc00; } button:disabled { opacity: .45; cursor: not-allowed; }
+button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline: 2px solid #ffcc00; outline-offset: 3px; }
+button.active, button[aria-pressed=true], button.primary { background: #ffcc00; color: #111; border-color: #ffcc00; }
+input[type=number] { font-size: 14px; padding: 8px; width: 95px; text-align: left; }
+input[type=checkbox] { accent-color: #ffcc00; }
+select { width: 100%; min-width: 0; background: #141617; color: #e8e6e3; padding: 9px; border: 1px solid #444; border-radius: 5px; }
+label { display: grid; gap: 5px; font-size: 13px; color: #b7bfbe; }
+.muted { color: #a6afae; font-size: 13px; line-height: 1.5; } p.muted { margin: 10px 0 0; }
+.editor-link { display:inline-flex; align-items:center; padding:9px 13px; border:1px solid #444; border-radius:5px; color:#e8e6e3; background:#2c2f30; text-decoration:none; font-weight:bold; }
+.editor-link:hover { border-color:#ffcc00; }
+.app-header, .app-toolbar, .metrics, .button-row, .form-row, .section-heading, .map-heading, .turn-bar { display: flex; align-items: center; gap: 10px; }
+.app-header { justify-content: space-between; padding: 0 0 20px; border-bottom: 1px solid #383c3e; gap: 24px; flex-wrap: wrap; }
+.metrics { gap: 36px; flex-wrap: wrap; } .metrics span { display: block; color: #a6afae; font-size: 12px; } .metrics strong { display: block; font-size: 22px; }
+.metric-button { padding: 0; border: 0; text-align: left; background: transparent; } .metric-button strong { color: #ffcc00; }
+.app-toolbar { justify-content: space-between; padding: 16px 0; flex-wrap: wrap; }
+.game-period-panel { margin-bottom: 16px; }
+.game-period-panel .button-row > strong { margin-right: 6px; }
+.button-row, .form-row { flex-wrap: wrap; } .form-row { align-items: flex-end; gap: 12px; } .form-row .grow { flex: 1; min-width: 180px; }
+.panel { padding: 16px; } .master-tools { margin-bottom: 20px; } .tool-content { border-top: 1px solid #383c3e; padding-top: 16px; margin-top: 14px; }
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 20px; align-items: start; } .map-column, .inspector { min-width: 0; display: grid; grid-template-columns: minmax(0,1fr); gap: 16px; }
+.map-column > *, .inspector > * { min-width: 0; }
+.section-heading, .map-heading { justify-content: space-between; flex-wrap: wrap; } .section-heading h2, .map-heading h2 { margin: 0; }
+.map-heading { margin-bottom: 12px; } #zoom-label { min-width: 42px; text-align: center; color: #a6afae; }
+.map-panel { isolation: isolate; }
+.map-action { color: #ffcc00; font-size: 13px; min-height: 32px; padding-bottom: 10px; }
+#map-viewport { overflow: auto; max-height: 76vh; background: #0c0d0e; border-radius: 6px; border: 1px solid #333; }
+#map-stage { position: relative; margin-inline: auto; } #game-grid { position: relative; }
+.cell { flex-shrink: 0; margin: 0; padding: 0; font-family: inherit; } .cell.selected-cell { outline: 2px solid #ffcc00; outline-offset: -2px; }
+.cell:hover { filter: brightness(1.2); } .map-legend { display: flex; flex-wrap: wrap; gap: 14px; color: #a6afae; font-size: 12px; margin-top: 12px; }
+.stack-count { position: absolute; right: 1px; top: 1px; z-index: 110; background: #141617; color: #ffcc00; padding: 1px 3px; border-radius: 3px; font-size: 10px; }
+.turn-bar { justify-content: space-between; flex-wrap: wrap; position: sticky; bottom: 12px; z-index: 50; box-shadow: 0 8px 24px #0008; }
+#btn-move-enemies { font-size: 16px; padding: 12px 22px; min-width: 190px; } #ready-summary { color: #ffcc00; }
+.team-member { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid #383c3e; border-radius: 0; padding: 12px 0; background: transparent; font-weight: normal; }
+.team-member:last-child { border-bottom: 0; } .team-member strong { display: block; font-size: 14px; color: #e8e6e3; } .team-meta { display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: #a6afae; }
+.good { color: #00e676; } .waiting { color: #ffd54f; } .danger-outline { color: #ff8585; border-color: #804040; }
+.object-name { font-size: 18px; color: #e8e6e3; margin-bottom: 4px; } .object-row { display: flex; justify-content: space-between; padding: 6px 0; gap: 12px; } .object-row span { color: #a6afae; }
+.object-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; } .object-actions button { font-size: 13px; }
+.journal summary, .technical-log summary { cursor: pointer; padding: 3px 0; font-weight: 600; color: #e8e6e3; } .journal .log-box { margin-top: 14px; height: 230px; font-size: 13px; }
+.log-line { padding: 9px 0; gap: 10px; } .technical-log { margin-top: 16px; } .technical-log .button-row { margin: 12px 0; }
+#debug-log-box { font: 12px/1.5 Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; background: #080a0c; color: #00ff66; padding: 12px; max-height: 260px; overflow: auto; }
+.hero-fields { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 12px; margin: 14px 0; } .hero-fields input { width: 100%; } .hero-flags label { display: flex; align-items: center; }
+#master-notice { padding-top: 12px; color: #00e676; } #master-notice.error { color: #ff8585; }
+.full-width { width: 100%; margin-top: 10px; } .vote-banner { color: #ff8585; gap: 12px; flex-wrap: wrap; }
+#map-editor .form-row { margin-top: 14px; } dialog { background: #202224; color: #e8e6e3; border: 1px solid #ffcc00; border-radius: 8px; padding: 24px; width: min(520px, calc(100vw - 30px)); }
+dialog::backdrop { background: #000b; } dialog .form-row { margin: 20px 0; } .session-actions { display: grid; gap: 12px; }
+#master-tower-modal { position: fixed; inset: 0; background: #000b; z-index: 999; justify-content: center; align-items: center; } .tower-dialog { width: min(420px,calc(100vw - 30px)); max-height: 90vh; overflow: auto; border-color: #ffcc00; } .tower-dialog .button-row { margin: 16px 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); } [hidden] { display: none !important; }
+@media (max-width:1100px) { body { padding: 16px; } .workspace { grid-template-columns: minmax(0,1fr) 270px; gap: 16px; } .hero-fields { grid-template-columns: repeat(4,minmax(0,1fr)); } }
+@media (max-width:800px) { .workspace { grid-template-columns: 1fr; } .inspector { grid-template-columns: repeat(2,minmax(0,1fr)); } .inspector > :first-child { grid-column: 1 / -1; } .metrics { gap: 22px; } .app-toolbar > .button-row { flex-wrap: wrap; } .hero-fields { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width:480px) { body { padding: 10px; } .inspector { grid-template-columns: 1fr; } .hero-fields { grid-template-columns: repeat(2,minmax(0,1fr)); } .metrics strong { font-size: 18px; } .panel { padding: 12px; } .turn-bar button { width: 100%; } .map-heading .button-row { gap: 5px; } button { min-height: 38px; } }
+@media (pointer:coarse) { button { min-height:44px; } }
+
+/* Пульт: поле и текущий бой занимают первый экран. Редакторы используют общие стили выше. */
+.master-page { padding: 12px 16px; font-size: 13px; }
+.master-page h1 { font-size: 20px; margin-bottom: 2px; }
+.master-page h2 { font-size: 14px; margin-bottom: 8px; }
+.master-page button, .master-page input, .master-page select, .master-page .editor-link { font-size: 13px; }
+.master-page button, .master-page select, .master-page .editor-link { padding: 6px 9px; }
+.master-page input[type=number] { padding: 6px; }
+.master-page .panel { padding: 10px 12px; border-radius: 6px; }
+.master-page .app-header { padding-bottom: 8px; gap: 12px; }
+.master-page .metrics { gap: 24px; }
+.master-page .metrics strong { font-size: 20px; }
+.master-page .metric-button { padding: 0; }
+.master-page .app-toolbar { padding: 8px 0; gap: 8px; }
+.master-page .button-row, .master-page .form-row { gap: 6px; }
+.master-page .workspace { grid-template-columns: minmax(0,1fr) 300px; gap: 12px; }
+.master-page .map-column, .master-page .inspector { gap: 10px; }
+.master-page .inspector { position: sticky; top: 12px; max-height: calc(100dvh - 128px); overflow-y: auto; scrollbar-gutter: stable; }
+.master-page .turn-bar { position: static; box-shadow: none; gap: 8px; }
+.master-page .turn-bar > div { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.master-page #btn-move-enemies { min-width: 150px; font-size: 14px; padding: 8px 12px; }
+.master-page .map-heading { margin-bottom: 6px; gap: 6px; }
+.master-page .map-title { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.master-page .map-action { min-height: 24px; padding-bottom: 6px; font-size: 12px; }
+.master-page #map-viewport { max-height: max(260px, calc(100dvh - 270px)); }
+.master-page .map-legend { gap: 5px 12px; margin-top: 7px; font-size: 11px; }
+.master-page .muted { font-size: 12px; line-height: 1.4; }
+.master-page p.muted { margin-top: 7px; }
+.master-page summary { cursor: pointer; font-weight: 600; line-height: 1.5; }
+.master-page summary:hover { color: #ffcc00; }
+.master-page .master-tools { margin: 0; }
+.master-page .tool-tabs { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); margin-top: 10px; }
+.master-page .tool-tabs button { text-align: left; }
+.master-page .tool-content { padding-top: 10px; margin-top: 10px; }
+.master-page .master-tools .form-row { align-items: stretch; }
+.master-page .master-tools .grow { min-width: 0; flex-basis: 100%; }
+.master-page .hero-fields { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 10px 0; }
+.master-page .team-member { padding: 8px 0; }
+.master-page .team-member strong { font-size: 13px; }
+.master-page .team-meta { gap: 6px; flex-wrap: wrap; }
+.master-page .object-name { font-size: 16px; }
+.master-page .object-row { padding: 4px 0; }
+.master-page .object-actions { margin-top: 8px; gap: 5px; }
+.master-page .inspector .master-scene-panel { margin: 0; }
+.master-page .inspector .planning-counter, .master-page .inspector .planning-entry { padding-block: 8px; }
+.master-page .inspector .planning-counter strong { min-width: 100%; }
+.master-page .inspector .planning-private { font-size: 12px; }
+.master-page #master-scenario-slot, .master-page #master-plan-slot { display: contents; }
+.master-page #master-notice:not([hidden]) { padding: 8px 12px; margin-bottom: 10px; background: #20352c; border-radius: 5px; }
+.master-page #master-notice.error { background: #3b2325; }
+.master-page .preparation-panel { margin-top: 10px; }
+.master-page .preparation-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); align-items: start; gap: 10px; margin-top: 12px; }
+.master-page .preparation-grid .panel { margin: 0; }
+.master-page .preparation-grid details { margin-top: 10px; }
+.master-page .preparation-links { margin-top: 12px; }
+@media (max-width:1100px) {
+    .master-page .workspace { grid-template-columns: minmax(0,1fr) 270px; }
+    .master-page .preparation-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:800px) {
+    .master-page .workspace { grid-template-columns: minmax(0,1fr); }
+    .master-page .inspector { position: static; max-height: none; overflow: visible; scrollbar-gutter: auto; grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .master-page .inspector > :first-child, .master-page #master-scenario-panel { grid-column: 1 / -1; }
+    .master-page .preparation-grid { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width:480px) {
+    .master-page { padding: 8px; }
+    .master-page .app-header { align-items: flex-start; }
+    .master-page .metrics { gap: 14px; }
+    .master-page .metrics strong { font-size: 18px; }
+    .master-page .inspector { grid-template-columns: minmax(0,1fr); }
+    .master-page .turn-bar { flex-wrap: nowrap; }
+    .master-page #btn-move-enemies { min-width: 0; width: auto; flex-shrink: 0; padding: 8px; font-size: 13px; }
+    .master-page #round-label { flex-basis: 100%; }
+}
+
+/* Боевой пульт: постоянная карта, одна выбранная панель, редакторы поверх поля. */
+.master-page { max-width: none; }
+.master-page .battle-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.master-page .battle-actions > .button-row { flex: 1; }
+.master-page .map-turn-status { flex: 1; min-width: 120px; }
+.master-page .map-turn-status strong { color: #cfe6b6; font-size: 12px; }
+.master-page .map-heading { align-items: center; }
+.master-page .bulk-selected-cell { box-shadow: inset 0 0 0 3px #75d7c3; }
+.master-page .master-target-cell::after { content: ''; position: absolute; inset: 4px; border: 2px dashed #f9db75; border-radius: 6px; pointer-events: none; z-index: 30; }
+.master-page .workspace { grid-template-columns: minmax(0,1fr) 340px; }
+.master-page .inspector { top: 10px; max-height: calc(100dvh - 184px); display: block; border: 1px solid #393e40; border-radius: 8px; background: #191d1e; }
+.master-page .inspector > .panel, .master-page #inspector-wave > .panel { border: 0; margin: 0; background: transparent; }
+.master-page .inspector-tabs { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); position: sticky; top: 0; z-index: 5; padding: 6px; gap: 3px; background: #191d1e; border-bottom: 1px solid #393e40; }
+.master-page .inspector-tabs button { padding: 8px 3px; font-size: 12px; border-color: transparent; }
+.master-page .inspector-tabs span { font-size: 10px; }
+.master-page #map-viewport { max-height: max(280px,calc(100dvh - 255px)); }
+.master-page .inspector-details { margin-top: 12px; padding-top: 10px; border-top: 1px solid #393e40; }
+.master-page .ability-card { padding: 10px 0; border-bottom: 1px solid #393e40; }
+.master-page .ability-card:last-child { border-bottom: 0; }
+.master-page .ability-card p { margin: 6px 0; line-height: 1.5; color: #c6cecc; }
+.master-page .enemy-roster { margin-top: 10px; max-height: 40dvh; overflow: auto; }
+.master-page .enemy-group-heading { position: sticky; top: 0; background: #191d1e; padding: 5px 0; }
+.master-page .enemy-group-heading button { width: 100%; text-align: left; color: #ffdc75; }
+.master-page .enemy-list-row { display: flex; gap: 5px; align-items: center; border-bottom: 1px solid #303637; }
+.master-page .enemy-list-row > button { flex: 1; min-width: 0; text-align: left; border: 0; background: transparent; font-size: 11px; overflow-wrap: anywhere; }
+.master-page input[type=search] { min-width: 0; width: 100%; padding: 8px; border: 1px solid #47504f; border-radius: 5px; color: #e8e6e3; background: #111617; }
+.master-page .check-label, .master-page .restore-options label { display: flex; align-items: center; gap: 8px; line-height: 1.5; }
+.master-page .check-label input, .master-page .restore-options input { width: auto; margin: 0; }
+.master-page .bulk-actions { position: sticky; bottom: 0; padding: 10px 0; margin-top: 10px; background: #191d1e; border-top: 1px solid #47504f; }
+.master-page .bulk-actions .button-row { margin-top: 8px; }
+.master-page #inspector-enemies > .button-row { margin-top: 10px; }
+.master-page .queue-row { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid #393e40; line-height: 1.5; }
+.master-page dialog { max-height: 88dvh; overflow: auto; }
+.master-page .master-tools-dialog { width: min(720px,calc(100vw - 24px)); }
+.master-page .master-tools-dialog .tool-tabs { display: flex; }
+.master-page .master-tools-dialog .hero-fields { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.master-page .restore-options { display: grid; gap: 14px; padding-block: 18px; }
+.master-page .master-tools-dialog #master-tool-spawn > .button-row { margin-top: 10px; }
+.master-page.map-focused .inspector, .master-page.map-focused .app-header, .master-page.map-focused .app-toolbar,
+.master-page.map-focused .preparation-panel, .master-page.map-focused .journal { display: none; }
+.master-page.map-focused .workspace { grid-template-columns: minmax(0,1fr); }
+.master-page.map-focused #map-viewport { max-height: calc(100dvh - 195px); }
+@media (max-width:1100px) { .master-page .workspace { grid-template-columns: minmax(0,1fr) 300px; } }
+@media (max-width:800px) {
+    .master-page .workspace { grid-template-columns: minmax(0,1fr); }
+    .master-page .inspector { position: static; max-height: 65dvh; overflow: auto; }
+    .master-page #map-viewport { max-height: 60dvh; }
+    .master-page .battle-actions { gap: 6px; }
+    .master-page .battle-actions > .button-row { flex-basis: 100%; }
+}
+@media (max-width:480px) {
+    .master-page .master-tools-dialog .hero-fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .master-page .battle-actions button { font-size: 12px; }
+}

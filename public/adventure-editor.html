@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><script src="diagnostics.js"></script><title>Session Plan — Kr6DnD</title><link rel="stylesheet" href="master.css"><link rel="stylesheet" href="master-layout.css"><link rel="stylesheet" href="scene-editor.css"><script src="i18n-dict.js"></script><script src="i18n.js"></script></head>
+<body>
+<header class="app-header"><div><h1>Session Plan</h1><div class="muted">Adventures and branches · <span id="plan-connection">connecting…</span></div></div><div class="button-row"><div class="lang-switcher-slot" style="display:inline-flex; align-items:center;"></div><a class="editor-link" href="scene-editor.html">Scene Preparation ↗</a><a class="editor-link" href="master.html">GM Dashboard ↗</a></div></header>
+<p class="preparation-banner">Only the GM can see this plan. Add prepared scenes, backup encounters, and outcome-based transitions. Launch the plan from the GM dashboard.</p>
+<nav class="app-toolbar"><div class="button-row"><button id="new-plan" disabled>＋ Adventure</button><button id="copy-plan" disabled>Duplicate</button><button id="delete-plan" class="danger-outline" disabled>Delete</button></div><div class="button-row"><span id="plan-save-state" class="muted" role="status">Loading…</span><button id="reload-plans">Load from server</button><button id="save-plan" class="primary" disabled>Save plan</button></div></nav>
+<p id="plan-notice" class="scene-notice" role="status" aria-live="polite" hidden></p>
+<div class="scene-workspace"><aside class="panel scene-library"><h2>Adventures</h2><div id="plan-list"></div><p class="muted">Edit scenes in the scene library. A template can be used in several steps and adventures.</p></aside><main>
+<p id="plan-empty" class="panel muted">Create an adventure and add saved scenes to it.</p>
+<fieldset id="plan-fields" hidden disabled>
+<section class="panel"><h2 id="plan-heading">Adventure</h2><label>Adventure title<input id="plan-title" maxlength="160" required></label><label>Premise and GM notes<textarea id="plan-description" rows="4" maxlength="8000"></textarea></label><p id="plan-duration" class="muted"></p></section>
+<section class="panel"><h2>Scene sequence</h2><p class="muted">Required and optional scenes run in order. Backup scenes are accessed through a branch or manual transition. When a step has branches, the next transition is chosen from them according to the current scene's outcome.</p><div class="form-row"><label class="grow">Scene from library<select id="plan-scene-choice"></select></label><button type="button" id="add-plan-step">Add to plan</button></div><div id="plan-steps"></div></section>
+</fieldset></main></div>
+<script src="scene-notes.js"></script><script src="scenario-rules.js"></script><script src="planning-ui.js"></script><script src="adventure-editor.js"></script>
+</body></html>

@@ -1,0 +1,21 @@
+.unit-status-trigger { position: relative; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; gap: 0; height: 12px; padding: 0; width: auto; min-width: 0; margin: 0; border: 0; border-radius: 1px; background: transparent; color: #fff; font: inherit; line-height: 1; text-shadow: 0 1px 2px #000; vertical-align: middle; }
+button.unit-status-trigger { cursor: pointer; }
+.unit-status-trigger:hover { border: 0; background: #ffffff26; }
+.unit-status-trigger:focus-visible { outline: 1px solid #fff; outline-offset: 0; }
+.unit-status-icon { display: inline-block; width: 12px; font-family: "Segoe UI Emoji", sans-serif; font-size: 11px; text-align: center; }
+.unit-status-more { font: 11px "Segoe UI", sans-serif; width: 12px; text-align: center; }
+.health-token .token-label, .token .status-token-label { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 1px; padding-inline: 1px; }
+.health-token .token-name, .status-token-name { min-width: 0; overflow: hidden; white-space: nowrap; text-align: center; }
+.unit-status-edge { display: flex; min-width: 0; align-items: center; }
+.unit-status-negative { justify-content: flex-end; }
+.token .status-token-label { height: 100%; }
+.unit-status-dialog { width: min(420px, calc(100vw - 28px)); max-height: 80dvh; overflow: auto; padding: 18px; border: 1px solid #526070; border-radius: 12px; background: #20252c; color: #edf1f5; font: 14px "Segoe UI", sans-serif; }
+.unit-status-dialog::backdrop { background: #000a; }
+.unit-status-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.unit-status-heading h2 { margin: 0; color: #f7cc66; font-size: 16px; }
+.unit-status-close { width: 36px; min-width: 36px; height: 36px; padding: 0; margin: 0; border: 1px solid #526070; border-radius: 6px; background: #2b3542; color: #fff; font-size: 16px; cursor: pointer; }
+.unit-status-health, .unit-status-empty { color: #b8c4d1; margin: 10px 0; }
+.unit-status-list { display: grid; gap: 8px; list-style: none; padding: 0; margin: 12px 0 0; font-size: 12px; line-height: 1.45; }
+.unit-status-list li { display: flex; align-items: flex-start; gap: 8px; overflow-wrap: anywhere; }
+.unit-status-list li > span:first-child { flex: 0 0 20px; font: 16px "Segoe UI Emoji", sans-serif; text-align: center; }
+@media (pointer: coarse) { .unit-status-close { width: 44px; min-width: 44px; height: 44px; } }

@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# Backups
+.codex-backup/
+*.tmp
+*.bak
+
+# OS
+.DS_Store
+Thumbs.db

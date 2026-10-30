@@ -1,0 +1,566 @@
+{
+  "version": 1,
+  "revision": 2,
+  "catalog": {
+    "enemies": {
+      "bandit": {
+        "name": "Бандит",
+        "shortName": "Бандит",
+        "description": "Ближний бой (урон 3, инициатива 12).",
+        "color": "#2e7d32",
+        "hp": 40,
+        "speed": 1,
+        "initiative": 12,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 5,
+        "meleeDmg": 3,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 40,
+        "baseSpeed": 1
+      },
+      "goblin": {
+        "name": "Гоблин",
+        "shortName": "Гобл",
+        "description": "Быстрый слабый гоблин (скорость 2, урон 2-3, инициатива 14).",
+        "color": "#388e3c",
+        "hp": 20,
+        "speed": 2,
+        "initiative": 14,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 3,
+        "meleeDmg": 3,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 20,
+        "baseSpeed": 2
+      },
+      "wulf": {
+        "name": "Волк (Wulf)",
+        "shortName": "Волк",
+        "description": "Стремительный хищник. Скорость 2, инициатива 16, 30% шанс уклонения!",
+        "color": "#8d6e63",
+        "hp": 40,
+        "speed": 2,
+        "initiative": 16,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 10,
+        "meleeDmg": 3,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 30,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 40,
+        "baseSpeed": 2
+      },
+      "orc_warrior": {
+        "name": "Орк-Воин",
+        "shortName": "ОркВ",
+        "description": "Грузный громила (180 ХП, броня 30%, урон 9-14, инициатива 7).",
+        "color": "#4caf50",
+        "hp": 180,
+        "speed": 1,
+        "initiative": 7,
+        "armor": 30,
+        "magicRes": 0,
+        "reward": 15,
+        "meleeDmg": 11,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 180,
+        "baseSpeed": 1
+      },
+      "orc_shaman": {
+        "name": "Орк-Шаман",
+        "shortName": "Шам",
+        "description": "Орочий целитель (маг. рез 80%, инициатива 9). Атакует магией и лечит союзников.",
+        "color": "#009688",
+        "hp": 100,
+        "speed": 1,
+        "initiative": 9,
+        "armor": 0,
+        "magicRes": 80,
+        "reward": 12,
+        "meleeDmg": 4,
+        "rangedDmg": 5,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": true,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "healing": {
+            "radius": 2,
+            "amount": 25,
+            "interval": 3,
+            "maxTargets": 100,
+            "healSelf": true
+          }
+        },
+        "maxHp": 100,
+        "baseSpeed": 1
+      },
+      "crowcaller": {
+        "name": "Заклинатель Воронов",
+        "shortName": "Закл",
+        "description": "Тёмный маг (300 ХП, маг. рез 60%, инициатива 8). Призывает Воронов, если не в блоке!",
+        "color": "#673ab7",
+        "hp": 300,
+        "speed": 1,
+        "initiative": 8,
+        "armor": 0,
+        "magicRes": 60,
+        "reward": 40,
+        "meleeDmg": 4,
+        "rangedDmg": 10,
+        "range": 1,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": true,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "summoning": {
+            "type": "crow",
+            "count": 1,
+            "interval": 3,
+            "maxAlive": 8,
+            "reward": 0,
+            "blockedStops": true
+          }
+        },
+        "maxHp": 300,
+        "baseSpeed": 1
+      },
+      "blackguard": {
+        "name": "Тёмный Гвардеец",
+        "shortName": "Гвар",
+        "description": "Ближний бой (урон 5, броня 30%, инициатива 10).",
+        "color": "#795548",
+        "hp": 80,
+        "speed": 1,
+        "initiative": 10,
+        "armor": 30,
+        "magicRes": 0,
+        "reward": 8,
+        "meleeDmg": 5,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 80,
+        "baseSpeed": 1
+      },
+      "shadow_archer": {
+        "name": "Теневой Лучник",
+        "shortName": "Лучн",
+        "description": "Дальний бой: 6 урона (дистанция 2-4, инициатива 11). Ближний: 2 урона.",
+        "color": "#ff9800",
+        "hp": 110,
+        "speed": 1,
+        "initiative": 11,
+        "armor": 0,
+        "magicRes": 30,
+        "reward": 15,
+        "meleeDmg": 2,
+        "rangedDmg": 6,
+        "range": 2,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": true,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 110,
+        "baseSpeed": 1
+      },
+      "shadow_blade": {
+        "name": "Теневой Клинок",
+        "shortName": "Клин",
+        "description": "Коварный лазутчик. Скорость 2, урон 4, инициатива 15.",
+        "color": "#9c27b0",
+        "hp": 70,
+        "speed": 2,
+        "initiative": 15,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 10,
+        "meleeDmg": 4,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 70,
+        "baseSpeed": 2
+      },
+      "crow": {
+        "name": "Ворон",
+        "shortName": "Ворн",
+        "description": "Летающий вестник несчастий. Скорость 2, урон 2, инициатива 15.",
+        "color": "#37474f",
+        "hp": 20,
+        "speed": 2,
+        "initiative": 15,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 2,
+        "meleeDmg": 2,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": true,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 20,
+        "baseSpeed": 2
+      },
+      "worg": {
+        "name": "Варг (Worg)",
+        "shortName": "Варг",
+        "description": "Свирепый хищник (110 ХП, маг. рез 50%, скорость 2, урон 12, уклонение 30%, инициатива 17).",
+        "color": "#6d4c41",
+        "hp": 110,
+        "speed": 2,
+        "initiative": 17,
+        "armor": 0,
+        "magicRes": 50,
+        "reward": 10,
+        "meleeDmg": 12,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 30,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 110,
+        "baseSpeed": 2
+      },
+      "orc_wildling": {
+        "name": "Орк-Дикарь (Wildling)",
+        "shortName": "Дик",
+        "description": "Бронированный дикарь (260 ХП, броня 60%, урон 8). Разгоняется до скорости 2 рядом со стаей варгов/наездников!",
+        "color": "#33691e",
+        "hp": 260,
+        "speed": 1,
+        "initiative": 13,
+        "armor": 60,
+        "magicRes": 0,
+        "reward": 20,
+        "meleeDmg": 8,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 260,
+        "baseSpeed": 1
+      },
+      "headhunter": {
+        "name": "Охотник за головами (Headhunter)",
+        "shortName": "Охот",
+        "description": "Беспощадный палач (650 ХП, броня 50%, урон 28, инициатива 8). Казнит цель, если её ХП <= 25%!",
+        "color": "#bf360c",
+        "hp": 650,
+        "speed": 1,
+        "initiative": 8,
+        "armor": 50,
+        "magicRes": 0,
+        "reward": 80,
+        "meleeDmg": 28,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0.25,
+        "traits": {},
+        "maxHp": 650,
+        "baseSpeed": 1
+      },
+      "goblin_rider": {
+        "name": "Гоблин на варге (Goblin Rider)",
+        "shortName": "Наезд",
+        "description": "Быстрый всадник (130 ХП, маг. рез 50%, скорость 2, урон 12). При гибели спешивается в обычного гоблина!",
+        "color": "#558b2f",
+        "hp": 130,
+        "speed": 2,
+        "initiative": 16,
+        "armor": 0,
+        "magicRes": 50,
+        "reward": 10,
+        "meleeDmg": 12,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 130,
+        "baseSpeed": 2
+      },
+      "ogre": {
+        "name": "Огр (Ogre Mini-Boss)",
+        "shortName": "Огр",
+        "description": "Сокрушительный мини-босс (1100 ХП, урон 45, сплэш по всем защитникам на клетке, иммун к полиморфу/ваншотам, отнимает 2 жизни базы)!",
+        "color": "#b71c1c",
+        "hp": 1100,
+        "speed": 1,
+        "initiative": 5,
+        "armor": 0,
+        "magicRes": 0,
+        "reward": 120,
+        "meleeDmg": 45,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 2,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isFlying": false,
+        "isRanged": false,
+        "isMiniBoss": true,
+        "aoeCleave": true,
+        "executeThreshold": 0,
+        "traits": {},
+        "maxHp": 1100,
+        "baseSpeed": 1
+      }
+    },
+    "presetWaves": [
+      {
+        "waveNum": 1,
+        "title": "Волна 1: Разведка бандитов",
+        "desc": "Первая группа лёгких бандитов пытается прорваться к Цитадели.",
+        "enemies": [
+          {
+            "type": "bandit",
+            "count": 4,
+            "offsetDelay": 1
+          }
+        ]
+      },
+      {
+        "waveNum": 2,
+        "title": "Волна 2: Теневые лазутчики",
+        "desc": "Быстрые Теневые Клинки и стрелки атакуют с флангов.",
+        "enemies": [
+          {
+            "type": "bandit",
+            "count": 3,
+            "offsetDelay": 0
+          },
+          {
+            "type": "shadow_blade",
+            "count": 2,
+            "offsetDelay": 1
+          },
+          {
+            "type": "shadow_archer",
+            "count": 2,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 3,
+        "title": "Волна 3: Чёрная Стража и Вороны",
+        "desc": "Бронированные гвардейцы под прикрытием стаи летающих воронов.",
+        "enemies": [
+          {
+            "type": "crow",
+            "count": 4,
+            "offsetDelay": 0
+          },
+          {
+            "type": "blackguard",
+            "count": 3,
+            "offsetDelay": 1
+          },
+          {
+            "type": "shadow_archer",
+            "count": 2,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 4,
+        "title": "Волна 4: Штурмовая колонна",
+        "desc": "Плотный строй Тёмной Гвардии и Теневых Клинков.",
+        "enemies": [
+          {
+            "type": "blackguard",
+            "count": 5,
+            "offsetDelay": 0
+          },
+          {
+            "type": "shadow_blade",
+            "count": 3,
+            "offsetDelay": 1
+          },
+          {
+            "type": "crow",
+            "count": 3,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 5,
+        "title": "Волна 5: Набег Гоблинов и Волков",
+        "desc": "Быстрые гоблины верхом и стая уклоняющихся волков атакуют на скорости!",
+        "enemies": [
+          {
+            "type": "goblin",
+            "count": 6,
+            "offsetDelay": 0
+          },
+          {
+            "type": "wulf",
+            "count": 4,
+            "offsetDelay": 1
+          },
+          {
+            "type": "bandit",
+            "count": 3,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 6,
+        "title": "Волна 6: Орочий Авангард и Шаманы",
+        "desc": "Мощные Орки-Воины под защитой исцеляющих ауров Орков-Шаманов.",
+        "enemies": [
+          {
+            "type": "orc_warrior",
+            "count": 3,
+            "offsetDelay": 0
+          },
+          {
+            "type": "orc_shaman",
+            "count": 2,
+            "offsetDelay": 1
+          },
+          {
+            "type": "wulf",
+            "count": 3,
+            "offsetDelay": 2
+          }
+        ]
+      },
+      {
+        "waveNum": 7,
+        "title": "Волна 7: Призыв Тьмы и Заклинатель Воронов",
+        "desc": "Опаснейший колдун призывает нескончаемые стаи воронов под прикрытием гвардейцев!",
+        "enemies": [
+          {
+            "type": "crowcaller",
+            "count": 1,
+            "offsetDelay": 0
+          },
+          {
+            "type": "orc_warrior",
+            "count": 4,
+            "offsetDelay": 1
+          },
+          {
+            "type": "orc_shaman",
+            "count": 2,
+            "offsetDelay": 1
+          },
+          {
+            "type": "crow",
+            "count": 4,
+            "offsetDelay": 2
+          }
+        ]
+      }
+    ]
+  }
+}

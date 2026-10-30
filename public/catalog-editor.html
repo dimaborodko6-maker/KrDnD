@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="diagnostics.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Enemy and Wave Editor — Kr6DnD</title>
+    <link rel="stylesheet" href="master.css">
+    <link rel="stylesheet" href="master-layout.css">
+    <link rel="stylesheet" href="catalog-editor.css">
+    <script src="i18n-dict.js"></script>
+    <script src="i18n.js"></script>
+</head>
+<body class="catalog-page">
+<header class="app-header"><div><h1>📚 Enemies, Waves and Towers</h1><div class="muted">Kr6DnD Catalog · <span id="editor-connection">connecting…</span></div></div><div style="display:flex; align-items:center; gap:8px;"><div class="lang-switcher-slot"></div><a href="master.html" class="editor-link">← GM Dashboard</a></div></header>
+<nav class="app-toolbar" aria-label="Catalog section"><div class="button-row"><button id="tab-mobs" aria-pressed="true">Enemies <span id="mob-count"></span></button><button id="tab-waves" aria-pressed="false">Waves <span id="wave-count"></span></button><button id="tab-towers" aria-pressed="false">Towers <span id="tower-count"></span></button></div><div class="button-row"><span id="save-state" class="muted">Loading catalog</span><button id="reload-catalog">Load from server</button><button id="save-catalog" class="primary" disabled>Save catalog</button></div></nav>
+<div id="editor-notice" class="panel catalog-notice" role="status" aria-live="polite" hidden></div>
+<fieldset id="catalog-fields" disabled><div class="catalog-workspace">
+<aside class="panel catalog-list"><div class="section-heading"><h2 id="list-title">Bestiary</h2><button id="add-entry">＋ Enemy</button></div><div id="entry-list" aria-label="Entry list"></div></aside>
+<main class="panel catalog-detail"><div class="section-heading"><div><h2 id="entry-title">Loading…</h2><span id="entry-subtitle" class="muted"></span></div><div class="button-row"><button id="clone-entry">Duplicate</button><button id="delete-entry" class="danger-outline">Delete</button></div></div>
+<section id="mob-detail">
+    <div class="mob-preview"><span id="mob-token"></span><div><strong id="mob-preview-name"></strong><div id="mob-preview-stats" class="muted"></div><a id="mob-trait-summary" class="trait-summary" href="#mob-features"></a></div></div>
+    <div class="catalog-form"><label class="span-two">Name<input id="mob-name" maxlength="100" required></label><label>Short name on map<input id="mob-shortName" maxlength="12" required></label><label>Token color<input id="mob-color" type="color" value="#388e3c"></label></div>
+    <h3>Stats</h3><div class="catalog-form" id="mob-numeric-fields"></div>
+    <div class="mob-flags"><label><input type="checkbox" id="mob-isFlying"> Flying</label><label><input type="checkbox" id="mob-isRanged"> Ranged attack</label><label><input type="checkbox" id="mob-isMiniBoss"> Mini-boss</label><label><input type="checkbox" id="mob-aoeCleave"> Hits all defenders in the cell</label></div>
+    <label>Description<textarea id="mob-description" rows="3" maxlength="2000"></textarea></label>
+    <p class="muted" id="mob-behavior"></p>
+    <div class="section-heading trait-heading" id="mob-features"><div><h3>Enemy traits</h3><p class="muted">Combine abilities. All settings are preserved when duplicating.</p></div></div>
+    <div class="trait-add"><label for="trait-choice">Add trait<select id="trait-choice" aria-label="Add trait"></select></label><button id="add-trait" type="button">＋ Add</button></div>
+    <div id="mob-traits"></div>
+</section>
+<section id="wave-detail" hidden>
+    <div class="catalog-form"><label>Wave number<input id="wave-number" type="number" min="1" max="10000" step="1" required></label><label class="span-two">Name<input id="wave-title" maxlength="160" required></label></div>
+    <label>Description<textarea id="wave-description" rows="2" maxlength="2000"></textarea></label>
+    <div class="wave-summary" aria-live="polite"><span>Enemies: <strong id="wave-total">0</strong></span><span>Reward: <strong id="wave-reward">0 G</strong></span><span>Last group: <strong id="wave-delay">immediately</strong></span></div>
+    <div class="section-heading"><h3>Enemy groups</h3><button id="add-group">＋ Add group</button></div><div id="wave-groups"></div>
+    <p class="muted">Delay 0 spawns when the wave starts. Delay 1 spawns on the first Wave Turn, 2 on the second. Groups are distributed across the map's spawn points.</p>
+    <div class="button-row wave-order"><button id="move-wave-up">↑ Move up</button><button id="move-wave-down">↓ Move down</button></div>
+</section>
+<section id="tower-detail" hidden>
+    <div class="mob-preview">
+        <span id="tower-token" style="font-size:24px; display:flex; align-items:center; justify-content:center; width:48px; height:48px; border-radius:8px; background:#8d6e63; color:#fff;">🏰</span>
+        <div>
+            <strong id="tower-preview-name">Dwarven Outpost</strong>
+            <div id="tower-preview-stats" class="muted">70 G · 4–18 physical · range 2</div>
+            <div id="tower-preview-progression" style="color:#ffcc00; font-size:12px; margin-top:2px;">1 direct line (I ➔ IV)</div>
+        </div>
+    </div>
+    
+    <div class="catalog-form">
+        <label class="span-two">Tower family name<input id="tower-name" maxlength="100" required></label>
+        <label>Icon / Short name<input id="tower-shortName" maxlength="12" required></label>
+        <label>Token color<input id="tower-color" type="color" value="#8d6e63"></label>
+    </div>
+
+    <div class="mob-flags">
+        <label style="color:#f87171; font-weight:bold;"><input type="checkbox" id="tower-hiddenFromPlayers" style="accent-color:#ef4444;"> 🚫 Disable (hide from players)</label>
+        <label><input type="checkbox" id="tower-isBarracks"> 🛡️ Barracks (infantry on the road)</label>
+        <label><input type="checkbox" id="tower-isSingleProgression"> ⚡ 1 direct line (I ➔ IV without branching)</label>
+    </div>
+
+    <label>Tower overview<textarea id="tower-description" rows="2" maxlength="2000"></textarea></label>
+
+    <div class="section-heading" style="margin-top:24px; margin-bottom:8px;">
+        <div>
+            <h3>Upgrade levels and combat parameters</h3>
+            <p class="muted">Select a level to configure damage, range, soldier health (for barracks) and cost.</p>
+        </div>
+    </div>
+    <div id="tower-level-tabs" class="tower-level-bar" aria-label="Tower level selection"></div>
+    
+    <div class="catalog-form" id="tower-level-fields"></div>
+
+    <div class="section-heading trait-heading" id="tower-features" style="margin-top:28px;">
+        <div>
+            <h3>Level IV abilities and upgrades</h3>
+            <p class="muted">Configure tower combat abilities, cooldowns (CD), costs and effect descriptions.</p>
+        </div>
+        <button id="add-tower-effect" type="button">＋ Ability</button>
+    </div>
+    <div id="tower-effects-list" style="display:flex; flex-direction:column; gap:12px;"></div>
+</section>
+</main></div></fieldset>
+<footer class="catalog-footer muted">Enemy and wave changes are saved on the server. Tower edits are a local preview in this browser and do not change server combat rules.</footer>
+<dialog id="catalog-confirm"><h2 id="confirm-title">Confirm</h2><p id="confirm-text"></p><div class="button-row"><button id="confirm-cancel">Cancel</button><button id="confirm-ok" class="primary">Continue</button></div></dialog>
+<script src="tower-draft-catalog.js"></script>
+<script src="enemy-traits.js"></script>
+<script src="catalog-editor.js"></script>
+</body>
+</html>
