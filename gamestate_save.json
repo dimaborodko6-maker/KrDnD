@@ -2,7 +2,7 @@
   "gold": 3631,
   "wave": 2,
   "phase": "player",
-  "gamePeriod": "preparation",
+  "gamePeriod": "game",
   "availableTowerTypes": [
     "mage_1",
     "barracks_1",
@@ -1505,7 +1505,7 @@
       "heroName": "Джеральд Светоносный",
       "heroKey": "gerald",
       "sen": 10,
-      "hp": 45,
+      "hp": 37,
       "maxHp": 45,
       "mana": 20,
       "maxMana": 20,
@@ -1515,10 +1515,10 @@
       "blockLimit": 2,
       "blockedEnemyIds": [],
       "godDamageOverride": null,
-      "x": 8,
-      "y": 8,
+      "x": 9,
+      "y": 6,
       "hasMovedThisRound": false,
-      "hasAttackedThisRound": false,
+      "hasAttackedThisRound": true,
       "fatedUsedThisWave": false,
       "isReady": false,
       "deathTimer": 0,
@@ -1535,13 +1535,83 @@
         "fated",
         "retribution"
       ],
-      "initiative": 7,
-      "cooldowns": {},
+      "initiative": 18,
+      "cooldowns": {
+        "ultimate": 1
+      },
       "bolinShotCount": 0
     }
   },
-  "enemies": [],
+  "enemies": [
+    {
+      "name": "Goblin tower",
+      "shortName": "Гобл",
+      "description": "Быстрый слабый гоблин (скорость 2, урон 2-3, инициатива 14).",
+      "color": "#388e3c",
+      "hp": 54,
+      "speed": 0,
+      "initiative": 14,
+      "armor": 0,
+      "magicRes": 0,
+      "reward": 0,
+      "meleeDmg": 0,
+      "rangedDmg": 0,
+      "range": 4,
+      "livesTaken": 0,
+      "dodgeChance": 0,
+      "healPower": 25,
+      "isFlying": false,
+      "isRanged": false,
+      "isMiniBoss": false,
+      "aoeCleave": false,
+      "executeThreshold": 0,
+      "traits": {},
+      "maxHp": 80,
+      "baseSpeed": 0,
+      "id": 1793373754482,
+      "type": "event_goblinTower",
+      "x": 9,
+      "y": 5,
+      "stunTurns": 0,
+      "slowTurns": 0,
+      "bleedTurns": 0,
+      "bleedDmg": 0,
+      "eventKind": "goblinTower",
+      "eventStructure": true,
+      "shieldHp": 0,
+      "eventId": "event_1",
+      "lastDamageRound": 572,
+      "lastAttackerId": "D"
+    }
+  ],
   "pendingSpawns": [],
+  "activeEvents": [
+    {
+      "id": "event_1",
+      "kind": "goblinTower",
+      "title": "Goblin tower",
+      "config": {
+        "kind": "goblinTower",
+        "hp": 80,
+        "radius": 3,
+        "damage": 5,
+        "damageType": "physical",
+        "interval": 5,
+        "maxAlive": 8,
+        "enemyType": "goblin",
+        "count": 1,
+        "summonReward": 0,
+        "spawnX": 8,
+        "spawnY": 5,
+        "title": "Goblin tower",
+        "x": 9,
+        "y": 5
+      },
+      "createdRound": 568,
+      "entityId": 1793373754482,
+      "nextRound": 573
+    }
+  ],
   "mines": [],
   "napalmPuddles": [],
   "poisonPuddles": [],
@@ -1551,47 +1621,153 @@
       "towerKey": "7,7",
       "towerType": "dwarf_4",
       "soldierIndex": 0,
-      "x": 8,
-      "y": 8,
+      "x": 7,
+      "y": 7,
       "hp": 150,
       "maxHp": 150,
       "armor": 20,
       "dmg": 18,
       "respawnTimer": 0,
-      "blockedEnemyIds": []
+      "blockedEnemyIds": [],
+      "initiative": 12,
+      "inMine": true
     },
     {
       "id": "soldier_7_7_1",
       "towerKey": "7,7",
       "towerType": "dwarf_4",
       "soldierIndex": 1,
-      "x": 8,
-      "y": 8,
+      "x": 7,
+      "y": 7,
       "hp": 150,
       "maxHp": 150,
       "armor": 20,
       "dmg": 18,
       "respawnTimer": 0,
-      "blockedEnemyIds": []
+      "blockedEnemyIds": [],
+      "initiative": 12,
+      "inMine": true
     },
     {
       "id": "soldier_7_7_2",
       "towerKey": "7,7",
       "towerType": "dwarf_4",
       "soldierIndex": 2,
-      "x": 8,
-      "y": 8,
+      "x": 7,
+      "y": 7,
       "hp": 150,
       "maxHp": 150,
       "armor": 20,
       "dmg": 18,
       "respawnTimer": 0,
-      "blockedEnemyIds": []
+      "blockedEnemyIds": [],
+      "initiative": 12,
+      "inMine": true
     }
   ],
   "demolishVote": null,
   "rosterVote": null,
   "actionLogs": [
+    {
+      "id": 1793373847024.7722,
+      "text": "⚔️ MELEE (d1+4+5): Джеральд Светоносный attacks at [Goblin tower] (physical damage). [Goblin tower]: -10 HP (remaining 54)",
+      "undoData": {
+        "type": "enemyHp",
+        "enemyId": 1793373754482,
+        "oldHp": 64,
+        "oldGold": 3631
+      }
+    },
+    {
+      "id": 1793373840772,
+      "text": "🚶 Wave turn completed. It is now the Heroes' turn.",
+      "undoData": null
+    },
+    {
+      "id": 1793373837986,
+      "text": "⏱️ [Джеральд Светоносный] ENDED TURN ✅",
+      "undoData": null
+    },
+    {
+      "id": 1793373835658.2751,
+      "text": "⚔️ MELEE (d6+4+5): Джеральд Светоносный attacks at [Goblin tower] (physical damage). [Goblin tower]: -15 HP (remaining 64)",
+      "undoData": {
+        "type": "enemyHp",
+        "enemyId": 1793373754482,
+        "oldHp": 79,
+        "oldGold": 3631
+      }
+    },
+    {
+      "id": 1793373814983,
+      "text": "🚶 Wave turn completed. It is now the Heroes' turn.",
+      "undoData": null
+    },
+    {
+      "id": 1793373814978,
+      "text": "☕ REST: Джеральд Светоносный spent the round resting (+4 HP, +0 Mana).",
+      "undoData": null
+    },
+    {
+      "id": 1793373812899,
+      "text": "🚶 Wave turn completed. It is now the Heroes' turn.",
+      "undoData": null
+    },
+    {
+      "id": 1793373812885,
+      "text": "☕ REST: Джеральд Светоносный spent the round resting (+4 HP, +0 Mana).",
+      "undoData": null
+    },
+    {
+      "id": 1793373809069,
+      "text": "🚶 Wave turn completed. It is now the Heroes' turn.",
+      "undoData": null
+    },
+    {
+      "id": 1793373809066,
+      "text": "⛏️ RETURN TO MINE: The road is clear! Dwarf returned to the mine at (7, 7) to extract ore.",
+      "undoData": null
+    },
+    {
+      "id": 1793373809063,
+      "text": "⛏️ RETURN TO MINE: The road is clear! Dwarf returned to the mine at (7, 7) to extract ore.",
+      "undoData": null
+    },
+    {
+      "id": 1793373809060,
+      "text": "⛏️ RETURN TO MINE: The road is clear! Dwarf returned to the mine at (7, 7) to extract ore.",
+      "undoData": null
+    },
+    {
+      "id": 1793373806155,
+      "text": "⏱️ [Джеральд Светоносный] ENDED TURN ✅",
+      "undoData": null
+    },
+    {
+      "id": 1793373798381.773,
+      "text": ": Джеральд Светоносный attacks at [Goblin tower] (physical damage). [Goblin tower]: -1 HP (remaining 79)",
+      "undoData": {
+        "type": "enemyHp",
+        "enemyId": 1793373754482,
+        "oldHp": 80,
+        "oldGold": 3631
+      }
+    },
+    {
+      "id": 1793373754482,
+      "text": "Event activated: Goblin tower",
+      "undoData": null
+    },
+    {
+      "id": 1793373643244,
+      "text": "🎮 The GM enabled the play period.",
+      "undoData": null
+    },
+    {
+      "id": 1793373457076,
+      "text": "👤 CREATION: Player D successfully created a D&D character sheet for Джеральд Светоносный!",
+      "undoData": null
+    },
     {
       "id": 1792919171619,
       "text": "🛠️ GM: Restored: Джеральд Светоносный. health, mana, revival, remove negative effects, cooldowns, action, movement.",
@@ -1706,151 +1882,9 @@
       "id": 1792692771210,
       "text": "🗡️ УДАР СОЛДАТА: Солдат гарнизона нанёс [Бандит] 12 физ. урона!",
       "undoData": null
-    },
-    {
-      "id": 1792692771209,
-      "text": "⚔️ СХВАТКА: [Бандит] атаковал солдата гарнизона на 2 физ. урона (броня: 30%). ХП: 27/55",
-      "undoData": null
-    },
-    {
-      "id": 1792692769948,
-      "text": "🚶 Шаг Волны выполнен. Очередь хода переходит Героям.",
-      "undoData": null
-    },
-    {
-      "id": 1792692769948,
-      "text": "🗡️ УДАР СОЛДАТА: Солдат гарнизона нанёс [Бандит] 12 физ. урона!",
-      "undoData": null
-    },
-    {
-      "id": 1792692769947,
-      "text": "⚔️ СХВАТКА: [Бандит] атаковал солдата гарнизона на 2 физ. урона (броня: 30%). ХП: 29/55",
-      "undoData": null
-    },
-    {
-      "id": 1792692769357,
-      "text": "🚶 Шаг Волны выполнен. Очередь хода переходит Героям.",
-      "undoData": null
-    },
-    {
-      "id": 1792692769356,
-      "text": "🗡️ УДАР СОЛДАТА: Солдат гарнизона нанёс [Бандит] 12 физ. урона!",
-      "undoData": null
-    },
-    {
-      "id": 1792692769356,
-      "text": "⚔️ СХВАТКА: [Бандит] атаковал солдата гарнизона на 2 физ. урона (броня: 30%). ХП: 31/55",
-      "undoData": null
-    },
-    {
-      "id": 1792692768665,
-      "text": "🚶 Шаг Волны выполнен. Очередь хода переходит Героям.",
-      "undoData": null
-    },
-    {
-      "id": 1792692768664,
-      "text": "💀 [Бандит] уничтожен солдатом гарнизона! Казна +5💰.",
-      "undoData": null
-    },
-    {
-      "id": 1792692768663,
-      "text": "🗡️ УДАР СОЛДАТА: Солдат гарнизона нанёс [Бандит] 12 физ. урона!",
-      "undoData": null
-    },
-    {
-      "id": 1792692768662,
-      "text": "⚔️ СХВАТКА: [Бандит] атаковал солдата гарнизона на 2 физ. урона (броня: 30%). ХП: 33/55",
-      "undoData": null
-    },
-    {
-      "id": 1792692768661,
-      "text": "⚔️ СХВАТКА: [Бандит] атаковал солдата гарнизона на 2 физ. урона (броня: 30%). ХП: 35/55",
-      "undoData": null
-    },
-    {
-      "id": 1792692767675,
-      "text": "🚶 Шаг Волны выполнен. Очередь хода переходит Героям.",
-      "undoData": null
-    },
-    {
-      "id": 1792692767675,
-      "text": "🗡️ УДАР СОЛДАТА: Солдат гарнизона нанёс [Бандит] 12 физ. урона!",
-      "undoData": null
-    },
-    {
-      "id": 1792692767674,
-      "text": "⚔️ СХВАТКА: [Бандит] атаковал солдата гарнизона на 2 физ. урона (броня: 30%). ХП: 37/55",
-      "undoData": null
-    },
-    {
-      "id": 1792692767673,
-      "text": "⚔️ СХВАТКА: [Бандит] атаковал солдата гарнизона на 2 физ. урона (броня: 30%). ХП: 39/55",
-      "undoData": null
-    },
-    {
-      "id": 1792692767669,
-      "text": "💀 ПОДНЯТИЕ НЕЖИТИ: [Зиккурат Архинекроманта IV] на (9, 7) подняла Скелет из останков [Бандит] на (8, 5) (4/4)!",
-      "undoData": null
     }
   ],
   "debugLogs": [
-    "[21:11:48] [INITIATIVE_ROLL] Гарнизон [Солдат] (#soldier_7_7_2): База 10 + Уровень(3)*2 = Инициатива 16",
-    "[21:11:48] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 1: ВЫСШАЯ ИНИЦИАТИВА (>= 16) (Инициатива: 16..99) <<<",
-    "[21:11:48] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 2: СРЕДНЯЯ ИНИЦИАТИВА (9..15) (Инициатива: 9..15) <<<",
-    "[21:11:48] [TOWER_SHOT] [Святилище Жрицы Света IV] (Иниц. 12) на (9, 7) -> [Бандит] (#1792692703807) Урон: 28 маг. (HP: 0/40)",
-    "[21:11:48] [PRIESTESS_SMITE] Карающий луч поразил [Бандит] (#1792692703808) на 20 урона",
-    "[21:11:48] [TOWER_KILL] Враг [Бандит] (#1792692703807) убит башней [Святилище Жрицы Света IV] (+5💰)",
-    "[21:11:48] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 3: НИЗКАЯ ИНИЦИАТИВА (<= 8) (Инициатива: 0..8) <<<",
-    "[21:11:48] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ 4: ДВИЖЕНИЕ И БЛИЖНИЙ БОЙ <<<",
-    "[21:11:48] [MOVE_STEP] Враг [Бандит] (#1792692703808, ХП: 12) на (8, 6) УДЕРЖИВАЕТСЯ в бою (солдатом). Шаг пропущен.",
-    "[21:11:48] [MOVE_STEP] Враг [Бандит] (#1792692703809, ХП: 32) на (8, 6) УДЕРЖИВАЕТСЯ в бою (солдатом). Шаг пропущен.",
-    "[21:11:48] [PRIESTESS_HEAL] Жрица Света на (9, 7) исцелила: Солдат (+1), Солдат (+2)",
-    "[21:11:49] [INITIATIVE_START] ========================================================",
-    "[21:11:49] [INITIATIVE_START] === 🎲 НАЧАЛО РАУНДА #555 (СИСТЕМА ИНИЦИАТИВЫ D&D 5e) ===",
-    "[21:11:49] [INITIATIVE_START] ========================================================",
-    "[21:11:49] [INITIATIVE_ROLL] Герой [Джеральд Светоносный]: d20(4) + DEX_MOD(5) = Инициатива 9",
-    "[21:11:49] [INITIATIVE_ROLL] Гарнизон [Солдат] (#soldier_7_7_0): База 10 + Уровень(3)*2 = Инициатива 16",
-    "[21:11:49] [INITIATIVE_ROLL] Гарнизон [Солдат] (#soldier_7_7_1): База 10 + Уровень(3)*2 = Инициатива 16",
-    "[21:11:49] [INITIATIVE_ROLL] Гарнизон [Солдат] (#soldier_7_7_2): База 10 + Уровень(3)*2 = Инициатива 16",
-    "[21:11:49] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 1: ВЫСШАЯ ИНИЦИАТИВА (>= 16) (Инициатива: 16..99) <<<",
-    "[21:11:49] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 2: СРЕДНЯЯ ИНИЦИАТИВА (9..15) (Инициатива: 9..15) <<<",
-    "[21:11:49] [TOWER_SHOT] [Святилище Жрицы Света IV] (Иниц. 12) на (9, 7) -> [Бандит] (#1792692703808) Урон: 32 маг. (HP: 0/40)",
-    "[21:11:49] [TOWER_KILL] Враг [Бандит] (#1792692703808) убит башней [Святилище Жрицы Света IV] (+5💰)",
-    "[21:11:49] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 3: НИЗКАЯ ИНИЦИАТИВА (<= 8) (Инициатива: 0..8) <<<",
-    "[21:11:49] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ 4: ДВИЖЕНИЕ И БЛИЖНИЙ БОЙ <<<",
-    "[21:11:49] [MOVE_STEP] Враг [Бандит] (#1792692703809, ХП: 24) на (8, 6) УДЕРЖИВАЕТСЯ в бою (солдатом). Шаг пропущен.",
-    "[21:11:49] [PRIESTESS_HEAL] Жрица Света на (9, 7) исцелила: Солдат (+2)",
-    "[21:11:55] [INITIATIVE_START] ========================================================",
-    "[21:11:55] [INITIATIVE_START] === 🎲 НАЧАЛО РАУНДА #556 (СИСТЕМА ИНИЦИАТИВЫ D&D 5e) ===",
-    "[21:11:55] [INITIATIVE_START] ========================================================",
-    "[21:11:55] [INITIATIVE_ROLL] Герой [Джеральд Светоносный]: d20(8) + DEX_MOD(5) = Инициатива 13",
-    "[21:11:55] [INITIATIVE_ROLL] Гарнизон [Солдат] (#soldier_7_7_0): База 10 + Уровень(3)*2 = Инициатива 16",
-    "[21:11:55] [INITIATIVE_ROLL] Гарнизон [Солдат] (#soldier_7_7_1): База 10 + Уровень(3)*2 = Инициатива 16",
-    "[21:11:55] [INITIATIVE_ROLL] Гарнизон [Солдат] (#soldier_7_7_2): База 10 + Уровень(3)*2 = Инициатива 16",
-    "[21:11:55] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 1: ВЫСШАЯ ИНИЦИАТИВА (>= 16) (Инициатива: 16..99) <<<",
-    "[21:11:55] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 2: СРЕДНЯЯ ИНИЦИАТИВА (9..15) (Инициатива: 9..15) <<<",
-    "[21:11:55] [TOWER_SHOT] [Святилище Жрицы Света IV] (Иниц. 12) на (9, 7) -> [Бандит] (#1792692703809) Урон: 25 маг. (HP: 0/40)",
-    "[21:11:55] [TOWER_KILL] Враг [Бандит] (#1792692703809) убит башней [Святилище Жрицы Света IV] (+5💰)",
-    "[21:11:55] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 3: НИЗКАЯ ИНИЦИАТИВА (<= 8) (Инициатива: 0..8) <<<",
-    "[21:11:55] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ 4: ДВИЖЕНИЕ И БЛИЖНИЙ БОЙ <<<",
-    "[21:12:17] [UPGRADE_PURCHASE] Куплено улучшение [Костяной Рыцарь] (necro_bone_knight) для башни на (9, 7). Казна: 3963💰",
-    "[21:12:23] [INITIATIVE_START] ========================================================",
-    "[21:12:23] [INITIATIVE_START] === 🎲 НАЧАЛО РАУНДА #557 (СИСТЕМА ИНИЦИАТИВЫ D&D 5e) ===",
-    "[21:12:23] [INITIATIVE_START] ========================================================",
-    "[21:12:23] [INITIATIVE_ROLL] Герой [Джеральд Светоносный]: d20(20) + DEX_MOD(5) = Инициатива 25",
-    "[21:12:23] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 1: ВЫСШАЯ ИНИЦИАТИВА (>= 16) (Инициатива: 16..99) <<<",
-    "[21:12:23] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 2: СРЕДНЯЯ ИНИЦИАТИВА (9..15) (Инициатива: 9..15) <<<",
-    "[21:12:23] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 3: НИЗКАЯ ИНИЦИАТИВА (<= 8) (Инициатива: 0..8) <<<",
-    "[21:12:23] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ 4: ДВИЖЕНИЕ И БЛИЖНИЙ БОЙ <<<",
-    "[21:12:23] [MOVE_STEP] Враг [Бандит] (#1792692742470) свободный шаг (8, 4) -> (8, 5)",
-    "[21:12:23] [MOVE_STEP] Враг [Бандит] (#1792692742471) свободный шаг (8, 4) -> (8, 5)",
-    "[21:12:23] [MOVE_STEP] Враг [Бандит] (#1792692742472) свободный шаг (8, 4) -> (8, 5)",
-    "[21:12:24] [INITIATIVE_START] ========================================================",
-    "[21:12:24] [INITIATIVE_START] === 🎲 НАЧАЛО РАУНДА #558 (СИСТЕМА ИНИЦИАТИВЫ D&D 5e) ===",
-    "[21:12:24] [INITIATIVE_START] ========================================================",
-    "[21:12:24] [INITIATIVE_ROLL] Герой [Джеральд Светоносный]: d20(4) + DEX_MOD(5) = Инициатива 9",
-    "[21:12:24] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 1: ВЫСШАЯ ИНИЦИАТИВА (>= 16) (Инициатива: 16..99) <<<",
-    "[21:12:24] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 2: СРЕДНЯЯ ИНИЦИАТИВА (9..15) (Инициатива: 9..15) <<<",
     "[21:12:24] [TOWER_SHOT] [Зиккурат Архинекроманта IV] (Иниц. 12) на (9, 7) -> [Бандит] (#1792692742470) Урон: 54 маг. (HP: 0/40)",
     "[21:12:24] [TOWER_KILL] Враг [Бандит] (#1792692742470) убит башней [Зиккурат Архинекроманта IV] (+5💰)",
     "[21:12:24] [NECRO_RAISE_SKELETON] Некромант (9, 7) поднял Костяной Рыцарь (#skeleton_9_7_1792692744422_892) на (8, 5) [HP: 55]",
@@ -1993,7 +2027,66 @@
     "[21:12:51] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 2: СРЕДНЯЯ ИНИЦИАТИВА (9..15) (Инициатива: 9..15) <<<",
     "[21:12:51] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ: ФАЗА 3: НИЗКАЯ ИНИЦИАТИВА (<= 8) (Инициатива: 0..8) <<<",
     "[21:12:51] [INITIATIVE_PHASE] >>> ВХОД В ФАЗУ 4: ДВИЖЕНИЕ И БЛИЖНИЙ БОЙ <<<",
-    "[21:12:51] [MOVE_STEP] Враг [Бандит] (#1792692754803, ХП: 4) на (8, 4) УДЕРЖИВАЕТСЯ в бою (солдатом). Шаг пропущен."
+    "[21:12:51] [MOVE_STEP] Враг [Бандит] (#1792692754803, ХП: 4) на (8, 4) УДЕРЖИВАЕТСЯ в бою (солдатом). Шаг пропущен.",
+    "[18:23:18] [CAST_START] Джеральд Светоносный [D] uses [ultimate] from (9, 6) against [Goblin tower] (#1793373754482) at (9, 5) | {\"diceRoll\":1,\"effectiveRange\":1,\"checkDist\":1,\"isBlocked\":false}",
+    "[18:23:18] [CAST_FILTER] Area [single] around (9, 5): affected 1 of 1 enemies | {\"center\":{\"x\":9,\"y\":5},\"targets\":[{\"id\":1793373754482,\"name\":\"Goblin tower\",\"pos\":\"(9,5)\",\"hp\":80,\"chebyshev\":0,\"inZone\":true}]}",
+    "[18:23:18] [CAST_HIT] Hit on [Goblin tower] (#1793373754482) at (9, 5): base=0, armor=0, resist=0, damage=1, HP: 80 -> 79 | {\"statuses\":{\"bleedTurns\":0,\"stunTurns\":0,\"slowTurns\":0,\"armor\":0}}",
+    "[18:23:29] [INITIATIVE_START] ========================================================",
+    "[18:23:29] [INITIATIVE_START] === 🎲 ROUND #569 BEGINS (D&D 5e INITIATIVE SYSTEM) ===",
+    "[18:23:29] [INITIATIVE_START] ========================================================",
+    "[18:23:29] [INITIATIVE_ROLL] Hero [Джеральд Светоносный]: d20(15) + DEX_MOD(5) = Initiative 20",
+    "[18:23:29] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_0): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:23:29] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_1): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:23:29] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_2): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:23:29] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 1: HIGH INITIATIVE (>= 16) (Initiative: 16..99) <<<",
+    "[18:23:29] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 2: MEDIUM INITIATIVE (9..15) (Initiative: 9..15) <<<",
+    "[18:23:29] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 3: LOW INITIATIVE (<= 8) (Initiative: 0..8) <<<",
+    "[18:23:29] [INITIATIVE_PHASE] >>> ENTERING PHASE 4: MOVEMENT AND MELEE <<<",
+    "[18:23:29] [DWARF_MINE_BLOCKED] Mine at (7, 7) produced no gold: enemies detected within range (1 total).",
+    "[18:23:32] [INITIATIVE_START] ========================================================",
+    "[18:23:32] [INITIATIVE_START] === 🎲 ROUND #570 BEGINS (D&D 5e INITIATIVE SYSTEM) ===",
+    "[18:23:32] [INITIATIVE_START] ========================================================",
+    "[18:23:32] [INITIATIVE_ROLL] Hero [Джеральд Светоносный]: d20(8) + DEX_MOD(5) = Initiative 13",
+    "[18:23:32] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_0): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:23:32] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_1): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:23:32] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_2): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:23:32] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 1: HIGH INITIATIVE (>= 16) (Initiative: 16..99) <<<",
+    "[18:23:32] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 2: MEDIUM INITIATIVE (9..15) (Initiative: 9..15) <<<",
+    "[18:23:32] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 3: LOW INITIATIVE (<= 8) (Initiative: 0..8) <<<",
+    "[18:23:32] [INITIATIVE_PHASE] >>> ENTERING PHASE 4: MOVEMENT AND MELEE <<<",
+    "[18:23:32] [DWARF_MINE_BLOCKED] Mine at (7, 7) produced no gold: enemies detected within range (1 total).",
+    "[18:23:34] [INITIATIVE_START] ========================================================",
+    "[18:23:34] [INITIATIVE_START] === 🎲 ROUND #571 BEGINS (D&D 5e INITIATIVE SYSTEM) ===",
+    "[18:23:34] [INITIATIVE_START] ========================================================",
+    "[18:23:34] [INITIATIVE_ROLL] Hero [Джеральд Светоносный]: d20(5) + DEX_MOD(5) = Initiative 10",
+    "[18:23:34] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_0): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:23:34] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_1): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:23:34] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_2): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:23:34] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 1: HIGH INITIATIVE (>= 16) (Initiative: 16..99) <<<",
+    "[18:23:34] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 2: MEDIUM INITIATIVE (9..15) (Initiative: 9..15) <<<",
+    "[18:23:34] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 3: LOW INITIATIVE (<= 8) (Initiative: 0..8) <<<",
+    "[18:23:34] [INITIATIVE_PHASE] >>> ENTERING PHASE 4: MOVEMENT AND MELEE <<<",
+    "[18:23:34] [DWARF_MINE_BLOCKED] Mine at (7, 7) produced no gold: enemies detected within range (1 total).",
+    "[18:23:55] [CAST_START] Джеральд Светоносный [D] uses [attack] from (9, 6) against [Goblin tower] (#1793373754482) at (9, 5) | {\"diceRoll\":6,\"effectiveRange\":1,\"checkDist\":1,\"isBlocked\":false}",
+    "[18:23:55] [CAST_FILTER] Area [single] around (9, 5): affected 1 of 1 enemies | {\"center\":{\"x\":9,\"y\":5},\"targets\":[{\"id\":1793373754482,\"name\":\"Goblin tower\",\"pos\":\"(9,5)\",\"hp\":79,\"chebyshev\":0,\"inZone\":true}]}",
+    "[18:23:55] [CAST_HIT] Hit on [Goblin tower] (#1793373754482) at (9, 5): base=15, armor=0, resist=0, damage=15, HP: 79 -> 64 | {\"statuses\":{\"bleedTurns\":0,\"stunTurns\":0,\"slowTurns\":0,\"armor\":0}}",
+    "[18:24:00] [INITIATIVE_START] ========================================================",
+    "[18:24:00] [INITIATIVE_START] === 🎲 ROUND #572 BEGINS (D&D 5e INITIATIVE SYSTEM) ===",
+    "[18:24:00] [INITIATIVE_START] ========================================================",
+    "[18:24:00] [INITIATIVE_ROLL] Hero [Джеральд Светоносный]: d20(13) + DEX_MOD(5) = Initiative 18",
+    "[18:24:00] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_0): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:24:00] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_1): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:24:00] [INITIATIVE_ROLL] Garrison [Soldier] (#soldier_7_7_2): Base 10 + Level(1)*2 = Initiative 12",
+    "[18:24:00] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 1: HIGH INITIATIVE (>= 16) (Initiative: 16..99) <<<",
+    "[18:24:00] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 2: MEDIUM INITIATIVE (9..15) (Initiative: 9..15) <<<",
+    "[18:24:00] [INITIATIVE_PHASE] >>> ENTERING PHASE: PHASE 3: LOW INITIATIVE (<= 8) (Initiative: 0..8) <<<",
+    "[18:24:00] [INITIATIVE_PHASE] >>> ENTERING PHASE 4: MOVEMENT AND MELEE <<<",
+    "[18:24:00] [DWARF_MINE_BLOCKED] Mine at (7, 7) produced no gold: enemies detected within range (1 total).",
+    "[18:24:07] [CAST_START] Джеральд Светоносный [D] uses [attack] from (9, 6) against [Goblin tower] (#1793373754482) at (9, 5) | {\"diceRoll\":1,\"effectiveRange\":1,\"checkDist\":1,\"isBlocked\":false}",
+    "[18:24:07] [CAST_FILTER] Area [single] around (9, 5): affected 1 of 1 enemies | {\"center\":{\"x\":9,\"y\":5},\"targets\":[{\"id\":1793373754482,\"name\":\"Goblin tower\",\"pos\":\"(9,5)\",\"hp\":64,\"chebyshev\":0,\"inZone\":true}]}",
+    "[18:24:07] [CAST_HIT] Hit on [Goblin tower] (#1793373754482) at (9, 5): base=10, armor=0, resist=0, damage=10, HP: 64 -> 54 | {\"statuses\":{\"bleedTurns\":0,\"stunTurns\":0,\"slowTurns\":0,\"armor\":0}}"
   ],
-  "roundCounter": 568
+  "roundCounter": 572,
+  "activatedEventSequence": 1,
+  "recentCombatFx": []
 }

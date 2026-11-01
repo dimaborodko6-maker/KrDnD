@@ -731,7 +731,11 @@ function moveEnemies() {
             }
 
             if (soldier.hp <= 0) {
-                if (soldier.isSkeleton) {
+                if (sUpgrades.includes('templar_grail') && (random ? random() : Math.random()) < 0.40) {
+                    soldier.hp = Math.round(soldier.maxHp * 0.5);
+                    logAction(Date.now(), `🏆 HOLY GRAIL: Templar was saved from death by divine grace (+${soldier.hp} HP)!`);
+                    logDebug('TEMPLAR_GRAIL', `Templar (#${soldier.id}) cheated death through Holy Grail [HP: ${soldier.hp}/${soldier.maxHp}]`);
+                } else if (soldier.isSkeleton) {
                     soldier.blockedEnemyIds = [];
                     logAction(Date.now(), `💀 DUST: ${soldier.name} crumbled to dust!`);
                 } else {
@@ -752,6 +756,13 @@ function moveEnemies() {
                     logDebug('ENEMY_DODGE', `[${targetEnemy.name}] (#${targetEnemy.id}) dodged soldier's attack (#${soldier.id})`);
                 } else {
                     let sDmg = soldier.dmg || 3;
+                    if (sUpgrades.includes('templar_arterial') && (random ? random() : Math.random()) < 0.30) {
+                        sDmg *= 2;
+                        targetEnemy.bleedTurns = 2;
+                        targetEnemy.bleedDmg = 6;
+                        logAction(Date.now(), `🩸 ARTERIAL STRIKE: Templar delivered a devastating greatsword blow for ${sDmg} damage and caused bleeding!`);
+                        logDebug('TEMPLAR_ARTERIAL', `Templar (#${soldier.id}) landed Arterial Strike on [${targetEnemy.name}] (#${targetEnemy.id})`);
+                    }
                     let targetArmor = Math.min(100, (targetEnemy.armor || 0) + ACTIVATED_EVENT_RULES.auraBonus(gameState, targetEnemy, 'armor'));
                     let calculatedDmg = Math.max(1, Math.round(sDmg * ((100 - targetArmor) / 100)));
                     mobTraits.damage(targetEnemy,calculatedDmg);

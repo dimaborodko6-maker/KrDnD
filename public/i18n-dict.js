@@ -5679,7 +5679,26 @@
     'Adventures and branches ·': 'Приключения и развилки ·',
     'Save named event settings and map positions. Choose live targets and enter saving throw results when activating from the GM dashboard.': 'Сохраните название, настройки события и позиции на карте. При активации с пульта мастера выберите текущие цели и внесите результаты спасбросков.',
     'Live targets are selected on the GM dashboard. Saving throw results are entered after rolling at the table.': 'Текущие цели выбираются с пульта мастера. Результаты спасбросков вносятся после бросков за столом.',
-    'Enter every saving throw result': 'Внесите результат спасброска каждого героя'
+    'Enter every saving throw result': 'Внесите результат спасброска каждого героя',
+    'Crossbow Post I': 'Пост арбалетчиков I',
+    'Heavy Ballista II': 'Тяжёлая баллиста II',
+    'Arbalest Battery III': 'Батарея арбалетов III',
+    'Crossbow Fort IV': 'Форт арбалетчиков IV',
+    'Crossbow Barrage': 'Шквал болтов',
+    'Falconer': 'Соколиный дозор',
+    'Mining Drill I': 'Шахтёрский бур I',
+    'Steam Crusher II': 'Паровой дробитель II',
+    'Magma Engine III': 'Магматический двигатель III',
+    'DWAARP Seismic Engine IV': 'Сейсмо-машина DWAARP IV',
+    'Core Drill': 'Бур в недра',
+    'Furnace Blast': 'Огненный выброс',
+    'Templar Novices I': 'Послушники тамплиеров I',
+    'Crusader Barracks II': 'Казармы крестоносцев II',
+    'Knight Chapter III': 'Капитул рыцарей III',
+    'Knights Templar IV': 'Рыцари-Тамплиеры IV',
+    'Arterial Strike': 'Рассекающий удар',
+    'Holy Grail': 'Святой Грааль',
+    'Toughness': 'Закалка',
   };
   Object.assign(en2ru, interfaceTranslations);
   for (const [english, russian] of Object.entries(interfaceTranslations)) {

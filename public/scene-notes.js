@@ -1,7 +1,12 @@
 'use strict';
 function sceneNewId() {
-    if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
-    return Array.from(crypto.getRandomValues(new Uint8Array(16)),byte => byte.toString(16).padStart(2,'0')).join('');
+    if (typeof window !== 'undefined' && window.crypto) {
+        if (typeof window.crypto.randomUUID === 'function') return window.crypto.randomUUID();
+        if (typeof window.crypto.getRandomValues === 'function') {
+            return Array.from(window.crypto.getRandomValues(new Uint8Array(16)), byte => byte.toString(16).padStart(2, '0')).join('');
+        }
+    }
+    return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 8);
 }
 function sceneNoteForm(container, note = {}) {
     container.replaceChildren();

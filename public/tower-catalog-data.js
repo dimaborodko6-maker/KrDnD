@@ -313,6 +313,258 @@ const TOWER_CATALOG_DATA = (() => {
                     desc: 'When an enemy is blocked, hits it for 20 magic damage and gives its next attack disadvantage.'
                 }
             ]
+        },
+
+        // ==================== 🏹 CROSSBOW FORT (1 DIRECT LINE) ====================
+        crossbow_1: {
+            name: "Crossbow Post I",
+            cost: 70,
+            range: 3,
+            minDamage: 4,
+            maxDamage: 7,
+            dmgType: 'phys',
+            initiative: 18,
+            color: "#8d6e63",
+            shortName: "🏹X1",
+            next: 'crossbow_2',
+            progressionType: 'single',
+            description: "High-speed ballista (initiative 18). Range 3 cells, physical damage 4–7. Hits ground and flying enemies."
+        },
+        crossbow_2: {
+            name: "Heavy Ballista II",
+            cost: 100,
+            range: 4,
+            minDamage: 8,
+            maxDamage: 14,
+            dmgType: 'phys',
+            initiative: 19,
+            color: "#6d4c41",
+            shortName: "🏹X2",
+            next: 'crossbow_3',
+            progressionType: 'single',
+            description: "Heavy arbalest battery (initiative 19). Range 4 cells, physical damage 8–14."
+        },
+        crossbow_3: {
+            name: "Arbalest Battery III",
+            cost: 150,
+            range: 4,
+            minDamage: 15,
+            maxDamage: 24,
+            dmgType: 'phys',
+            initiative: 19,
+            color: "#4e342e",
+            shortName: "🏹X3",
+            next: 'crossbow_4',
+            progressionType: 'single',
+            description: "Repeating heavy crossbow battery (initiative 19, range 4 cells). Physical damage 15–24. Unlocks level IV fortification."
+        },
+        crossbow_4: {
+            name: "Crossbow Fort IV",
+            cost: 230,
+            range: 5,
+            minDamage: 20,
+            maxDamage: 30,
+            dmgType: 'phys',
+            initiative: 20,
+            color: "#3e2723",
+            shortName: "🏰X4",
+            next: null,
+            progressionType: 'single',
+            description: "Elite ballista fortress (initiative 20, range 5). Rapid fire (20–30 damage). Barrage and Falconer upgrades available.",
+            upgrades: [
+                {
+                    id: 'crossbow_barrage',
+                    name: 'Crossbow Barrage',
+                    cost: 160,
+                    icon: '🏹',
+                    cooldown: 3,
+                    desc: 'Every 3 rounds, fires a rapid burst of 2 additional bolts at the target.'
+                },
+                {
+                    id: 'crossbow_falconer',
+                    name: 'Falconer',
+                    cost: 180,
+                    icon: '🦅',
+                    desc: 'A trained scouting falcon increases the attack range of all allied shooting and magic towers within 4 cells by +1 cell.'
+                }
+            ]
+        },
+
+        // ==================== 🌋 DWAARP SEISMIC ENGINE (1 DIRECT LINE) ====================
+        dwaarp_1: {
+            name: "Mining Drill I",
+            cost: 125,
+            range: 2,
+            minDamage: 10,
+            maxDamage: 20,
+            dmgType: 'phys',
+            initiative: 8,
+            noAir: true,
+            color: "#d84315",
+            shortName: "🌋I",
+            next: 'dwaarp_2',
+            progressionType: 'single',
+            description: "Heavy seismic drill (initiative 8, range 2 cells). Ground shockwaves deal 10–20 physical damage to all ground enemies in range."
+        },
+        dwaarp_2: {
+            name: "Steam Crusher II",
+            cost: 220,
+            range: 2,
+            minDamage: 22,
+            maxDamage: 40,
+            dmgType: 'phys',
+            initiative: 7,
+            noAir: true,
+            color: "#bf360c",
+            shortName: "🌋II",
+            next: 'dwaarp_3',
+            progressionType: 'single',
+            description: "Steam-powered seismic crusher (initiative 7, range 2 cells). Ground shockwaves deal 22–40 physical damage to all ground enemies in range."
+        },
+        dwaarp_3: {
+            name: "Magma Engine III",
+            cost: 320,
+            range: 2,
+            minDamage: 38,
+            maxDamage: 65,
+            dmgType: 'phys',
+            initiative: 7,
+            noAir: true,
+            color: "#870000",
+            shortName: "🌋III",
+            next: 'dwaarp_4',
+            progressionType: 'single',
+            description: "Deep-crust magma engine (initiative 7, range 2 cells). Ground shockwaves deal 38–65 physical damage to all ground enemies in range."
+        },
+        dwaarp_4: {
+            name: "DWAARP Seismic Engine IV",
+            cost: 400,
+            range: 2,
+            minDamage: 60,
+            maxDamage: 100,
+            dmgType: 'phys',
+            initiative: 6,
+            noAir: true,
+            color: "#3e2723",
+            shortName: "🌋IV",
+            next: null,
+            progressionType: 'single',
+            description: "Ultimate Dwarven seismic weapon (initiative 6, range 2 cells). Shockwaves deal 60–100 physical damage to all ground enemies. Core Drill and Furnace Blast available.",
+            upgrades: [
+                {
+                    id: 'dwaarp_drill',
+                    name: 'Core Drill',
+                    cost: 240,
+                    icon: '⛏️',
+                    cooldown: 4,
+                    desc: 'Every 4 rounds, drills into the strongest ground enemy in range: instantly eliminates normal enemies; deals 180 true damage to bosses.'
+                },
+                {
+                    id: 'dwaarp_furnace',
+                    name: 'Furnace Blast',
+                    cost: 190,
+                    icon: '🔥',
+                    cooldown: 3,
+                    desc: 'Every 3 rounds, vents superheated magma onto adjacent road cells, dealing 10 fire damage for 2 turns to passing enemies.'
+                }
+            ]
+        },
+
+        // ==================== ⚔️ KNIGHTS TEMPLAR (1 DIRECT LINE) ====================
+        templar_1: {
+            name: "Templar Novices I",
+            cost: 70,
+            range: 2,
+            initiative: 12,
+            soldierCount: 3,
+            soldierHp: 45,
+            soldierArmor: 25,
+            soldierDmg: 4,
+            respawnTurns: 2,
+            isBarracks: true,
+            dmgType: 'phys',
+            color: "#c62828",
+            shortName: "⚔️T1",
+            next: 'templar_2',
+            progressionType: 'single',
+            description: "3 templar novices: 45 HP, 25% armor, 4 physical damage (initiative 12). Dedicated defenders of the realm."
+        },
+        templar_2: {
+            name: "Crusader Barracks II",
+            cost: 110,
+            range: 2,
+            initiative: 14,
+            soldierCount: 3,
+            soldierHp: 70,
+            soldierArmor: 35,
+            soldierDmg: 6,
+            respawnTurns: 2,
+            isBarracks: true,
+            dmgType: 'phys',
+            color: "#b71c1c",
+            shortName: "⚔️T2",
+            next: 'templar_3',
+            progressionType: 'single',
+            description: "3 crusaders: 70 HP, 35% armor, 6 physical damage (initiative 14). Sturdy defensive frontline."
+        },
+        templar_3: {
+            name: "Knight Chapter III",
+            cost: 160,
+            range: 3,
+            initiative: 16,
+            soldierCount: 3,
+            soldierHp: 100,
+            soldierArmor: 45,
+            soldierDmg: 10,
+            respawnTurns: 2,
+            isBarracks: true,
+            dmgType: 'phys',
+            color: "#880e4f",
+            shortName: "⚔️T3",
+            next: 'templar_4',
+            progressionType: 'single',
+            description: "3 chapter knights: 100 HP, 45% armor, 10 physical damage (initiative 16). Unlocks Knights Templar."
+        },
+        templar_4: {
+            name: "Knights Templar IV",
+            cost: 230,
+            range: 3,
+            initiative: 18,
+            soldierCount: 3,
+            soldierHp: 140,
+            soldierArmor: 50,
+            soldierDmg: 16,
+            respawnTurns: 2,
+            isBarracks: true,
+            dmgType: 'phys',
+            color: "#d32f2f",
+            shortName: "⚔️T4",
+            next: null,
+            progressionType: 'single',
+            description: "3 elite Knights Templar: 140 HP, 50% armor, 16 damage (initiative 18). Arterial Strike, Holy Grail and Toughness upgrades available.",
+            upgrades: [
+                {
+                    id: 'templar_arterial',
+                    name: 'Arterial Strike',
+                    cost: 160,
+                    icon: '🩸',
+                    desc: 'Templar attacks have a 30% chance to deal double damage and inflict bleeding for 2 turns (6 physical DoT per turn).'
+                },
+                {
+                    id: 'templar_grail',
+                    name: 'Holy Grail',
+                    cost: 180,
+                    icon: '🏆',
+                    desc: 'When a Templar suffers a fatal blow, there is a 40% chance divine grace revives him immediately with 50% maximum HP.'
+                },
+                {
+                    id: 'templar_toughness',
+                    name: 'Toughness',
+                    cost: 140,
+                    icon: '🛡️',
+                    desc: 'Increases the maximum HP of all 3 Templars by +30 (up to 170 HP).'
+                }
+            ]
         }
     };
 

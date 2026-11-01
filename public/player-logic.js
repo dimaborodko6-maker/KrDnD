@@ -159,7 +159,7 @@ window.finishCharacterCreation = function() {
         localStorage.setItem('kr_player_id', myId);
         localStorage.setItem('kr_character', JSON.stringify(character));
     } catch(e) {}
-    socket.send(JSON.stringify({ type: 'REGISTER_PLAYER', name: myId, heroName: character.heroName, sen: character.sen, stats: character.stats, skills: character.skills }));
+    socket.send(JSON.stringify({ type: 'REGISTER_PLAYER', name: myId, heroName: character.heroName, heroKey: character.heroKey, sen: character.sen, stats: character.stats, skills: character.skills }));
     document.getElementById('screen-login').classList.remove('active');
     document.getElementById('screen-game').classList.add('active');
     renderBattleAbilitiesButtons();

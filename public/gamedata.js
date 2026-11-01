@@ -103,81 +103,81 @@ const GAME_DATA = {
         },
         goblin: {
             name: "Goblin", shortName: "Gobl", color: "#388e3c", initiative: 14,
-            hp: 20, maxHp: 20, speed: 2, armor: 0, magicRes: 0, isFlying: false, reward: 3, 
+            hp: 20, maxHp: 20, speed: 2, armor: 0, magicRes: 0, isFlying: false, reward: 4, 
             isRanged: false, meleeDmg: 3, description: "A fast, fragile goblin (speed 2, damage 2–3, initiative 14)."
         },
         wulf: {
             name: "Wulf", shortName: "Wolf", color: "#8d6e63", initiative: 16,
-            hp: 40, maxHp: 40, speed: 2, armor: 0, magicRes: 0, isFlying: false, reward: 10, 
-            isRanged: false, meleeDmg: 3, dodgeChance: 30, description: "A swift predator. Speed 2, initiative 16, 30% dodge chance!"
+            hp: 35, maxHp: 35, speed: 2, armor: 0, magicRes: 0, isFlying: false, reward: 7, 
+            isRanged: false, meleeDmg: 3, dodgeChance: 25, description: "A swift predator. Speed 2, initiative 16, 25% dodge chance!"
         },
         orc_warrior: {
             name: "Orc Warrior", shortName: "OrcW", color: "#4caf50", initiative: 7,
-            hp: 180, maxHp: 180, speed: 1, armor: 30, magicRes: 0, isFlying: false, reward: 15, 
-            isRanged: false, meleeDmg: 11, description: "A hulking brute (180 HP, 30% armor, damage 9–14, initiative 7)."
+            hp: 120, maxHp: 120, speed: 1, armor: 25, magicRes: 0, isFlying: false, reward: 16, 
+            isRanged: false, meleeDmg: 10, description: "A hulking brute (120 HP, 25% armor, damage 10, initiative 7)."
         },
         orc_shaman: {
             name: "Orc Shaman", shortName: "Sham", color: "#009688", initiative: 9,
-            hp: 100, maxHp: 100, speed: 1, armor: 0, magicRes: 80, isFlying: false, reward: 12, 
-            isRanged: true, range: 4, rangedDmg: 5, meleeDmg: 4, healPower: 25,
-            description: "An orc healer (80% magic resistance, initiative 9). Uses magic attacks and heals allies."
+            hp: 65, maxHp: 65, speed: 1, armor: 0, magicRes: 50, isFlying: false, reward: 15, 
+            isRanged: true, range: 4, rangedDmg: 5, meleeDmg: 4, healPower: 15,
+            description: "An orc healer (50% magic resistance, initiative 9). Uses magic attacks and heals allies for 15 HP."
         },
         crowcaller: {
             name: "Crowcaller", shortName: "Call", color: "#673ab7", initiative: 8,
-            hp: 300, maxHp: 300, speed: 1, armor: 0, magicRes: 60, isFlying: false, reward: 40, 
-            isRanged: true, range: 1, rangedDmg: 10, meleeDmg: 4,
-            description: "A dark mage (300 HP, 60% magic resistance, initiative 8). Summons Crows while not blocked!"
+            hp: 160, maxHp: 160, speed: 1, armor: 0, magicRes: 40, isFlying: false, reward: 37, 
+            isRanged: true, range: 1, rangedDmg: 9, meleeDmg: 4,
+            description: "A dark mage (160 HP, 40% magic resistance, initiative 8). Summons Crows while not blocked!"
         },
         blackguard: { 
             name: "Blackguard", shortName: "Grd", color: "#795548", initiative: 10,
-            hp: 80, maxHp: 80, speed: 1, armor: 30, magicRes: 0, isFlying: false, reward: 8, 
-            isRanged: false, meleeDmg: 5, description: "Melee (damage 5, 30% armor, initiative 10)."
+            hp: 60, maxHp: 60, speed: 1, armor: 25, magicRes: 0, isFlying: false, reward: 8, 
+            isRanged: false, meleeDmg: 5, description: "Melee (damage 5, 25% armor, initiative 10)."
         },
         shadow_archer: { 
             name: "Shadow Archer", shortName: "Arch", color: "#ff9800", initiative: 11,
-            hp: 110, maxHp: 110, speed: 1, armor: 0, magicRes: 30, isFlying: false, reward: 15, 
+            hp: 60, maxHp: 60, speed: 1, armor: 0, magicRes: 25, isFlying: false, reward: 9, 
             isRanged: true, range: 2, rangedDmg: 6, meleeDmg: 2,
-            description: "Ranged: 6 damage (range 2–4, initiative 11). Melee: 2 damage."
+            description: "Ranged: 6 damage (range 2–4, initiative 11, 25% magic resistance). Melee: 2 damage."
         },
         shadow_blade: { 
             name: "Shadow Blade", shortName: "Blde", color: "#9c27b0", initiative: 15,
-            hp: 70, maxHp: 70, speed: 2, armor: 0, magicRes: 0, isFlying: false, reward: 10, 
+            hp: 50, maxHp: 50, speed: 2, armor: 0, magicRes: 0, isFlying: false, reward: 8, 
             isRanged: false, meleeDmg: 4, description: "A cunning infiltrator. Speed 2, damage 4, initiative 15."
         },
         crow: { 
             name: "Crow", shortName: "Crow", color: "#37474f", initiative: 15,
-            hp: 20, maxHp: 20, speed: 2, armor: 0, magicRes: 0, isFlying: true, reward: 2, 
+            hp: 20, maxHp: 20, speed: 2, armor: 0, magicRes: 0, isFlying: true, reward: 4, 
             isRanged: false, meleeDmg: 2, description: "A flying harbinger of misfortune. Speed 2, damage 2, initiative 15."
         },
         worg: {
             name: "Worg", shortName: "Worg", color: "#6d4c41", initiative: 17,
-            hp: 110, maxHp: 110, armor: 0, magicRes: 50, speed: 2, isFlying: false, reward: 10,
-            isRanged: false, meleeDmg: 12, dodgeChance: 30, livesTaken: 1,
-            description: "A fierce predator (110 HP, 50% magic resistance, speed 2, damage 12, 30% dodge, initiative 17)."
+            hp: 70, maxHp: 70, armor: 0, magicRes: 30, speed: 2, isFlying: false, reward: 18,
+            isRanged: false, meleeDmg: 10, dodgeChance: 25, livesTaken: 1,
+            description: "A fierce predator (70 HP, 30% magic resistance, speed 2, damage 10, 25% dodge, initiative 17)."
         },
         orc_wildling: {
             name: "Orc Wildling", shortName: "Wild", color: "#33691e", initiative: 13,
-            hp: 260, maxHp: 260, armor: 60, magicRes: 0, speed: 1, baseSpeed: 1, isFlying: false, reward: 20,
+            hp: 150, maxHp: 150, armor: 40, magicRes: 0, speed: 1, baseSpeed: 1, isFlying: false, reward: 17,
             isRanged: false, meleeDmg: 8, livesTaken: 1,
-            description: "An armored wildling (260 HP, 60% armor, damage 8). Accelerates to speed 2 near a pack of worgs/riders!"
+            description: "An armored wildling (150 HP, 40% armor, damage 8). Accelerates to speed 2 near a pack of worgs/riders!"
         },
         headhunter: {
             name: "Headhunter", shortName: "Hunt", color: "#bf360c", initiative: 8,
-            hp: 650, maxHp: 650, armor: 50, magicRes: 0, speed: 1, isFlying: false, reward: 80,
-            isRanged: false, meleeDmg: 28, executeThreshold: 0.25, livesTaken: 1,
-            description: "A merciless executioner (650 HP, 50% armor, damage 28, initiative 8). Executes targets at <=25% HP!"
+            hp: 280, maxHp: 280, armor: 35, magicRes: 0, speed: 1, isFlying: false, reward: 41,
+            isRanged: false, meleeDmg: 22, executeThreshold: 0.25, livesTaken: 1,
+            description: "A merciless executioner (280 HP, 35% armor, damage 22, initiative 8). Executes targets at <=25% HP!"
         },
         goblin_rider: {
             name: "Goblin Rider", shortName: "Ride", color: "#558b2f", initiative: 16,
-            hp: 130, maxHp: 130, armor: 0, magicRes: 50, speed: 2, isFlying: false, reward: 10,
-            isRanged: false, meleeDmg: 12, livesTaken: 1,
-            description: "A swift rider (130 HP, 50% magic resistance, speed 2, damage 12). On death, dismounts into a regular goblin!"
+            hp: 80, maxHp: 80, armor: 0, magicRes: 30, speed: 2, isFlying: false, reward: 20,
+            isRanged: false, meleeDmg: 10, livesTaken: 1,
+            description: "A swift rider (80 HP, 30% magic resistance, speed 2, damage 10). On death, dismounts into a regular goblin!"
         },
         ogre: {
             name: "Ogre (Mini-Boss)", shortName: "Ogre", color: "#b71c1c", initiative: 5,
-            hp: 1100, maxHp: 1100, armor: 0, magicRes: 0, speed: 1, isFlying: false, reward: 120,
-            isRanged: false, meleeDmg: 45, isMiniBoss: true, aoeCleave: true, livesTaken: 2,
-            description: "A devastating mini-boss (1100 HP, damage 45, cleaves all defenders in the cell, immune to polymorph/instant kills, costs the base 2 lives)!"
+            hp: 480, maxHp: 480, armor: 0, magicRes: 0, speed: 1, isFlying: false, reward: 83,
+            isRanged: false, meleeDmg: 35, isMiniBoss: true, aoeCleave: true, livesTaken: 2,
+            description: "A devastating mini-boss (480 HP, damage 35, cleaves all defenders in the cell, immune to polymorph/instant kills, costs the base 2 lives)!"
         }
     },
 

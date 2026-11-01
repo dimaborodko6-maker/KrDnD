@@ -46,14 +46,18 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
     }
 
     // Определяем системное имя героя для подгрузки данных
-    let hKey = player.heroKey || "gerald";
-    if (player.heroName.indexOf("Zefira") > -1) hKey = "zefira";
-    if (player.heroName.indexOf("Malik") > -1) hKey = "malik";
-    if (player.heroName.indexOf("Bolin") > -1) hKey = "bolin";
-    if (player.heroName.indexOf("Connor") > -1) hKey = "connor";
-    if (player.heroName.indexOf("Illiana") > -1) hKey = "illiana";
-    if (player.heroName.indexOf("Torghar") > -1) hKey = "torghar";
-    if (player.heroName.indexOf("Ratchet") > -1) hKey = "ratchet";
+    let hKey = player.heroKey;
+    if (!hKey) {
+        const name = player.heroName || '';
+        if (name.includes("Zefira") || name.includes("Зефира")) hKey = "zefira";
+        else if (name.includes("Malik") || name.includes("Малик")) hKey = "malik";
+        else if (name.includes("Bolin") || name.includes("Болин")) hKey = "bolin";
+        else if (name.includes("Connor") || name.includes("Коннор")) hKey = "connor";
+        else if (name.includes("Illiana") || name.includes("Иллиана")) hKey = "illiana";
+        else if (name.includes("Torghar") || name.includes("Торгар")) hKey = "torghar";
+        else if (name.includes("Ratchet") || name.includes("Рэтчет")) hKey = "ratchet";
+        else hKey = "gerald";
+    }
 
     const heroProto = GAME_DATA.heroes[hKey];
     let strMod = getModifier(player.stats.str);
@@ -406,10 +410,9 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
             effectiveRange = Math.max(effectiveRange, abilityRanges[sId]);
         }
     } else if (abilityType === 'ultimate') {
-        if (["Zefira", "Bolin", "Illiana"].some(n => player.heroName.includes(n))) {
+        if (['zefira', 'bolin', 'illiana', 'ratchet'].includes(hKey)) {
             effectiveRange = Math.max(effectiveRange, 4);
         }
-        if (hKey === 'ratchet') effectiveRange = 4;
         if (hKey === 'torghar') effectiveRange = 2;
     }
 
@@ -445,9 +448,9 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
     }
 
     if (abilityType === 'ultimate') {
-        if (player.heroName.includes("Malik")) {
+        if (hKey === 'malik') {
             areaType = 'aoe_around_player';
-        } else if (player.heroName.includes("Bolin") || player.heroName.includes("Zefira") || player.heroName.includes("Illiana")) {
+        } else if (['bolin', 'zefira', 'illiana'].includes(hKey)) {
             areaType = 'aoe_around_target';
         } else {
             areaType = 'single';
@@ -519,38 +522,38 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
         baseDamage = player.godDamageOverride;
         abilityTitle = `✨ DIVINE STRIKE (fixed ${baseDamage})`;
     } else if (abilityType === 'ultimate') {
-        if (player.heroName.includes("Gerald")) {
+        if (hKey === 'gerald') {
             dmgType = 'pure'; baseDamage = 200; abilityTitle = `⚡ ULTIMATE [Divine Blade]`;
-        } else if (player.heroName.includes("Zefira")) {
+        } else if (hKey === 'zefira') {
             dmgType = 'magic'; baseDamage = 210; abilityTitle = `⚡ ULTIMATE [Ethereal Spears]`;
-        } else if (player.heroName.includes("Malik")) {
+        } else if (hKey === 'malik') {
             dmgType = 'phys'; baseDamage = 180; abilityTitle = `⚡ ULTIMATE [Hammernado]`;
-        } else if (player.heroName.includes("Bolin")) {
+        } else if (hKey === 'bolin') {
             dmgType = 'phys'; baseDamage = 200; abilityTitle = `⚡ ULTIMATE [Suppressive Fire]`;
-        } else if (player.heroName.includes("Connor")) {
-            dmgType = 'phys'; baseDamage = 250; player.invulnerableRounds = 2;
+        } else if (hKey === 'connor') {
+            dmgType = 'phys'; baseDamage = 200; player.invulnerableRounds = 2;
             abilityTitle = `⚡ ULTIMATE [Templar Rage]`;
             statusEffectNote = ` Connor gained FULL INVULNERABILITY for 2 rounds!`;
-        } else if (player.heroName.includes("Illiana")) {
-            dmgType = 'pure'; baseDamage = 185; abilityTitle = `⚡ ULTIMATE [Sparky, Incinerate!]`;
+        } else if (hKey === 'illiana') {
+            dmgType = 'pure'; baseDamage = 200; abilityTitle = `⚡ ULTIMATE [Sparky, Incinerate!]`;
         }
     } else if (abilityType === 'attack') {
-        let isRangedHero = ["Zefira", "Bolin", "Illiana", "Ratchet"].some(name => player.heroName.includes(name));
+        let isRangedHero = ['zefira', 'bolin', 'illiana', 'ratchet'].includes(hKey);
 
-        if (isRangedHero && euclideanDist <= 1.05 && !player.heroName.includes("Ratchet")) {
+        if (isRangedHero && euclideanDist <= 1.05 && hKey !== 'ratchet') {
             dmgType = 'phys';
             baseDamage = diceRoll + 2 + Math.min(strMod, dexMod);
             abilityTitle = `⚔️ POINT-BLANK DISADVANTAGE (d${diceRoll})`;
-        } else if (isRangedHero && (euclideanDist > 1.05 || player.heroName.includes("Ratchet"))) {
-            if (player.heroName.includes("Ratchet")) {
+        } else if (isRangedHero && (euclideanDist > 1.05 || hKey === 'ratchet')) {
+            if (hKey === 'ratchet') {
                 dmgType = 'pure';
                 baseDamage = diceRoll + 3 + intMod;
                 abilityTitle = `⚡ RATCHET'S ENERGY STUNNER (d${diceRoll}+3+${intMod})`;
-            } else if (player.heroName.includes("Bolin")) {
+            } else if (hKey === 'bolin') {
                 dmgType = 'phys';
                 baseDamage = diceRoll + 6 + dexMod;
                 abilityTitle = `🏹 RANGED BARRAGE (d${diceRoll}+6+${dexMod})`;
-            } else if (player.heroName.includes("Illiana")) {
+            } else if (hKey === 'illiana') {
                 dmgType = 'phys';
                 baseDamage = diceRoll + 6 + dexMod;
                 let blissBonus = player.skills.includes('bliss') ? 2 : 1;
@@ -643,11 +646,11 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
             calcDmg = Math.max(1, Math.round(baseDamage * ((100 - resist) / 100)));
         } else {
             armor = Math.min(100, (t.armor || 0) + EVENT_RULES.auraBonus(gameState, t, 'armor'));
-            if (player.heroName.includes("Bolin") && player.skills.includes('rounds')) {
+            if (hKey === 'bolin' && player.skills.includes('rounds')) {
                 armor = Math.max(0, armor - 25);
             }
             calcDmg = Math.max(1, Math.round(baseDamage * ((100 - armor) / 100)));
-            if (player.heroName.includes("Bolin") && player.skills.includes('slayer')) {
+            if (hKey === 'bolin' && player.skills.includes('slayer')) {
                 calcDmg += Math.max(1, Math.round(t.hp * 0.02));
             }
         }

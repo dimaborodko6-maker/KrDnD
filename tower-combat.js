@@ -57,13 +57,37 @@ module.exports = function createTowerCombat({
         };
     }
 
+function getTowerEffectiveRange(state, x, y, proto) {
+    let range = proto.range || 0;
+    if (proto.isBarracks) return range;
+    if (state && state.grid) {
+        const gh = state.gridHeight || state.grid.length;
+        const gw = state.gridWidth || state.grid[0].length;
+        let falconerFound = false;
+        for (let fy = 0; fy < gh && !falconerFound; fy++) {
+            for (let fx = 0; fx < gw && !falconerFound; fx++) {
+                const fCell = state.grid[fy]?.[fx];
+                if (fCell && fCell.type === 'crossbow_4' && (fCell.upgrades || []).includes('crossbow_falconer')) {
+                    if (distanceSquared(x, y, { x: fx, y: fy }) <= 16) { // radius 4
+                        falconerFound = true;
+                    }
+                }
+            }
+        }
+        if (falconerFound) range += 1;
+    }
+    return range;
+}
+
     function fireTower(ctx) {
         const { state, cell, proto, x, y, initiative } = ctx;
         const abilities = towerAbilities[cell.type];
         abilities?.beforeAttack?.(ctx);
         // Пассивка могла убить или переместить врага, поэтому ищем цель после неё.
+        const effectiveRange = getTowerEffectiveRange(state, x, y, proto);
+        ctx.effectiveRange = effectiveRange;
         const target = state.enemies.find(enemy => enemy.hp > 0 &&
-            !(proto.noAir && enemy.isFlying) && inRange(x, y, enemy, proto.range));
+            !(proto.noAir && enemy.isFlying) && inRange(x, y, enemy, effectiveRange));
         if (!target) return;
 
         let baseDamage = proto.damage || 10;

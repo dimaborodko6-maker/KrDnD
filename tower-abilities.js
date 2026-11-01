@@ -378,6 +378,107 @@ function dwarfSoldierBeforeCombat(ctx) {
     }
 }
 
+function crossbowBarrage(ctx) {
+    const { state, cell, proto, x, y, upgrades, shot: { target }, action, debug, random, inRange, damage, reward, remove } = ctx;
+    if (!upgrades.includes('crossbow_barrage')) return;
+    if (state.roundCounter - (cell.lastBarrageRound || -999) < 3) return;
+    cell.lastBarrageRound = state.roundCounter;
+    action(`🏹 CROSSBOW BARRAGE: Crossbow Fort at (${x}, ${y}) unleashed a rapid repeating barrage!`);
+    debug('CROSSBOW_BARRAGE', `Barrage activated at (${x}, ${y})`);
+    const range = ctx.effectiveRange || proto.range || 5;
+    for (let bolt = 1; bolt <= 2; bolt++) {
+        const currentTarget = (target && target.hp > 0) ? target :
+            state.enemies.find(en => en.hp > 0 && !(proto.noAir && en.isFlying) && inRange(x, y, en, range));
+        if (!currentTarget) break;
+        const rnd = random ? random() : Math.random();
+        let boltDamage = Math.floor(rnd * (proto.maxDamage - proto.minDamage + 1)) + proto.minDamage;
+        if (cell.damageBuffMultiplier && cell.damageBuffTurns > 0) {
+            boltDamage = Math.round(boltDamage * cell.damageBuffMultiplier);
+        }
+        const dealt = damage(currentTarget, boltDamage, 'phys');
+        action(`🎯 BARRAGE BOLT #${bolt}: [${currentTarget.name}] was pierced for ${dealt} physical damage!`);
+        debug('CROSSBOW_BARRAGE_HIT', `Barrage bolt #${bolt} hit [${currentTarget.name}] (#${currentTarget.id}) for ${dealt} damage [HP: ${currentTarget.hp}/${currentTarget.maxHp}]`);
+        if (currentTarget.hp <= 0) {
+            reward(currentTarget, `💀 [${currentTarget.name}] was felled by the crossbow barrage! Treasury +${currentTarget.reward}💰.`, `Enemy [${currentTarget.name}] killed by Crossbow Barrage (+${currentTarget.reward}💰)`);
+            remove(currentTarget);
+        }
+    }
+}
+
+function dwaarpShockwave(ctx) {
+    const { state, proto, shot, x, y, action, debug } = ctx;
+    const range = proto.range || 2;
+    const others = state.enemies.filter(en => en.id !== shot.target.id && en.hp > 0 && !en.isFlying && ctx.inRange(x, y, en, range));
+    for (const other of others) {
+        const rawDmg = Math.round(shot.baseDamage * 0.8);
+        const dealt = ctx.damage(other, rawDmg, 'phys');
+        action(`🌋 SHOCKWAVE: Seismic tremor from [${proto.name}] at (${x}, ${y}) struck [${other.name}] for ${dealt} physical damage!`);
+        debug('DWAARP_SHOCKWAVE', `Shockwave hit [${other.name}] (#${other.id}) for ${dealt} damage [HP: ${other.hp}/${other.maxHp}]`);
+        if (other.hp <= 0) {
+            ctx.reward(other, `💀 [${other.name}] was crushed by the seismic shockwave! Treasury +${other.reward}💰.`, `Enemy killed by DWAARP shockwave (+${other.reward}💰)`);
+        }
+    }
+    ctx.removeDead();
+}
+
+function dwaarpBeforeAttack(ctx) {
+    const { state, cell, proto, upgrades, x, y, action, debug } = ctx;
+    if (upgrades.includes('dwaarp_drill') && state.roundCounter - (cell.lastCoreDrillRound || -999) >= 4) {
+        const range = proto.range || 2;
+        let strongest = null;
+        for (const en of state.enemies) {
+            if (en.hp > 0 && !en.isFlying && !en.eventStructure && ctx.inRange(x, y, en, range)) {
+                if (!strongest || en.hp > strongest.hp) strongest = en;
+            }
+        }
+        if (strongest) {
+            cell.lastCoreDrillRound = state.roundCounter;
+            if (strongest.isBoss || strongest.isMiniBoss) {
+                ctx.damage(strongest, 180);
+                action(`🛡️ BOSS RESISTANCE: [${strongest.name}] resisted the Core Drill, taking 180 true damage!`);
+                debug('BOSS_RESIST', `[${strongest.name}] (#${strongest.id}) took 180 damage from Core Drill [HP: ${strongest.hp}/${strongest.maxHp}]`);
+                if (strongest.hp <= 0) {
+                    ctx.reward(strongest, `💀 [${strongest.name}] was obliterated by the Core Drill! Treasury +${strongest.reward}💰.`);
+                    ctx.removeDead();
+                }
+            } else {
+                ctx.setHp(strongest, 0);
+                state.gold += strongest.reward;
+                action(`⛏️ CORE DRILL: DWAARP at (${x}, ${y}) deployed the giant drill and obliterated [${strongest.name}]! Treasury +${strongest.reward}💰.`);
+                debug('DWAARP_CORE_DRILL', `Core drill eliminated [${strongest.name}] (#${strongest.id})`);
+                ctx.removeDead();
+            }
+        }
+    }
+    if (upgrades.includes('dwaarp_furnace') && state.roundCounter - (cell.lastFurnaceRound || -999) >= 3) {
+        cell.lastFurnaceRound = state.roundCounter;
+        action(`🔥 FURNACE BLAST: DWAARP at (${x}, ${y}) vented superheated magma onto adjacent road cells!`);
+        debug('DWAARP_FURNACE', `Furnace blast created napalm puddles around (${x}, ${y})`);
+        if (!state.napalmPuddles) state.napalmPuddles = [];
+        const gh = state.gridHeight || 16, gw = state.gridWidth || 16;
+        for (let dy = -1; dy <= 1; dy++) {
+            for (let dx = -1; dx <= 1; dx++) {
+                const rx = x + dx, ry = y + dy;
+                if (rx >= 0 && rx < gw && ry >= 0 && ry < gh) {
+                    const roadCell = state.grid[ry]?.[rx];
+                    if (roadCell && ['road', 'spawn'].includes(roadCell.type)) {
+                        state.napalmPuddles.push({ x: rx, y: ry, turns: 2, dmg: 10 });
+                    }
+                }
+            }
+        }
+    }
+}
+
+function templarSoldierBeforeCombat(ctx) {
+    const { soldier, upgrades } = ctx;
+    if (upgrades.includes('templar_toughness') && !soldier.toughnessApplied) {
+        soldier.maxHp = (soldier.maxHp || 140) + 30;
+        soldier.hp = Math.min(soldier.maxHp, soldier.hp + 30);
+        soldier.toughnessApplied = true;
+    }
+}
+
 module.exports = {
     towers: {
         archer_ranger: { afterAttack: rangerEffects },
@@ -391,7 +492,12 @@ module.exports = {
         bombard_tesla: { beforeAttack: teslaField, afterAttack: teslaChain },
         necro_4: { beforeAttack: necroPoisonMire },
         mage_court: { beforeAttack: courtResonance, afterAttack: courtOldTome },
-        mage_priestess: { beforeAttack: priestessCleanse, afterAttack: priestessRadiantSmite }
+        mage_priestess: { beforeAttack: priestessCleanse, afterAttack: priestessRadiantSmite },
+        crossbow_4: { afterAttack: crossbowBarrage },
+        dwaarp_1: { afterAttack: dwaarpShockwave },
+        dwaarp_2: { afterAttack: dwaarpShockwave },
+        dwaarp_3: { afterAttack: dwaarpShockwave },
+        dwaarp_4: { beforeAttack: dwaarpBeforeAttack, afterAttack: dwaarpShockwave }
     },
     soldiers: {
         barracks_paladins: { beforeCombat: paladinGrace, blocksHit: paladinShield },
@@ -399,6 +505,10 @@ module.exports = {
         dwarf_1: { beforeCombat: dwarfSoldierBeforeCombat },
         dwarf_2: { beforeCombat: dwarfSoldierBeforeCombat },
         dwarf_3: { beforeCombat: dwarfSoldierBeforeCombat },
-        dwarf_4: { beforeCombat: dwarfSoldierBeforeCombat }
+        dwarf_4: { beforeCombat: dwarfSoldierBeforeCombat },
+        templar_1: {},
+        templar_2: {},
+        templar_3: {},
+        templar_4: { beforeCombat: templarSoldierBeforeCombat }
     }
 };

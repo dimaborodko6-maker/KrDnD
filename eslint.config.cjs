@@ -1,3 +1,5 @@
+const globals = require('globals');
+
 module.exports = [
     {
         files: ['**/*.js', '**/*.cjs'],
@@ -5,23 +7,28 @@ module.exports = [
             ecmaVersion: 'latest',
             sourceType: 'commonjs',
             globals: {
-                console: 'readonly',
-                process: 'readonly',
-                module: 'readonly',
-                require: 'readonly',
-                __dirname: 'readonly',
-                setTimeout: 'readonly',
-                clearTimeout: 'readonly',
-                setInterval: 'readonly',
-                clearInterval: 'readonly',
-                Math: 'readonly',
-                document: 'readonly',
-                window: 'readonly'
+                ...globals.node,
+                ...globals.es2021
             }
         },
         rules: {
             'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
             'no-undef': 'error'
+        }
+    },
+    {
+        files: ['public/**/*.js'],
+        languageOptions: {
+            sourceType: 'script',
+            globals: {
+                ...globals.browser,
+                ...globals.es2021,
+                _tr: 'readonly'
+            }
+        },
+        rules: {
+            'no-undef': 'off',
+            'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }]
         }
     }
 ];

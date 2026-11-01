@@ -1,0 +1,701 @@
+{
+  "version": 1,
+  "revision": 1,
+  "scenes": [
+    {
+      "id": "roadside-defense",
+      "kind": "combat",
+      "scenario": {
+        "counters": [],
+        "goals": [],
+        "events": [],
+        "autoResolve": false,
+        "endings": {
+          "success": "",
+          "partial": "",
+          "failure": ""
+        }
+      },
+      "cards": [],
+      "title": "Roadside Defense — Quick Start",
+      "description": "A ready-made training map. Build on yellow slots, place heroes on the road, switch to Play, and launch a wave. This uses the original enemy and wave balance.",
+      "objectives": "Keep the castle standing. Launch waves one at a time; advance Wave Turn after the players have acted.",
+      "gold": 300,
+      "baseHp": 20,
+      "gridWidth": 12,
+      "gridHeight": 8,
+      "grid": [
+        [
+          {
+            "x": 0,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 1,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 2,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 3,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 4,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 5,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 6,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 7,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 8,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 9,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 10,
+            "y": 0,
+            "type": "empty"
+          },
+          {
+            "x": 11,
+            "y": 0,
+            "type": "empty"
+          }
+        ],
+        [
+          {
+            "x": 0,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 1,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 2,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 3,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 4,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 5,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 6,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 7,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 8,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 9,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 10,
+            "y": 1,
+            "type": "empty"
+          },
+          {
+            "x": 11,
+            "y": 1,
+            "type": "empty"
+          }
+        ],
+        [
+          {
+            "x": 0,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 1,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 2,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 3,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 4,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 5,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 6,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 7,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 8,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 9,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 10,
+            "y": 2,
+            "type": "empty"
+          },
+          {
+            "x": 11,
+            "y": 2,
+            "type": "empty"
+          }
+        ],
+        [
+          {
+            "x": 0,
+            "y": 3,
+            "type": "empty"
+          },
+          {
+            "x": 1,
+            "y": 3,
+            "type": "empty"
+          },
+          {
+            "x": 2,
+            "y": 3,
+            "type": "slot"
+          },
+          {
+            "x": 3,
+            "y": 3,
+            "type": "empty"
+          },
+          {
+            "x": 4,
+            "y": 3,
+            "type": "empty"
+          },
+          {
+            "x": 5,
+            "y": 3,
+            "type": "empty"
+          },
+          {
+            "x": 6,
+            "y": 3,
+            "type": "slot"
+          },
+          {
+            "x": 7,
+            "y": 3,
+            "type": "empty"
+          },
+          {
+            "x": 8,
+            "y": 3,
+            "type": "empty"
+          },
+          {
+            "x": 9,
+            "y": 3,
+            "type": "empty"
+          },
+          {
+            "x": 10,
+            "y": 3,
+            "type": "slot"
+          },
+          {
+            "x": 11,
+            "y": 3,
+            "type": "empty"
+          }
+        ],
+        [
+          {
+            "x": 0,
+            "y": 4,
+            "type": "spawn"
+          },
+          {
+            "x": 1,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 2,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 3,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 4,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 5,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 6,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 7,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 8,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 9,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 10,
+            "y": 4,
+            "type": "road"
+          },
+          {
+            "x": 11,
+            "y": 4,
+            "type": "castle"
+          }
+        ],
+        [
+          {
+            "x": 0,
+            "y": 5,
+            "type": "empty"
+          },
+          {
+            "x": 1,
+            "y": 5,
+            "type": "empty"
+          },
+          {
+            "x": 2,
+            "y": 5,
+            "type": "empty"
+          },
+          {
+            "x": 3,
+            "y": 5,
+            "type": "empty"
+          },
+          {
+            "x": 4,
+            "y": 5,
+            "type": "slot"
+          },
+          {
+            "x": 5,
+            "y": 5,
+            "type": "empty"
+          },
+          {
+            "x": 6,
+            "y": 5,
+            "type": "empty"
+          },
+          {
+            "x": 7,
+            "y": 5,
+            "type": "empty"
+          },
+          {
+            "x": 8,
+            "y": 5,
+            "type": "slot"
+          },
+          {
+            "x": 9,
+            "y": 5,
+            "type": "empty"
+          },
+          {
+            "x": 10,
+            "y": 5,
+            "type": "empty"
+          },
+          {
+            "x": 11,
+            "y": 5,
+            "type": "empty"
+          }
+        ],
+        [
+          {
+            "x": 0,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 1,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 2,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 3,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 4,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 5,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 6,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 7,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 8,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 9,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 10,
+            "y": 6,
+            "type": "empty"
+          },
+          {
+            "x": 11,
+            "y": 6,
+            "type": "empty"
+          }
+        ],
+        [
+          {
+            "x": 0,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 1,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 2,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 3,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 4,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 5,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 6,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 7,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 8,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 9,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 10,
+            "y": 7,
+            "type": "empty"
+          },
+          {
+            "x": 11,
+            "y": 7,
+            "type": "empty"
+          }
+        ]
+      ],
+      "enemies": [],
+      "waves": [
+        {
+          "waveNum": 1,
+          "title": "Wave 1: Bandit Scouts",
+          "desc": "The first band of lightly armed bandits tries to break through to the Citadel.",
+          "enemies": [
+            {
+              "type": "bandit",
+              "count": 4,
+              "offsetDelay": 1
+            }
+          ]
+        },
+        {
+          "waveNum": 2,
+          "title": "Wave 2: Shadow Infiltrators",
+          "desc": "Fast Shadow Blades and archers attack from the flanks.",
+          "enemies": [
+            {
+              "type": "bandit",
+              "count": 3,
+              "offsetDelay": 0
+            },
+            {
+              "type": "shadow_blade",
+              "count": 2,
+              "offsetDelay": 1
+            },
+            {
+              "type": "shadow_archer",
+              "count": 2,
+              "offsetDelay": 2
+            }
+          ]
+        },
+        {
+          "waveNum": 3,
+          "title": "Wave 3: Blackguards and Crows",
+          "desc": "Armored guards advance under cover of a flock of flying crows.",
+          "enemies": [
+            {
+              "type": "crow",
+              "count": 4,
+              "offsetDelay": 0
+            },
+            {
+              "type": "blackguard",
+              "count": 3,
+              "offsetDelay": 1
+            },
+            {
+              "type": "shadow_archer",
+              "count": 2,
+              "offsetDelay": 2
+            }
+          ]
+        },
+        {
+          "waveNum": 4,
+          "title": "Wave 4: Assault Column",
+          "desc": "A dense formation of Blackguards and Shadow Blades.",
+          "enemies": [
+            {
+              "type": "blackguard",
+              "count": 5,
+              "offsetDelay": 0
+            },
+            {
+              "type": "shadow_blade",
+              "count": 3,
+              "offsetDelay": 1
+            },
+            {
+              "type": "crow",
+              "count": 3,
+              "offsetDelay": 2
+            }
+          ]
+        },
+        {
+          "waveNum": 5,
+          "title": "Wave 5: Goblin and Wolf Raid",
+          "desc": "Fast goblin riders and a pack of dodging wolves attack at speed!",
+          "enemies": [
+            {
+              "type": "goblin",
+              "count": 6,
+              "offsetDelay": 0
+            },
+            {
+              "type": "wulf",
+              "count": 4,
+              "offsetDelay": 1
+            },
+            {
+              "type": "bandit",
+              "count": 3,
+              "offsetDelay": 2
+            }
+          ]
+        },
+        {
+          "waveNum": 6,
+          "title": "Wave 6: Orc Vanguard and Shamans",
+          "desc": "Powerful Orc Warriors protected by Orc Shamans' healing auras.",
+          "enemies": [
+            {
+              "type": "orc_warrior",
+              "count": 3,
+              "offsetDelay": 0
+            },
+            {
+              "type": "orc_shaman",
+              "count": 2,
+              "offsetDelay": 1
+            },
+            {
+              "type": "wulf",
+              "count": 3,
+              "offsetDelay": 2
+            }
+          ]
+        },
+        {
+          "waveNum": 7,
+          "title": "Wave 7: Dark Summoning and the Crowcaller",
+          "desc": "A deadly sorcerer summons endless flocks of crows under the protection of guards!",
+          "enemies": [
+            {
+              "type": "crowcaller",
+              "count": 1,
+              "offsetDelay": 0
+            },
+            {
+              "type": "orc_warrior",
+              "count": 4,
+              "offsetDelay": 1
+            },
+            {
+              "type": "orc_shaman",
+              "count": 2,
+              "offsetDelay": 1
+            },
+            {
+              "type": "crow",
+              "count": 4,
+              "offsetDelay": 2
+            }
+          ]
+        }
+      ],
+      "notes": [
+        {
+          "id": "welcome",
+          "x": 1,
+          "y": 4,
+          "title": "The Road to the Castle",
+          "text": "Enemies travel from the green spawn to the purple castle. Place defenders along the road and build towers on the yellow slots.",
+          "secret": "A tutorial note. Reveal it after explaining the map; it does not change combat.",
+          "skill": "",
+          "dc": 10,
+          "success": "",
+          "failure": ""
+        }
+      ],
+      "availableTowerTypes": [
+        "archer_1",
+        "mage_1",
+        "bombard_1",
+        "barracks_1",
+        "dwarf_1"
+      ]
+    }
+  ],
+  "adventures": []
+}

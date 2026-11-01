@@ -1245,14 +1245,18 @@ wss.on('connection', (ws, request) => {
                 ws.send(JSON.stringify({type:'CATALOG_UPDATE',...catalogStore.read()}));
                 clientRole = 'player'; clientPlayerName = msg.name; clients.players[msg.name] = ws;
                 if (!gameState.players[msg.name]) {
-                    let hKey = "gerald";
-                    if (msg.heroName.indexOf("Zefira") > -1) hKey = "zefira";
-                    if (msg.heroName.indexOf("Malik") > -1) hKey = "malik";
-                    if (msg.heroName.indexOf("Bolin") > -1) hKey = "bolin";
-                    if (msg.heroName.indexOf("Connor") > -1) hKey = "connor";
-                    if (msg.heroName.indexOf("Illiana") > -1) hKey = "illiana";
-                    if (msg.heroName.indexOf("Torghar") > -1) hKey = "torghar";
-                    if (msg.heroName.indexOf("Ratchet") > -1) hKey = "ratchet";
+                    let hKey = msg.heroKey;
+                    if (!hKey) {
+                        const name = msg.heroName || '';
+                        if (name.includes("Zefira") || name.includes("Зефира")) hKey = "zefira";
+                        else if (name.includes("Malik") || name.includes("Малик")) hKey = "malik";
+                        else if (name.includes("Bolin") || name.includes("Болин")) hKey = "bolin";
+                        else if (name.includes("Connor") || name.includes("Коннор")) hKey = "connor";
+                        else if (name.includes("Illiana") || name.includes("Иллиана")) hKey = "illiana";
+                        else if (name.includes("Torghar") || name.includes("Торгар")) hKey = "torghar";
+                        else if (name.includes("Ratchet") || name.includes("Рэтчет")) hKey = "ratchet";
+                        else hKey = "gerald";
+                    }
                     
                     const heroProto = GAME_DATA.heroes[hKey];
                     const scores = ['str', 'dex', 'con', 'int', 'wis', 'cha'].map(key => msg.stats?.[key]);
@@ -1279,11 +1283,15 @@ wss.on('connection', (ws, request) => {
                         baseArmor = 55;
                         bLimit = 3;
                     } else if (hKey === 'ratchet') {
-                        calculatedMaxHp = 60 + (conMod * 4);
+                        calculatedMaxHp = 65 + (conMod * 4);
                         calculatedMaxMana = 50 + (intMod * 5);
                         baseArmor = 35;
                         hRange = 3;
                         bLimit = 1;
+                    } else if (hKey === 'gerald') {
+                        baseArmor = 30;
+                    } else if (hKey === 'malik') {
+                        calculatedMaxHp = 50 + (conMod * 5);
                     }
 
                     let gwSpawn = gameState.gridWidth || 16;
@@ -1747,6 +1755,17 @@ wss.on('connection', (ws, request) => {
                     logAction(Date.now(), `✨ SPECIALIZATION: Player ${clientPlayerName} purchased [${upgDef.name}] for [${tProto.name}] at (${msg.x}, ${msg.y}) for ${upgDef.cost}💰!`);
                     logDebug('UPGRADE_PURCHASE', `Purchased upgrade [${upgDef.name}] (${upgDef.id}) for the tower at (${msg.x}, ${msg.y}). Treasury: ${gameState.gold}💰`);
 
+                    if (upgDef.id === 'templar_toughness') {
+                        let towerKey = `${msg.x},${msg.y}`;
+                        (gameState.soldiers || []).filter(s => s.towerKey === towerKey).forEach(s => {
+                            if (!s.toughnessApplied) {
+                                s.maxHp = (s.maxHp || 140) + 30;
+                                s.hp = Math.min(s.maxHp, s.hp + 30);
+                                s.toughnessApplied = true;
+                            }
+                        });
+                    }
+
                     // Особый эффект: если Чародей купил Каменного голема ('sorcerer_golem') - спавним голема на дорогу рядом!
                     if (upgDef.id === 'sorcerer_golem') {
                         let roadCell = findNearestRoadCell(msg.x, msg.y, tProto.range || 3);
@@ -2140,4 +2159,13 @@ function printAccessInfo() {
     console.log('======================================================');
 }
 
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`\n❌ Error: Port ${PORT} is already in use by another program or an existing game instance.`);
+        console.error(`   Please close other windows running the game or set a different port with: set PORT=3001\n`);
+        process.exit(1);
+    } else {
+        throw err;
+    }
+});
 server.listen(PORT, '0.0.0.0', printAccessInfo);
