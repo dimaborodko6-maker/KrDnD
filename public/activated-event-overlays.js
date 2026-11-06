@@ -2,7 +2,7 @@
 /* global ACTIVATED_EVENT_RULES */
 const ACTIVATED_EVENT_OVERLAYS = (() => {
     const tr=text=>window.KR_I18N ? window.KR_I18N.t(text) : text;
-    const symbols={goldenGoblin:'💰',goblinTower:'🏚',ritualTotem:'🔮',banner:'🚩',sandstorm:'🌪',bombardment:'🎯',chainLightning:'⚡',frost:'❄'};
+    const symbols={goldenGoblin:'💰',goblinTower:'🏚',ritualTotem:'🔮',banner:'🚩',sandstorm:'🌪',bombardment:'🎯',chainLightning:'⚡',frost:'❄',necroticMist:'☠️'};
     function render(grid,state,preview){
         if(!grid || !state)return;
         const cells=Array.from(grid.querySelectorAll('.cell'));
@@ -16,7 +16,7 @@ const ACTIVATED_EVENT_OVERLAYS = (() => {
             if(kind==='chainLightning' && typeof ACTIVATED_EVENT_RULES!=='undefined')areas=ACTIVATED_EVENT_RULES.chain(state,config).map(item=>item.unit);
             const radius=['frost','chainLightning','goldenGoblin','goblinTower','ritualTotem'].includes(kind) ? 0 : config.radius || 0;
             for(const cell of cells){const x=Number(cell.dataset.x),y=Number(cell.dataset.y),inside=areas.some(point=>Math.hypot(point.x-x,point.y-y)<=radius);
-                if(inside){if(entry.preview || kind==='banner')cell.classList.add('event-zone-preview');else if(kind==='sandstorm')cell.classList.add('event-zone-storm');else if(['bombardment','chainLightning'].includes(kind))cell.classList.add('event-zone-warning');}
+                if(inside){if(entry.preview || kind==='banner')cell.classList.add('event-zone-preview');else if(kind==='sandstorm' || kind==='necroticMist')cell.classList.add('event-zone-storm');else if(['bombardment','chainLightning'].includes(kind))cell.classList.add('event-zone-warning');}
                 if(areas.some(point=>point.x===x && point.y===y)){const marker=document.createElement('span');marker.className='event-map-marker';marker.textContent=(symbols[kind] || '✦')+(kind==='chainLightning' ? String(areas.findIndex(point=>point.x===x && point.y===y)+1) : '');marker.title=tr(config.title || kind)+(source ? ' · HP '+source.hp+'/'+source.maxHp : '');cell.append(marker);}
             }
         }

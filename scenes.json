@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "revision": 1,
+  "revision": 2,
   "scenes": [
     {
       "id": "roadside-defense",
@@ -17,6 +17,7 @@
         }
       },
       "cards": [],
+      "eventPresets": [],
       "title": "Roadside Defense — Quick Start",
       "description": "A ready-made training map. Build on yellow slots, place heroes on the road, switch to Play, and launch a wave. This uses the original enemy and wave balance.",
       "objectives": "Keep the castle standing. Launch waves one at a time; advance Wave Turn after the players have acted.",
@@ -277,7 +278,7 @@
           {
             "x": 0,
             "y": 4,
-            "type": "spawn"
+            "type": "castle"
           },
           {
             "x": 1,
@@ -332,7 +333,7 @@
           {
             "x": 11,
             "y": 4,
-            "type": "castle"
+            "type": "spawn"
           }
         ],
         [

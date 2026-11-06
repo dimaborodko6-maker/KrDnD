@@ -61,7 +61,7 @@ module.exports = function enemyTraitsEngine({ getState, getData, createEnemy, da
             const traits = ensure(enemy);
             if (!active(enemy)) continue;
             const elapsed = enemy.lastDamageRound === undefined ? Infinity : round()-enemy.lastDamageRound;
-            if (traits.regeneration && elapsed > traits.regeneration.delay && enemy.hp < enemy.maxHp) {
+            if (traits.regeneration && !(enemy.burnTurns > 0) && elapsed > traits.regeneration.delay && enemy.hp < enemy.maxHp) {
                 const before = enemy.hp;
                 setHp(enemy, Math.min(enemy.maxHp,enemy.hp+Math.max(1,Math.round(enemy.maxHp*traits.regeneration.percent/100))));
                 log(`💚 REGENERATION: [${enemy.name}] recovered ${enemy.hp-before} HP.`);

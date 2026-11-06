@@ -56,6 +56,8 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
         else if (name.includes("Illiana") || name.includes("Иллиана")) hKey = "illiana";
         else if (name.includes("Torghar") || name.includes("Торгар")) hKey = "torghar";
         else if (name.includes("Ratchet") || name.includes("Рэтчет")) hKey = "ratchet";
+        else if (name.includes("Dante") || name.includes("Данте")) hKey = "dante";
+        else if (name.includes("Solaris") || name.includes("Солярис") || name.includes("Ignis")) hKey = "solaris";
         else hKey = "gerald";
     }
 
@@ -105,14 +107,14 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
 
     // --- 1. ОБРАБОТКА САМОБАФФОВ И УТИЛИТАРНЫХ СПОСОБНОСТЕЙ (БЕЗ ВРАЖЕСКОЙ ЦЕЛИ) ---
     // Shield Wall, Inspire Courage, Shield of Retribution, Unbreakable Shield, Astral Blink, Undying Bastion
-    if (['shield_wall', 'inspire', 'retribution', 'unbreakable', 'connor_retribution'].includes(cleanKey) ||
+    if (['shield_wall', 'inspire', 'retribution', 'unbreakable', 'connor_retribution', 'solar_overdrive'].includes(cleanKey) ||
         (abilityType === 'ultimate' && ['torghar', 'connor'].includes(hKey))) {
         
         let manaCost = 5;
         let cooldownVal = 3;
         if (cleanKey === 'connor_retribution') manaCost = 6;
         if (cleanKey === 'retribution') { manaCost = 6; cooldownVal = 3; }
-        if (cleanKey === 'unbreakable') manaCost = 4;
+        if (cleanKey === 'unbreakable' || cleanKey === 'solar_overdrive') manaCost = 4;
         if (abilityType === 'ultimate') { manaCost = 0; cooldownVal = 5; }
 
         if (player.mana < manaCost) {
@@ -125,7 +127,30 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
         player.hasAttackedThisRound = true;
         player.isReady = false;
 
-        if (cleanKey === 'shield_wall') {
+        
+        if (cleanKey === 'solar_overdrive') {
+            let ignis = (gameState.soldiers || []).find(s => s.isElemental && s.ownerId === player.id);
+            if (ignis) {
+                ignis.hp = Math.min(ignis.maxHp, ignis.hp + 40);
+                ignis.dmg = (ignis.dmg || 10) + 10;
+                logAction(Date.now(), `🔥 SOLAR OVERDRIVE: Solaris empowered Ignis (+40 HP healed, +10 attack)!`);
+                const adjEnemies = (gameState.enemies || []).filter(e => e.hp > 0 && Math.max(Math.abs(e.x - ignis.x), Math.abs(e.y - ignis.y)) <= 1);
+                for (const en of adjEnemies) {
+                    let d = mobTraits.damage(en, 25);
+                    en.burnTurns = Math.max(en.burnTurns || 0, 2);
+                    logAction(Date.now(), `💥 OVERDRIVE BLAST: Ignis discharged plasma at [${en.name}] for ${d} fire damage!`);
+                    if (en.hp <= 0) {
+                        gameState.gold += en.reward;
+                        logAction(Date.now(), `💀 [${en.name}] dissolved in solar plasma! Treasury +${en.reward}💰.`);
+                    }
+                }
+                gameState.recentCombatFx = gameState.recentCombatFx || [];
+                gameState.recentCombatFx.push({ x: ignis.x, y: ignis.y, type: 'solar_flare', text: '🔥 OVERDRIVE' });
+            } else {
+                logAction(Date.now(), `☀️ SOLAR OVERDRIVE: Ignis dissipated, but solar embers surge around Solaris!`);
+            }
+        }
+        else if (cleanKey === 'shield_wall') {
             const previousArmor = player.armor ?? 55;
             player.armor = Math.min(80, previousArmor + 25);
             player.shieldWallArmorBonus = player.armor - previousArmor;
@@ -404,13 +429,17 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
             // Ratchet
             'surgical_laser': 3,
             'nanite_cloud': 2,
-            'ambulance_rush': 4
+            'ambulance_rush': 4,
+            'silver_bullet': 3,
+            'consecrated_ground': 3,
+            'sunray_lance': 4,
+            'solar_flare': 3
         };
         if (abilityRanges[sId]) {
             effectiveRange = Math.max(effectiveRange, abilityRanges[sId]);
         }
     } else if (abilityType === 'ultimate') {
-        if (['zefira', 'bolin', 'illiana', 'ratchet'].includes(hKey)) {
+        if (['zefira', 'bolin', 'illiana', 'ratchet', 'dante', 'solaris'].includes(hKey)) {
             effectiveRange = Math.max(effectiveRange, 4);
         }
         if (hKey === 'torghar') effectiveRange = 2;
@@ -421,8 +450,8 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
     let chebyshevDist = Math.max(Math.abs(player.x - enemy.x), Math.abs(player.y - enemy.y));
     let isBlockedMeleeTarget = (player.blockedEnemyIds || []).includes(enemy.id) && chebyshevDist <= 1;
 
-    let isEuclideanSkill = ['hammer', 'mortar', 'tag', 'glitter', 'prey', 'surgical_laser', 'nanite_cloud', 'ambulance_rush'].includes(cleanKey) ||
-                           (abilityType === 'attack' && ['zefira', 'bolin', 'illiana', 'ratchet'].includes(hKey));
+    let isEuclideanSkill = ['hammer', 'mortar', 'tag', 'glitter', 'prey', 'surgical_laser', 'nanite_cloud', 'ambulance_rush', 'silver_bullet', 'consecrated_ground', 'sunray_lance', 'solar_flare'].includes(cleanKey) ||
+                           (abilityType === 'attack' && ['zefira', 'bolin', 'illiana', 'ratchet', 'dante'].includes(hKey));
 
     let checkDist = isEuclideanSkill ? euclideanDist : chebyshevDist;
 
@@ -450,6 +479,19 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
     if (abilityType === 'ultimate') {
         if (hKey === 'malik') {
             areaType = 'aoe_around_player';
+        } else if (hKey === 'solaris') {
+            areaType = 'aoe_around_player';
+            aoeRadius = 3;
+        } else if (hKey === 'solaris') {
+                dmgType = 'magic';
+                baseDamage = diceRoll + 4 + intMod;
+                abilityTitle = `☀️ SOLAR BEAM (d${diceRoll}+4+${intMod})`;
+                if (player.skills.includes('purifying_pyre')) {
+                    enemy.burnTurns = Math.max(enemy.burnTurns || 0, 2);
+                }
+            } else if (hKey === 'dante') {
+            areaType = 'aoe_around_player';
+            aoeRadius = 2;
         } else if (['bolin', 'zefira', 'illiana'].includes(hKey)) {
             areaType = 'aoe_around_target';
         } else {
@@ -465,7 +507,7 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
             areaType = 'aoe_around_player';
         } 
         // Дальнобойные площадные и взрывные способности бьют квадратом 3х3 (радиус 1) вокруг целевой клетки дороги!
-        else if (['mortar', 'mines', 'glitter', 'hammer', 'tag'].includes(skillId)) {
+        else if (['mortar', 'mines', 'glitter', 'hammer', 'tag', 'consecrated_ground', 'solar_flare'].includes(skillId)) {
             areaType = 'aoe_around_target';
         } else {
             areaType = 'single';
@@ -528,6 +570,12 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
             dmgType = 'magic'; baseDamage = 210; abilityTitle = `⚡ ULTIMATE [Ethereal Spears]`;
         } else if (hKey === 'malik') {
             dmgType = 'phys'; baseDamage = 180; abilityTitle = `⚡ ULTIMATE [Hammernado]`;
+        } else if (hKey === 'solaris') {
+            dmgType = 'pure'; baseDamage = 190; abilityTitle = `⚡ ULTIMATE [Supernova]`;
+            gameState.magmaPuddles = gameState.magmaPuddles || [];
+            gameState.magmaPuddles.push({ x: enemy.x, y: enemy.y, turns: 2, dmg: 15 });
+        } else if (hKey === 'dante') {
+            dmgType = 'pure'; baseDamage = 180; abilityTitle = `⚡ ULTIMATE [Beacon of Light]`;
         } else if (hKey === 'bolin') {
             dmgType = 'phys'; baseDamage = 200; abilityTitle = `⚡ ULTIMATE [Suppressive Fire]`;
         } else if (hKey === 'connor') {
@@ -538,7 +586,7 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
             dmgType = 'pure'; baseDamage = 200; abilityTitle = `⚡ ULTIMATE [Sparky, Incinerate!]`;
         }
     } else if (abilityType === 'attack') {
-        let isRangedHero = ['zefira', 'bolin', 'illiana', 'ratchet'].includes(hKey);
+        let isRangedHero = ['zefira', 'bolin', 'illiana', 'ratchet', 'dante'].includes(hKey);
 
         if (isRangedHero && euclideanDist <= 1.05 && hKey !== 'ratchet') {
             dmgType = 'phys';
@@ -549,6 +597,15 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
                 dmgType = 'pure';
                 baseDamage = diceRoll + 3 + intMod;
                 abilityTitle = `⚡ RATCHET'S ENERGY STUNNER (d${diceRoll}+3+${intMod})`;
+            } else if (hKey === 'dante') {
+                dmgType = 'phys';
+                baseDamage = diceRoll + 5 + dexMod;
+                if (player.skills.includes('undead_bane') && (enemy.magicRes > 0 || (enemy.traits && enemy.traits.shield) || enemy.shieldHp > 0)) {
+                    baseDamage = Math.round(baseDamage * 1.25);
+                    abilityTitle = `🔫 DANTE'S HOLY SHOT (d${diceRoll}+5+${dexMod} +25% Bane)`;
+                } else {
+                    abilityTitle = `🔫 DANTE'S DUAL SHOT (d${diceRoll}+5+${dexMod})`;
+                }
             } else if (hKey === 'bolin') {
                 dmgType = 'phys';
                 baseDamage = diceRoll + 6 + dexMod;
@@ -593,6 +650,18 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
         let statMod = intMod;
         if (['earthquake', 'obliterate', 'slash', 'connor_retribution', 'shatter', 'shield_slam', 'ground_tremor'].includes(skillId)) {
             dmgType = 'phys'; statMod = strMod;
+        } else if (skillId === 'sunray_lance') {
+            dmgType = 'magic'; statMod = intMod + 4;
+            enemy.shieldHp = 0;
+            enemy.burnTurns = Math.max(enemy.burnTurns || 0, 2);
+        } else if (skillId === 'solar_flare') {
+            dmgType = 'magic'; statMod = intMod + 2;
+            enemy.hasDisadvantage = true;
+            enemy.burnTurns = Math.max(enemy.burnTurns || 0, 2);
+        } else if (skillId === 'silver_bullet') {
+            dmgType = 'pure'; statMod = dexMod + 4;
+        } else if (skillId === 'consecrated_ground') {
+            dmgType = 'magic'; statMod = getModifier(player.stats.wis) + 3;
         } else if (['mortar', 'mines', 'prey'].includes(skillId)) {
             dmgType = 'phys'; statMod = dexMod;
         } else if (skillId === 'tag' || skillId === 'surgical_laser') {
@@ -724,6 +793,12 @@ function castAbility(playerName, abilityType, targetEnemyId, diceRoll) {
                    `at [${enemy.name}]`;
 
     let logMessage = `${abilityTitle}: ${player.heroName} attacks ${areaDesc} (${typeLabel} damage)${statusEffectNote}. ` + targetDetails.join(', ');
+    if (totalKills > 0 && player.skills && player.skills.includes('holy_water') && player.hp > 0) {
+        let healAmt = 10;
+        let oldHp = player.hp;
+        setCombatHp(player, Math.min(player.maxHp, player.hp + healAmt));
+        logAction(Date.now(), `💧 HOLY WATER: Dante cleansed the unholy and restored +${player.hp - oldHp} HP!`);
+    }
     if (totalKills > 0) {
         logMessage += `. ⚰️ Total defeated: ${totalKills} monsters! (+${totalGoldGained}💰 to treasury).`;
     }

@@ -33,7 +33,7 @@ test('готовые башни восстанавливают гарнизон 
 });
 function temporary(t) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(),'kr-scenes-'));
-    t.after(() => { for (const name of fs.readdirSync(dir)) fs.unlinkSync(path.join(dir,name)); fs.rmdirSync(dir); });
+    t.after(() => { try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} });
     return dir;
 }
 test('библиотека сохраняет, копирует, удаляет и восстанавливает сцены; устаревшие записи и невалидные данные не меняют файл', t => {

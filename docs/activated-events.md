@@ -1,6 +1,6 @@
 # Activated combat events
 
-The GM can configure eight combat events from the dashboard during Play, independently of a prepared scene. Named presets can also be saved under **Activated event presets** in Scene Preparation. A preset stores settings and map positions; live heroes, banner bearers, lightning targets and saving throw results are chosen again at activation. Existing scene-condition events remain separate.
+The GM can configure nine combat events from the dashboard during Play, independently of a prepared scene. Named presets can also be saved under **Activated event presets** in Scene Preparation. A preset stores settings and map positions; live heroes, banner bearers, lightning targets and saving throw results are chosen again at activation. Existing scene-condition events remain separate.
 
 ## Using events
 
@@ -20,6 +20,7 @@ Active durations and warning areas are visible to players. The GM can end an ong
 | Ritual totem | 40 HP; countdown 3 rounds; three goblins; summon reward 0 G | Place on empty grass and select a connected reinforcement cell. Destroy the totem before its enemy-phase countdown completes to cancel the one-time reinforcement. Successful completion consumes the totem. |
 | Warlord banner | Radius 2; duration 3 rounds; damage bonus 20% | Select a living non-structure enemy bearer. Choose damage %, armor percentage points or speed cells; recommended defaults are 20%, 20 points and 1 cell respectively. Only the highest active event bonus of each type applies. A fallen, stunned or transformed bearer stops supplying the aura. |
 | Chain lightning | 10 magic damage; up to 4 targets; jump radius 2; all sides | Choose a living first target. Each jump selects the nearest eligible unhit creature, with stable tie-breaking. Choose instant resolution or a one-round warning. Delayed lightning resolves from the current target positions. |
+| Necrotic mist | Radius 2; duration 3 rounds; 8 magic damage; heroes | Select a center cell on the map. Deals magic damage to living defenders within radius at the start of each wave round. |
 
 Physical damage respects armor; magic damage respects magic resistance where the target has it; true damage bypasses those reductions. Existing shields and hero survival mechanics still apply. Event-created structures are attackable enemy targets. Durations count GM wave turns, never wall-clock time or individual hero actions. Preparation pauses combat progression and cannot activate a new combat event.
 

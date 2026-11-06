@@ -5,6 +5,8 @@
 function teslaField(ctx) {
     const { state, upgrades, x, y, action, debug } = ctx;
     if (!upgrades.includes('tesla_field')) return;
+    state.recentCombatFx = state.recentCombatFx || [];
+    state.recentCombatFx.push({ x, y, type: 'tesla_field', text: '⚡ FIELD' });
     const targets = state.enemies.filter(en => en.hp > 0 && Math.max(Math.abs(x - en.x), Math.abs(y - en.y)) <= 1);
     for (const en of targets) {
         ctx.damage(en, 15);
@@ -34,6 +36,8 @@ function arcanePassives(ctx) {
                 ctx.setHp(target, 0);
                 state.gold += target.reward;
                 action(`💀 ARCANE VERDICT: Archmage at (${x}, ${y}) erased [${target.name}] from existence! Treasury +${target.reward}💰.`);
+            state.recentCombatFx = state.recentCombatFx || [];
+            state.recentCombatFx.push({ x: target.x, y: target.y, type: 'arcane_death', text: '💀 VERDICT' });
                 debug('ARCANE_DEATH', `Archmage annihilated [${target.name}] (#${target.id}) (Cooldown until round #${state.roundCounter + 5})`);
                 debug('TOWER_KILL', killDebug);
                 ctx.removeDead();
@@ -49,6 +53,8 @@ function arcanePassives(ctx) {
                 const oldX = target.x, oldY = target.y;
                 target.x = stepBack.x; target.y = stepBack.y;
                 cell.lastTeleportRound = state.roundCounter;
+                state.recentCombatFx = state.recentCombatFx || [];
+                state.recentCombatFx.push({ x: target.x, y: target.y, type: 'arcane_teleport', text: '🌀 WARP' });
                 action(`🌀 DESTABILIZATION: Archmage at (${x}, ${y}) warped space and knocked [${target.name}] from (${oldX}, ${oldY}) back to (${target.x}, ${target.y})!`);
                 debug('ARCANE_TELEPORT', `[${target.name}] (#${target.id}) teleported back from (${oldX}, ${oldY}) at (${target.x}, ${target.y}) (Cooldown until round #${state.roundCounter + 5})`);
             }
@@ -62,6 +68,8 @@ function berthaMissiles(ctx) {
     const target = ctx.closestEnemy();
     if (!target) return;
     const damage = ctx.damage(target, 50);
+    state.recentCombatFx = state.recentCombatFx || [];
+    state.recentCombatFx.push({ x: target.x, y: target.y, type: 'bertha_missile', text: '🚀 MISSILE' });
     action(`🚀 BERTHA MISSILE: A homing missile from (${x}, ${y}) struck vanguard [${target.name}] for ${damage} explosive damage!`);
     debug('BERTHA_MISSILE', `Bertha's missile hit [${target.name}] (#${target.id}) for ${damage} damage [HP: ${target.hp}]`);
     if (target.hp <= 0) {
@@ -144,6 +152,8 @@ function berthaAfterAttack(ctx) {
     const { state, shot: { target }, action, debug } = ctx;
     if (!state.napalmPuddles) state.napalmPuddles = [];
     state.napalmPuddles.push({ x: target.x, y: target.y, turns: 2, dmg: 10 });
+    state.recentCombatFx = state.recentCombatFx || [];
+    state.recentCombatFx.push({ x: target.x, y: target.y, type: 'bertha_napalm', text: '🔥 NAPALM' });
     action(`🔥 NAPALM: Bertha's shell ignited a napalm pool at cell (${target.x}, ${target.y})!`);
     debug('BERTHA_NAPALM_SPAWN', `Napalm pool created at (${target.x}, ${target.y}) for 2 rounds`);
 }
@@ -163,6 +173,8 @@ function teslaChain(ctx) {
         const damage = ctx.damage(enemy, overcharge ? 30 : 20);
         const stunned = overcharge && random() < 0.30;
         if (stunned) enemy.stunTurns = Math.max(enemy.stunTurns || 0, 1);
+        state.recentCombatFx = state.recentCombatFx || [];
+        state.recentCombatFx.push({ x: enemy.x, y: enemy.y, type: 'tesla_chain', text: '⚡ CHAIN' });
         action(`⚡ CHAIN LIGHTNING: Tesla's discharge jumped to [${enemy.name}], dealing ${damage} magic damage${stunned ? ' and stunning!' : '!'}`);
         debug('TESLA_CHAIN', `Tesla's chain lightning hit [${enemy.name}] (#${enemy.id}) for ${damage} damage${stunned ? ' [STUN]' : ''} [HP: ${enemy.hp}/${enemy.maxHp}]`);
         if (enemy.hp <= 0) ctx.reward(enemy,
@@ -433,6 +445,8 @@ function dwaarpBeforeAttack(ctx) {
         }
         if (strongest) {
             cell.lastCoreDrillRound = state.roundCounter;
+            state.recentCombatFx = state.recentCombatFx || [];
+            state.recentCombatFx.push({ x: strongest.x, y: strongest.y, type: 'dwaarp_drill', text: '⛏️ DRILL' });
             if (strongest.isBoss || strongest.isMiniBoss) {
                 ctx.damage(strongest, 180);
                 action(`🛡️ BOSS RESISTANCE: [${strongest.name}] resisted the Core Drill, taking 180 true damage!`);
@@ -452,6 +466,8 @@ function dwaarpBeforeAttack(ctx) {
     }
     if (upgrades.includes('dwaarp_furnace') && state.roundCounter - (cell.lastFurnaceRound || -999) >= 3) {
         cell.lastFurnaceRound = state.roundCounter;
+        state.recentCombatFx = state.recentCombatFx || [];
+        state.recentCombatFx.push({ x, y, type: 'dwaarp_furnace', text: '🌋 FURNACE' });
         action(`🔥 FURNACE BLAST: DWAARP at (${x}, ${y}) vented superheated magma onto adjacent road cells!`);
         debug('DWAARP_FURNACE', `Furnace blast created napalm puddles around (${x}, ${y})`);
         if (!state.napalmPuddles) state.napalmPuddles = [];
@@ -479,6 +495,90 @@ function templarSoldierBeforeCombat(ctx) {
     }
 }
 
+
+function mechaFlameAfterAttack(ctx) {
+    const { state, shot, proto, upgrades, action, debug, damage, removeDead } = ctx;
+    const target = shot.target;
+    if (!target) return;
+    target.burnTurns = upgrades.includes('mecha_inferno') ? 3 : 2;
+    if (upgrades.includes('mecha_inferno')) target.armor = Math.max(0, (target.armor || 0) - 20);
+
+    const burnDuration = upgrades.includes('mecha_inferno') ? 3 : 2;
+    const targets = state.enemies.filter(en => en.id !== target.id && en.hp > 0 &&
+        Math.max(Math.abs(en.x - shot.impactX), Math.abs(en.y - shot.impactY)) <= 1);
+    for (const other of targets) {
+        const splashDmg = Math.round(shot.baseDamage * 0.5);
+        damage(other, splashDmg, 'magic');
+        other.burnTurns = burnDuration;
+        if (upgrades.includes('mecha_inferno')) other.armor = Math.max(0, (other.armor || 0) - 20);
+        action(`🔥 FLAME SPRAY: Incinerator flame scorched [${other.name}] for ${splashDmg} fire damage (burning applied)!`);
+    }
+
+    if (upgrades.includes('mecha_magma')) {
+        state.magmaPuddles = state.magmaPuddles || [];
+        state.magmaPuddles.push({ x: target.x, y: target.y, turns: 2, dmg: 15 });
+        action(`🌋 MAGMA VENT: Flame-Mecha vented molten magma onto cell (${target.x}, ${target.y}) for 2 rounds!`);
+    }
+
+    state.recentCombatFx = state.recentCombatFx || [];
+    state.recentCombatFx.push({ x: target.x, y: target.y, type: 'mecha_flame', text: '🔥 FLAME' });
+    removeDead();
+}
+
+function mechaMissileBeforeAttack(ctx) {
+    const { state, proto, upgrades, x, y, action, debug, inRange, damage, reward, removeDead } = ctx;
+    if (!upgrades.includes('mecha_wasp')) return;
+    const range = ctx.effectiveRange || proto.range || 4;
+    for (let missile = 1; missile <= 2; missile++) {
+        const flyingTarget = state.enemies.find(en => en.hp > 0 && en.isFlying && inRange(x, y, en, range));
+        const target = flyingTarget || state.enemies.find(en => en.hp > 0 && inRange(x, y, en, range));
+        if (!target) break;
+        const dmgAmount = damage(target, 40, 'pure');
+        action(`🚀 WASP MISSILE #${missile}: Missile-Mecha fired a homing rocket at [${target.name}] for ${dmgAmount} damage!`);
+        debug('MECHA_WASP_MISSILE', `Wasp missile #${missile} hit [${target.name}] (#${target.id}) for ${dmgAmount} damage [HP: ${target.hp}]`);
+        state.recentCombatFx = state.recentCombatFx || [];
+        state.recentCombatFx.push({ x: target.x, y: target.y, type: 'mecha_missile', text: '🚀 WASP' });
+        if (target.hp <= 0) {
+            reward(target, `💀 [${target.name}] was obliterated by a Wasp missile! Treasury +${target.reward}💰.`,
+                `Enemy [${target.name}] (#${target.id}) killed by Wasp missile (+${target.reward}💰)`);
+        }
+    }
+    removeDead();
+}
+
+function mechaHeavyAfterAttack(ctx) {
+    splash(ctx);
+    const { state, shot, upgrades, action, debug, findShortestPath } = ctx;
+    const target = shot.target;
+    if (!target) return;
+
+    if (upgrades.includes('mecha_oil')) {
+        state.oilPuddles = state.oilPuddles || [];
+        state.oilPuddles.push({ x: target.x, y: target.y, turns: 2 });
+        action(`🛢️ OIL SLICK: Heavy-Mecha dropped a viscous oil slick at (${target.x}, ${target.y}) slowing enemies by 50%!`);
+        state.recentCombatFx = state.recentCombatFx || [];
+        state.recentCombatFx.push({ x: target.x, y: target.y, type: 'mecha_oil', text: '🛢️ OIL' });
+    }
+
+    if (upgrades.includes('mecha_concussive') && (ctx.random ? ctx.random() : Math.random()) < 0.35) {
+        const splashGroup = state.enemies.filter(en => en.hp > 0 &&
+            Math.max(Math.abs(en.x - shot.impactX), Math.abs(en.y - shot.impactY)) <= 1);
+        for (const en of splashGroup) {
+            en.stunTurns = Math.max(en.stunTurns || 0, 1);
+            if (findShortestPath) {
+                const stepBack = findShortestPath(en.x, en.y, 'spawn');
+                if (stepBack && stepBack.length > 1) {
+                    en.x = stepBack[1].x;
+                    en.y = stepBack[1].y;
+                }
+            }
+        }
+        action(`💥 CONCUSSIVE SHOCKWAVE: Colossal shell shockwave stunned and knocked enemies back!`);
+        state.recentCombatFx = state.recentCombatFx || [];
+        state.recentCombatFx.push({ x: target.x, y: target.y, type: 'mecha_concussion', text: '💥 SHOCKWAVE' });
+    }
+}
+
 module.exports = {
     towers: {
         archer_ranger: { afterAttack: rangerEffects },
@@ -497,7 +597,13 @@ module.exports = {
         dwaarp_1: { afterAttack: dwaarpShockwave },
         dwaarp_2: { afterAttack: dwaarpShockwave },
         dwaarp_3: { afterAttack: dwaarpShockwave },
-        dwaarp_4: { beforeAttack: dwaarpBeforeAttack, afterAttack: dwaarpShockwave }
+        dwaarp_4: { beforeAttack: dwaarpBeforeAttack, afterAttack: dwaarpShockwave },
+        mecha_1: { afterAttack: splash },
+        mecha_2: { afterAttack: splash },
+        mecha_3: { afterAttack: splash },
+        mecha_flame: { afterAttack: mechaFlameAfterAttack },
+        mecha_missile: { beforeAttack: mechaMissileBeforeAttack, afterAttack: splash },
+        mecha_heavy: { afterAttack: mechaHeavyAfterAttack }
     },
     soldiers: {
         barracks_paladins: { beforeCombat: paladinGrace, blocksHit: paladinShield },

@@ -15,7 +15,7 @@ function scene() {
 function preset(kind) {
     return {id:kind,title:RULES.kinds[kind],...RULES.defaults(kind),x:1,y:1,spawnX:1,spawnY:2,areas:[{x:4,y:2}]};
 }
-test('all eight named presets round-trip without requiring live targets or rolling saves',t=>{
+test('all named presets round-trip without requiring live targets or rolling saves',t=>{
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),'kr-event-presets-'));
     t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
     const file=path.join(dir,'scenes.json'),store=createSceneStore(data,file),draft=scene();
@@ -25,7 +25,7 @@ test('all eight named presets round-trip without requiring live targets or rolli
     draft.eventPresets.find(item=>item.kind === 'chainLightning').target={kind:'enemy',id:'missing'};
     store.save(draft,0);
     const restored=createSceneStore(data,file).get('events');
-    assert.equal(restored.eventPresets.length,8);
+    assert.equal(restored.eventPresets.length,Object.keys(RULES.kinds).length);
     for (const item of restored.eventPresets) for (const key of ['playerNames','results','sourceId','target']) assert.equal(Object.hasOwn(item,key),false);
     assert.equal(restored.eventPresets.find(item=>item.kind === 'goldenGoblin').reward,50);
     assert.deepEqual(store.get('events'),restored);

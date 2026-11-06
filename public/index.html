@@ -3,6 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10191c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
   <meta name="description" content="A cooperative tower defense game led by a game master. Create a hero, build defenses and protect the castle together.">
   <title>Kr6DnD — Gather your defenders</title>
   <script src="i18n-dict.js"></script>
@@ -10,7 +15,7 @@
   <style>
     :root{color-scheme:dark;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#10191c;color:#e9f0e9}
     *{box-sizing:border-box}body{margin:0}main{max-width:1050px;padding:64px 28px 40px;margin:auto}.eyebrow{color:#b8d18c;letter-spacing:.15em;font-size:12px;text-transform:uppercase;font-weight:700}
-    h1{font-size:clamp(40px,7vw,76px);line-height:1.04;letter-spacing:-.05em;margin:24px 0}h1 span{color:#b8d18c}p{color:#aebeb9;line-height:1.7;max-width:650px}a{color:inherit}.intro{font-size:18px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:38px 0 28px}.card{display:block;text-decoration:none;border:1px solid #37483f;padding:28px;border-radius:14px;background:#192521;transition:transform .15s,border-color .15s}.card:hover{transform:translateY(-3px);border-color:#b8d18c}.card:focus-visible{outline:3px solid #b8d18c;outline-offset:4px}.card h2{font-size:24px;margin:16px 0 8px}.card p{margin:0;min-height:58px}.card strong{display:inline-block;margin-top:24px;color:#c9e4a1}.icon{font-size:30px}.secondary{background:#182027;border-color:#34414c}.secondary strong{color:#b5cce5}.tools{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0 40px}.tools a{font-size:14px;text-decoration:none;border-bottom:1px solid #596c61;padding-bottom:4px}.tools a:hover{color:#c9e4a1}.note{padding:20px 24px;border-left:3px solid #b8d18c;background:#17211e}.note p{margin:6px 0}.note strong{font-size:14px}footer{border-top:1px solid #2c3a33;padding-top:24px;display:flex;justify-content:space-between;gap:18px;color:#8da398;font-size:12px;margin-top:44px}@media(max-width:650px){main{padding-top:36px}.cards{grid-template-columns:1fr}.card p{min-height:0}footer{flex-direction:column}}
+    h1{font-size:clamp(40px,7vw,76px);line-height:1.04;letter-spacing:-.05em;margin:24px 0}h1 span{color:#b8d18c}p{color:#aebeb9;line-height:1.7;max-width:650px}a{color:inherit}.intro{font-size:18px}.cards{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:18px;margin:38px 0 28px}.card{display:block;text-decoration:none;border:1px solid #37483f;padding:28px;border-radius:14px;background:#192521;transition:transform .15s,border-color .15s}.card:hover{transform:translateY(-3px);border-color:#b8d18c}.card:focus-visible{outline:3px solid #b8d18c;outline-offset:4px}.card h2{font-size:24px;margin:16px 0 8px}.card p{margin:0;min-height:58px}.card strong{display:inline-block;margin-top:24px;color:#c9e4a1}.icon{font-size:30px}.secondary{background:#182027;border-color:#34414c}.secondary strong{color:#b5cce5}.tools{display:flex;flex-wrap:wrap;gap:12px;margin:22px 0 40px}.tools a{font-size:14px;text-decoration:none;border-bottom:1px solid #596c61;padding-bottom:4px}.tools a:hover{color:#c9e4a1}.note{padding:20px 24px;border-left:3px solid #b8d18c;background:#17211e}.note p{margin:6px 0}.note strong{font-size:14px}footer{border-top:1px solid #2c3a33;padding-top:24px;display:flex;justify-content:space-between;gap:18px;color:#8da398;font-size:12px;margin-top:44px}@media(max-width:650px){main{padding-top:36px}.cards{grid-template-columns:1fr}.card p{min-height:0}footer{flex-direction:column}}
   </style>
 </head>
 <body><main>
@@ -20,10 +25,167 @@
   <p class="intro">A shared battlefield. A treasury to build from. Heroes with a few tricks left. Bring your friends and let the game master lead the defense.</p>
   <div class="cards">
     <a class="card" href="master.html"><span class="icon" aria-hidden="true">🏰</span><h2>Host a game</h2><p>Prepare the battlefield, launch enemy waves and guide your party through the adventure.</p><strong>Open GM dashboard →</strong></a>
+    <a class="card" id="card-coop" href="player.html?mode=coop" style="background:#1a2720; border-color:#4a6338;"><span class="icon" aria-hidden="true">🤝</span><h2>Co-op / Solo (No GM)</h2><p>Play autonomously with auto-advancing rounds, AI waves and no game master required.</p><strong style="color:#d4f58b;">Start Co-op defense →</strong></a>
     <a class="card secondary" href="player.html"><span class="icon" aria-hidden="true">🛡️</span><h2>Join as a player</h2><p>Create your hero, choose abilities and work with the team to protect the castle.</p><strong>Create or return to a hero →</strong></a>
   </div>
   <div class="tools" aria-label="Preparation and help"><a href="guide.html">Read the playing guide</a><a href="scene-editor.html">Prepare scenes</a><a href="adventure-editor.html">Plan a session</a><a href="catalog-editor.html">Edit enemies and waves</a></div>
   <div class="note"><strong>First time hosting?</strong><p>On the GM dashboard, open <b>Roadside Defense — Quick Start</b> under Adventure scenes. Invite players using the network address printed in your server window. Build during Preparation, then switch to Play and launch the first wave.</p></div>
+  <dialog id="coop-scenario-dialog" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:1000; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+    <div style="background:#141e1c; border:2px solid #4a6338; border-radius:14px; max-width:620px; width:100%; max-height:88vh; display:flex; flex-direction:column; padding:24px; box-shadow:0 12px 36px rgba(0,0,0,0.95); color:#e9f0e9; box-sizing:border-box;">
+      <header style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:16px; border-bottom:1px solid #2d3e35; padding-bottom:12px;">
+        <div>
+          <h2 id="coop-dialog-title" style="margin:0 0 4px 0; font-size:22px; color:#b8d18c; display:flex; align-items:center; gap:8px;">
+            <span>🤝</span> <span>Co-op / Solo Defense</span>
+          </h2>
+          <p style="margin:0; font-size:13px; color:#8fa398;">Select a battlefield scenario or continue the existing game.</p>
+        </div>
+        <button type="button" id="coop-dialog-close" style="background:none; border:none; color:#8fa398; font-size:22px; cursor:pointer; padding:0 4px; line-height:1;">✕</button>
+      </header>
+
+      <div id="coop-dialog-active-card" style="display:none; margin-bottom:16px; padding:14px 18px; border-radius:10px; background:#192621; border:1px solid #4a6338; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+        <div>
+          <div style="font-size:11px; font-weight:bold; text-transform:uppercase; letter-spacing:0.08em; color:#b8d18c; margin-bottom:2px;">▶ Active game session</div>
+          <div id="coop-dialog-active-title" style="font-size:16px; font-weight:bold; color:#fff;">Roadside Defense</div>
+          <div id="coop-dialog-active-subtitle" style="font-size:12px; color:#8fa398;">Wave 1 · Preparation</div>
+        </div>
+        <a href="player.html?mode=coop" class="btn" style="background:#2e7d32; color:#fff; text-decoration:none; padding:8px 16px; border-radius:6px; font-weight:bold; font-size:13px; white-space:nowrap;">Continue game →</a>
+      </div>
+
+      <div style="font-size:14px; font-weight:bold; color:#c9e4a1; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+        <span>🗺️</span> <span>Choose battlefield scenario</span>
+      </div>
+      <div id="coop-dialog-scenes-list" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:10px; padding-right:4px;">
+        <div style="text-align:center; padding:20px; color:#8fa398;">Loading scenarios...</div>
+      </div>
+
+      <footer style="margin-top:16px; padding-top:12px; border-top:1px solid #2d3e35; display:flex; justify-content:flex-end;">
+        <button type="button" id="coop-dialog-cancel" style="background:#243029; color:#e9f0e9; border:none; padding:8px 18px; border-radius:6px; cursor:pointer; font-size:13px;">Cancel</button>
+      </footer>
+    </div>
+  </dialog>
+
   <footer><span>Play with people you trust on the same local network.</span><span>0.1.0-en.1 · Release candidate</span></footer>
-</main></body>
+</main>
+<script>
+  (function() {
+    const coopCard = document.getElementById('card-coop');
+    const dialog = document.getElementById('coop-scenario-dialog');
+    const closeBtn = document.getElementById('coop-dialog-close');
+    const cancelBtn = document.getElementById('coop-dialog-cancel');
+    const activeBox = document.getElementById('coop-dialog-active-card');
+    const activeTitle = document.getElementById('coop-dialog-active-title');
+    const activeSubtitle = document.getElementById('coop-dialog-active-subtitle');
+    const listContainer = document.getElementById('coop-dialog-scenes-list');
+
+    function closeDialog() {
+      if (dialog) dialog.style.display = 'none';
+    }
+
+    if (closeBtn) closeBtn.onclick = closeDialog;
+    if (cancelBtn) cancelBtn.onclick = closeDialog;
+
+    if (coopCard && dialog) {
+      coopCard.addEventListener('click', function(e) {
+        e.preventDefault();
+        dialog.style.display = 'flex';
+        loadScenes();
+      });
+    }
+
+    function loadScenes() {
+      if (!listContainer) return;
+      listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#8fa398;">Loading scenarios...</div>';
+
+      fetch('/api/scenes')
+        .then(res => res.json())
+        .then(data => {
+          if (activeBox) {
+            if (data.currentSceneTitle) {
+              activeBox.style.display = 'flex';
+              if (activeTitle) activeTitle.textContent = data.currentSceneTitle;
+              if (activeSubtitle) {
+                const waveStr = 'Wave ' + (data.wave || 1);
+                const periodStr = data.gamePeriod === 'preparation' ? 'Preparation' : 'Combat';
+                activeSubtitle.textContent = waveStr + ' · ' + periodStr;
+              }
+            } else {
+              activeBox.style.display = 'none';
+            }
+          }
+
+          const scenes = data.scenes || [];
+          if (!scenes.length) {
+            listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#8fa398;">No scenarios found in library.</div>';
+            return;
+          }
+
+          listContainer.innerHTML = '';
+          scenes.forEach(s => {
+            const card = document.createElement('div');
+            card.style.cssText = 'background:#192521; border:1px solid #37483f; padding:14px; border-radius:8px; display:flex; flex-direction:column; gap:6px;';
+
+            const headerRow = document.createElement('div');
+            headerRow.style.cssText = 'display:flex; justify-content:space-between; align-items:center; gap:8px;';
+
+            const titleEl = document.createElement('h4');
+            titleEl.style.cssText = 'margin:0; font-size:15px; color:#fff; font-weight:bold;';
+            titleEl.textContent = s.title;
+
+            const badge = document.createElement('span');
+            badge.style.cssText = 'font-size:11px; background:#243228; color:#b8d18c; border:1px solid #3e5243; padding:2px 8px; border-radius:10px; font-weight:bold;';
+            badge.textContent = s.gridWidth + '×' + s.gridHeight + ' · ' + s.waveCount + ' waves';
+
+            headerRow.appendChild(titleEl);
+            headerRow.appendChild(badge);
+
+            const descEl = document.createElement('p');
+            descEl.style.cssText = 'margin:0; font-size:12px; color:#aebeb9; line-height:1.4;';
+            descEl.textContent = s.description || 'Custom battlefield scenario.';
+
+            const footerRow = document.createElement('div');
+            footerRow.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:12px; color:#8fa398;';
+
+            const statsSpan = document.createElement('span');
+            statsSpan.textContent = '💰 ' + s.gold + ' · 🏰 ' + s.baseHp + ' HP';
+
+            const selectBtn = document.createElement('button');
+            selectBtn.type = 'button';
+            selectBtn.style.cssText = 'background:#37523f; color:#d4f58b; border:1px solid #4a6a52; padding:6px 14px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;';
+            selectBtn.textContent = 'Start this map →';
+
+            selectBtn.onclick = function() {
+              selectBtn.disabled = true;
+              selectBtn.textContent = '...';
+              fetch('/api/coop/select-scene', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sceneId: s.id, force: true })
+              })
+              .then(res => res.json())
+              .then(() => {
+                window.location.href = 'player.html?mode=coop';
+              })
+              .catch(err => {
+                alert('Error selecting scene: ' + err.message);
+                selectBtn.disabled = false;
+                selectBtn.textContent = 'Start this map →';
+              });
+            };
+
+            footerRow.appendChild(statsSpan);
+            footerRow.appendChild(selectBtn);
+
+            card.appendChild(headerRow);
+            card.appendChild(descEl);
+            card.appendChild(footerRow);
+            listContainer.appendChild(card);
+          });
+        })
+        .catch(err => {
+          listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#ff6b6b;">Error: ' + err.message + '</div>';
+        });
+    }
+  })();
+</script>
+</body>
 </html>

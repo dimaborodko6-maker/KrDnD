@@ -10,7 +10,7 @@ const base = require('../public/gamedata');
 const clone = v => JSON.parse(JSON.stringify(v));
 function temporary(t) {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(),'kr-catalog-'));
-    t.after(() => { for (const file of ['catalog.json','catalog.json.tmp','gamecatalog.json','save.json','game.log']) { const p = path.join(dir,file); if (fs.existsSync(p)) fs.unlinkSync(p); } fs.rmdirSync(dir); });
+    t.after(() => { for (const file of ['catalog.json','catalog.json.tmp','gamecatalog.json','save.json','game.log']) { const p = path.join(dir,file); if (fs.existsSync(p)) fs.unlinkSync(p); } try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {} });
     return dir;
 }
 test('каталог сохраняется атомарно, восстанавливается и защищён от устаревшей записи', t => {

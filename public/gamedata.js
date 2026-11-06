@@ -92,6 +92,31 @@ const GAME_DATA = {
                 { id: 'construct_repair', name: 'Construct Repair', cooldown: 0, desc: 'Passive: Doubles all healing applied to garrison soldiers and stone golems (0 mana)' }
             ],
             ultimate: { id: 'ultimate_ratchet', name: 'Spark Reboot', cooldown: 5, desc: 'Ultimate: Instantly revives a fallen ally with 50% HP (or restores 100% HP and grants +30% armor to a living ally and Ratchet)! [CD: 5 rounds]' }
+        },
+        solaris: {
+            heroName: "Solaris & Ignis",
+            description: "A sun mage bound to Ignis, a radiant solar elemental who marches at his side. Channels blazing light to scorch foes and shield allies.",
+            baseSpeed: 2,
+            baseRange: 4,
+            blockLimit: 1,
+            skills: [
+                { id: 'sunray_lance', name: 'Sunray Lance', cooldown: 2, desc: 'Active: Concentrated solar lance dealing 2d8+INT magic damage and stripping shields (4 mana) [CD: 2 rounds]' },
+                { id: 'solar_flare', name: 'Solar Flare', cooldown: 3, desc: 'Active: Blinds and burns enemies in radius 1 dealing 1d10+INT fire damage and giving enemies attack disadvantage (5 mana) [CD: 3 rounds]' },
+                { id: 'solar_overdrive', name: 'Solar Overdrive', cooldown: 3, desc: 'Active: Infuses Ignis with solar plasma: heals 40 HP, gains +10 damage, and blasts adjacent enemies for 25 fire damage (4 mana) [CD: 3 rounds]' },
+                { id: 'dawn_aegis', name: 'Dawn Aegis', cooldown: 0, desc: 'Passive: Solaris and Ignis gain +15% armor and 10 shield HP while within 2 cells of each other (0 mana)' },
+                { id: 'purifying_pyre', name: 'Purifying Pyre', cooldown: 0, desc: 'Passive: All attacks from Solaris and Ignis ignite targets with burning for 2 rounds (0 mana)' }
+            ],
+            ultimate: { id: 'ultimate_solaris', name: 'Supernova', cooldown: 5, desc: 'Ultimate: Channels a cosmic blast dealing 190 pure fire damage in radius 3 and creating magma pools! [CD: 5 rounds]' }
+        },
+        dante: {
+            heroName: "Dante the Inquisitor", description: "A holy gunslinger who purges evil with silver bolts and consecrated fire.", baseSpeed: 3, baseRange: 3, blockLimit: 1,
+            skills: [
+                { id: 'silver_bullet', name: 'Silver Bullet', cooldown: 2, desc: 'Active: Fires a blessed silver shot dealing d10+DEX true damage (4 mana) [CD: 2 rounds]' },
+                { id: 'consecrated_ground', name: 'Consecrated Ground', cooldown: 3, desc: 'Active: Ignites the target area with holy fire dealing d8+WIS magic damage in radius 1 (5 mana) [CD: 3 rounds]' },
+                { id: 'undead_bane', name: 'Undead Bane', cooldown: 0, desc: 'Passive: Basic attacks deal +25% bonus damage to enemies with magic resistance or shields (0 mana)' },
+                { id: 'holy_water', name: 'Holy Water Splash', cooldown: 0, desc: 'Passive: Purifying splashes restore 10 HP to Dante upon defeating an enemy (0 mana)' },
+                { id: 'acrobatic_roll', name: 'Acrobatic Roll', cooldown: 0, desc: 'Passive: +20% Dexterity-based dodge chance against enemy attacks (0 mana)' }
+            ],            ultimate: { id: 'ultimate_dante', name: 'Beacon of Light', cooldown: 5, desc: 'Ultimate: Unleashes a radiant blast dealing 180 true damage to all enemies within radius 2! [CD: 5 rounds]' }
         }
     },
     // 👾 АВТОМАТИЧЕСКИЙ БЕСТИАРИЙ ВРАГОВ
@@ -178,6 +203,24 @@ const GAME_DATA = {
             hp: 480, maxHp: 480, armor: 0, magicRes: 0, speed: 1, isFlying: false, reward: 83,
             isRanged: false, meleeDmg: 35, isMiniBoss: true, aoeCleave: true, livesTaken: 2,
             description: "A devastating mini-boss (480 HP, damage 35, cleaves all defenders in the cell, immune to polymorph/instant kills, costs the base 2 lives)!"
+        },
+        skeleton_warrior: {
+            name: "Skeleton Warrior", shortName: "Skel", color: "#c8c8c8", initiative: 10,
+            hp: 60, maxHp: 60, speed: 1, armor: 20, magicRes: 0, isFlying: false, reward: 8,
+            isRanged: false, meleeDmg: 4, traits: { shield: { percent: 30, recharge: true, rechargeDelay: 2 } },
+            description: "An undead warrior with a regenerating bone shield (60 HP, 20% armor, damage 4, initiative 10)."
+        },
+        ghoul: {
+            name: "Ghoul", shortName: "Ghul", color: "#7a9a60", initiative: 14,
+            hp: 90, maxHp: 90, speed: 2, armor: 0, magicRes: 20, isFlying: false, reward: 18,
+            isRanged: false, meleeDmg: 6, traits: { berserk: { threshold: 40, damagePercent: 30, speedBonus: 1 } },
+            description: "A ravenous ghoul that enters a frenzy when wounded (90 HP, speed 2, damage 6, 20% magic resistance)."
+        },
+        necromancer: {
+            name: "Necromancer", shortName: "Necr", color: "#5c2d91", initiative: 8,
+            hp: 240, maxHp: 240, speed: 1, armor: 0, magicRes: 50, isFlying: false, reward: 41,
+            isRanged: true, range: 4, rangedDmg: 8, meleeDmg: 4, traits: { summoning: { type: "skeleton_warrior", count: 1, interval: 3, maxAlive: 6, reward: 0, blockedStops: true } },
+            description: "A dark sorcerer who raises skeleton warriors (240 HP, 50% magic resistance, ranged damage 8, initiative 8)."
         }
     },
 

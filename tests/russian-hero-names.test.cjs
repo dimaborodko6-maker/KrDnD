@@ -47,7 +47,9 @@ test('русские имена всех героев распознаются �
         { name: 'Коннор (Тамплиер)', expected: 'connor', skills: ['slash'] },
         { name: 'Иллиана и Спарки', expected: 'illiana', skills: ['bliss'] },
         { name: 'Торгар Несокрушимый', expected: 'torghar', skills: ['shield_wall'] },
-        { name: 'Рэтчет (Боевой медик)', expected: 'ratchet', skills: ['triage_aura'] }
+        { name: 'Рэтчет (Боевой медик)', expected: 'ratchet', skills: ['triage_aura'] },
+        { name: 'Данте (Инквизитор)', expected: 'dante', skills: ['silver_bullet'] },
+        { name: 'Солярис и Игнис', expected: 'solaris', skills: ['sunray_lance'] }
     ];
 
     for (let i = 0; i < testCases.length; i++) {

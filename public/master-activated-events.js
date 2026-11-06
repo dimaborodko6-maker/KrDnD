@@ -3,7 +3,7 @@
 
 // Event drafts stay local; only confirmed activations enter the shared world.
 const MASTER_ACTIVATED_EVENTS = (() => {
-    const names = { frost:'Frost', goldenGoblin:'Golden goblin', sandstorm:'Sandstorm', goblinTower:'Goblin tower', bombardment:'Artillery bombardment', ritualTotem:'Ritual totem', banner:'Leader’s banner', chainLightning:'Chain lightning' };
+    const names = { frost:'Frost', goldenGoblin:'Golden goblin', sandstorm:'Sandstorm', goblinTower:'Goblin tower', bombardment:'Artillery bombardment', ritualTotem:'Ritual totem', banner:'Leader’s banner', chainLightning:'Chain lightning', necroticMist:'Necrotic mist' };
     const tr = text => window.KR_I18N ? window.KR_I18N.t(text) : text;
     const node = (tag, text, cls) => { const el=document.createElement(tag); if(text !== undefined)el.textContent=tr(text); if(cls)el.className=cls; return el; };
     let state, draft, modal, form, fields, error, apply, picker=null, request=null, sequence=0;
@@ -38,7 +38,7 @@ const MASTER_ACTIVATED_EVENTS = (() => {
             if(config.kind==='frost')summary.textContent=tr('Selected heroes')+': '+config.playerNames.length;
             else if(config.kind==='chainLightning'){const chain=ACTIVATED_EVENT_RULES.chain(state,config);summary.textContent=tr('Affected targets')+': '+chain.length+' · '+chain.map(item=>item.unit.heroName || item.unit.name || item.id).join(' → ');}
             else if(config.kind==='bombardment'){const targets=new Set();for(const area of config.areas || [])for(const item of ACTIVATED_EVENT_RULES.targets(state,{...config,...area}))targets.add(item.kind+':'+item.id);summary.textContent=tr('Marked impact areas')+': '+(config.areas || []).length+' · '+tr('Affected targets')+': '+targets.size;}
-            else if(config.kind==='sandstorm')summary.textContent=tr('Affected targets')+': '+ACTIVATED_EVENT_RULES.targets(state,config).length;
+            else if(config.kind==='sandstorm' || config.kind==='necroticMist')summary.textContent=tr('Affected targets')+': '+ACTIVATED_EVENT_RULES.targets(state,config).length;
             else summary.textContent=tr('Preview on the tactical map');
         }
         if(apply)apply.disabled=!!request || config.kind==='frost' && (!config.playerNames.length || config.playerNames.some(name=>!config.results[name]));
@@ -76,12 +76,12 @@ const MASTER_ACTIVATED_EVENTS = (() => {
         const header=node('div',undefined,'section-heading');header.append(node('h2',names[draft.kind] || draft.title),button('Close',close));
         form=node('form',undefined,'activated-event-form');modal.append(header,form);document.body.append(modal);
         field('title','Event title',{type:'text',value:names[draft.kind]});
-        if(['frost','sandstorm','goldenGoblin','goblinTower','ritualTotem'].includes(draft.kind)){
+        if(['frost','sandstorm','goldenGoblin','goblinTower','ritualTotem','necroticMist'].includes(draft.kind)){
             field('x','X coordinate',{max:(state?.gridWidth || 16)-1,value:0});field('y','Y coordinate',{max:(state?.gridHeight || 16)-1,value:0});form.append(button('Select cell on map',()=>chooseCell('point')));
         }
-        if(['frost','sandstorm','bombardment','banner'].includes(draft.kind))field('radius','Radius',{max:40,min:1,value:2});
-        if(['frost','sandstorm','goldenGoblin','banner'].includes(draft.kind))field('duration','Duration in rounds',{min:1,max:100});
-        if(['frost','sandstorm','bombardment','chainLightning'].includes(draft.kind)){
+        if(['frost','sandstorm','bombardment','banner','necroticMist'].includes(draft.kind))field('radius','Radius',{max:40,min:1,value:2});
+        if(['frost','sandstorm','goldenGoblin','banner','necroticMist'].includes(draft.kind))field('duration','Duration in rounds',{min:1,max:100});
+        if(['frost','sandstorm','bombardment','chainLightning','necroticMist'].includes(draft.kind)){
             field('damage','Damage',{min:0});field('damageType','Damage type',{values:{physical:'Physical',magic:'Magic',true:'True damage'}});
         }
         if(draft.kind==='frost'){

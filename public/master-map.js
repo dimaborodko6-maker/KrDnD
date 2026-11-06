@@ -478,17 +478,37 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
                             '<span class="mire-skull">☠️</span></div>';
                     }
 
+                    // Magma Pool
+                    var magmaPuddle = state.magmaPuddles && state.magmaPuddles.find(function(mp) { return mp.x === x && mp.y === y; });
+                    if (magmaPuddle) {
+                        cellEl.classList.add('cell-magma-pool');
+                        cellEl.innerHTML += '<div class="magma-pool-overlay" title="Magma Pool: 15 fire damage (remaining: ' + magmaPuddle.turns + ' rounds)">' +
+                            '<span class="magma-bubble-1">🔥</span><span class="magma-counter">' + magmaPuddle.turns + 't</span></div>';
+                    }
+
+                    // Oil Slick
+                    var oilPuddle = state.oilPuddles && state.oilPuddles.find(function(op) { return op.x === x && op.y === y; });
+                    if (oilPuddle) {
+                        cellEl.classList.add('cell-oil-slick');
+                        cellEl.innerHTML += '<div class="oil-slick-overlay" title="Oil Slick: Slows enemies (remaining: ' + oilPuddle.turns + ' rounds)">' +
+                            '<span class="oil-bubble-1">🛢️</span><span class="oil-counter">' + oilPuddle.turns + 't</span></div>';
+                    }
+
                     // Recent Combat FX
                     if (state.recentCombatFx && state.recentCombatFx.length > 0) {
                         state.recentCombatFx.forEach(function(fx) {
                             var isTargetCell = (fx.toX !== undefined && fx.toX === x && fx.toY === y) ||
                                                (fx.toX === undefined && fx.x !== undefined && fx.x === x && fx.y === y);
                             if (isTargetCell) {
-                                var fxClass = fx.type === 'blast_keg' ? 'combat-fx-blast' :
-                                              fx.type === 'radiant_smite' ? 'combat-fx-smite' :
-                                              fx.type === 'old_tome_shot' ? 'combat-fx-tome' :
-                                              fx.type === 'dwarf_surprise' ? 'combat-fx-surprise' :
-                                              fx.type === 'poison_mire' ? 'combat-fx-mire-cast' : 'combat-fx-blast';
+                                var fxClass = 
+                                    ['blast_keg', 'dwaarp_furnace', 'bertha_napalm', 'mecha_flame', 'solar_flare', 'supernova'].indexOf(fx.type) !== -1 ? 'combat-fx-fire' :
+                                    ['bertha_missile', 'mecha_missile'].indexOf(fx.type) !== -1 ? 'combat-fx-rocket' :
+                                    ['mecha_heavy', 'mecha_concussion', 'dwaarp_shockwave', 'dwaarp_drill', 'barbarian_axe'].indexOf(fx.type) !== -1 ? 'combat-fx-shock' :
+                                    ['ranger_roots', 'priestess_cleanse'].indexOf(fx.type) !== -1 ? 'combat-fx-nature' :
+                                    fx.type === 'radiant_smite' ? 'combat-fx-smite' :
+                                    fx.type === 'old_tome_shot' ? 'combat-fx-tome' :
+                                    fx.type === 'dwarf_surprise' ? 'combat-fx-surprise' :
+                                    fx.type === 'poison_mire' ? 'combat-fx-mire-cast' : 'combat-fx-blast';
                                 var fxText = fx.text || '✨';
                                 cellEl.innerHTML += '<div class="combat-fx-banner ' + fxClass + '">' + fxText + '</div>';
                             }

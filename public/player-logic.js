@@ -21,7 +21,8 @@ const heroesBase = [
     { id: 'connor', name: 'Connor (Templar)', sen: 11 },
     { id: 'illiana', name: 'Illiana and Sparky', sen: 14 },
     { id: 'torghar', name: 'Torghar the Unbreakable', sen: 8 },
-    { id: 'ratchet', name: 'Ratchet (Combat Medic)', sen: 15 }
+    { id: 'ratchet', name: 'Ratchet (Combat Medic)', sen: 15 },
+    { id: 'dante', name: 'Dante the Inquisitor', sen: 13 }
 ];
 
 let character = { heroKey: '', heroName: '', sen: 0, stats: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 }, skills: [] };
@@ -183,11 +184,11 @@ function renderBattleAbilitiesButtons() {
         button.className = 'ab-btn';
         button.id = 'ab-' + ability.key.replace('spell_', '');
         button.dataset.ability = ability.key;
-        button.title = ability.desc;
+        button.title = typeof _tr === 'function' ? _tr(ability.desc) : ability.desc;
         button.onclick = () => setBattleAbility(ability.key);
         const title = document.createElement('span');
         title.className = 'ab-title';
-        title.textContent = (ability.key === 'ultimate' ? '⚡ ' : '') + ability.name;
+        title.textContent = (ability.key === 'ultimate' ? '⚡ ' : '') + (typeof _tr === 'function' ? _tr(ability.name) : ability.name);
         const meta = document.createElement('span');
         meta.className = 'ab-meta';
         const info = getAbilityRangeInfo(ability.key, me);
@@ -477,10 +478,10 @@ function renderBattleControls(state = window.lastReceivedState) {
     const key = activeAbility.replace('spell_', '');
     const ability = activeAbility === 'disengage' ? BATTLE_ABILITY_RULES.disengage :
         activeAbility === 'ultimate' ? hero?.ultimate : activeHeroSkillsPool.find(s => s.id === key);
-    document.getElementById('ability-name').textContent = !activeAbility ? 'No ability selected' : ability?.name || 'Basic attack';
+    document.getElementById('ability-name').textContent = !activeAbility ? (typeof _tr === 'function' ? _tr('No ability selected') : 'No ability selected') : (typeof _tr === 'function' ? _tr(ability?.name || 'Basic attack') : (ability?.name || 'Basic attack'));
     document.getElementById('ability-description').textContent = !activeAbility ?
-        'Select an ability to highlight its range and targets. Click again to clear selection and highlights.' :
-        ability?.desc || 'Select an enemy in the highlighted range and confirm the attack. Dice are rolled automatically.';
+        (typeof _tr === 'function' ? _tr('Select an ability to highlight its range and targets. Click again to clear selection and highlights.') : 'Select an ability to highlight its range and targets. Click again to clear selection and highlights.') :
+        (typeof _tr === 'function' ? _tr(ability?.desc || 'Select an enemy in the highlighted range and confirm the attack. Dice are rolled automatically.') : (ability?.desc || 'Select an enemy in the highlighted range and confirm the attack. Dice are rolled automatically.'));
     document.querySelectorAll('.ab-btn').forEach(button => {
         const selected = button.dataset.ability === activeAbility;
         button.classList.toggle('active', selected);
@@ -1145,6 +1146,12 @@ new ResizeObserver(() => applyMapZoom()).observe(document.getElementById('p-map-
 socket.onopen = function() {
     let savedId = null;
     try { savedId = localStorage.getItem('kr_player_id'); } catch(e) {}
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('mode') === 'coop') {
+            socket.send(JSON.stringify({ type: 'SET_GAME_MODE', mode: 'coop' }));
+        }
+    } catch(e) {}
     if (savedId) {
         myId = savedId;
         try {
@@ -1247,6 +1254,13 @@ window.renderGridAndUI = function(state) {
     const phaseTitle = document.getElementById('phase-title');
     const waveBadge = document.getElementById('phase-wave-badge');
     if (waveBadge) waveBadge.innerText = 'Wave ' + (state.wave || 1);
+
+    const coopBadge = document.getElementById('coop-mode-badge');
+    const isCoop = state.gameMode === 'coop';
+    if (coopBadge) {
+        coopBadge.style.display = isCoop ? 'inline-block' : 'none';
+        coopBadge.textContent = _tr('🤝 Co-op');
+    }
 
     if (state.gamePeriod === 'preparation') {
         if (phaseTitle) {
@@ -1379,15 +1393,39 @@ window.renderGridAndUI = function(state) {
         
         // Обновление состояния кнопки Завершить ход
         const readyBtn = document.getElementById('btn-toggle-ready');
+        const coopStartBtn = document.getElementById('btn-coop-start-wave');
+        if (coopStartBtn) {
+            if (isCoop && state.gamePeriod === 'preparation') {
+                coopStartBtn.style.display = 'inline-block';
+                coopStartBtn.textContent = _tr('⚔️ Start wave');
+                if (readyBtn) readyBtn.style.display = 'none';
+            } else {
+                coopStartBtn.style.display = 'none';
+                if (readyBtn) readyBtn.style.display = '';
+            }
+        }
+        const coopSceneBox = document.getElementById('coop-scene-box');
+        const coopSceneName = document.getElementById('coop-scene-current-name');
+        if (coopSceneBox) {
+            if (isCoop && state.gamePeriod === 'preparation') {
+                coopSceneBox.style.display = 'block';
+                if (coopSceneName) coopSceneName.textContent = state.sceneTitle || _tr('Active Map');
+            } else {
+                coopSceneBox.style.display = 'none';
+            }
+        }
         if (readyBtn) {
+            const allPlayers = Object.values(state.players || {}).filter(p => p.hp > 0);
+            const readyCount = allPlayers.filter(p => p.isReady).length;
+            const countSuffix = (isCoop && allPlayers.length > 1) ? ' (' + readyCount + '/' + allPlayers.length + ')' : '';
             if (me.isReady) {
                 readyBtn.style.background = '#2e7d32';
                 readyBtn.style.color = '#fff';
-                readyBtn.innerHTML = '<span>✓ Ready · cancel</span>';
+                readyBtn.innerHTML = '<span>✓ ' + _tr('Ready · cancel') + countSuffix + '</span>';
             } else {
                 readyBtn.style.background = '#ffcc00';
                 readyBtn.style.color = '#111';
-                readyBtn.innerHTML = '<span>✅ End turn</span>';
+                readyBtn.innerHTML = '<span>✅ ' + _tr('End turn') + countSuffix + '</span>';
             }
             readyBtn.classList.toggle('is-ready', !!me.isReady);
         }
@@ -1554,17 +1592,43 @@ window.renderGridAndUI = function(state) {
                 `</div>`;
             }
 
+            // Magma Pool
+            let magmaPuddle = state.magmaPuddles && state.magmaPuddles.find(mp => mp.x === x && mp.y === y);
+            if (magmaPuddle) {
+                cEl.classList.add('cell-magma-pool');
+                cEl.innerHTML += `<div class="magma-pool-overlay" title="Magma Pool: 15 fire damage (remaining: ${magmaPuddle.turns} rounds)">` +
+                    `<span class="magma-bubble-1">🔥</span>` +
+                    `<span class="magma-bubble-2">🌋</span>` +
+                    `<span class="magma-counter">${magmaPuddle.turns}t</span>` +
+                `</div>`;
+            }
+
+            // Oil Slick
+            let oilPuddle = state.oilPuddles && state.oilPuddles.find(op => op.x === x && op.y === y);
+            if (oilPuddle) {
+                cEl.classList.add('cell-oil-slick');
+                cEl.innerHTML += `<div class="oil-slick-overlay" title="Oil Slick: Slows enemies by 50% (remaining: ${oilPuddle.turns} rounds)">` +
+                    `<span class="oil-bubble-1">🛢️</span>` +
+                    `<span class="oil-bubble-2">🐌</span>` +
+                    `<span class="oil-counter">${oilPuddle.turns}t</span>` +
+                `</div>`;
+            }
+
             // Recent Combat FX
             if (state.recentCombatFx && state.recentCombatFx.length > 0) {
                 state.recentCombatFx.forEach(fx => {
                     let isTargetCell = (fx.toX !== undefined && fx.toX === x && fx.toY === y) ||
                                        (fx.toX === undefined && fx.x !== undefined && fx.x === x && fx.y === y);
                     if (isTargetCell) {
-                        let fxClass = fx.type === 'blast_keg' ? 'combat-fx-blast' :
-                                      fx.type === 'radiant_smite' ? 'combat-fx-smite' :
-                                      fx.type === 'old_tome_shot' ? 'combat-fx-tome' :
-                                      fx.type === 'dwarf_surprise' ? 'combat-fx-surprise' :
-                                      fx.type === 'poison_mire' ? 'combat-fx-mire-cast' : 'combat-fx-blast';
+                        let fxClass = 
+                            ['blast_keg', 'dwaarp_furnace', 'bertha_napalm', 'mecha_flame', 'solar_flare', 'supernova'].includes(fx.type) ? 'combat-fx-fire' :
+                            ['bertha_missile', 'mecha_missile'].includes(fx.type) ? 'combat-fx-rocket' :
+                            ['mecha_heavy', 'mecha_concussion', 'dwaarp_shockwave', 'dwaarp_drill', 'barbarian_axe'].includes(fx.type) ? 'combat-fx-shock' :
+                            ['ranger_roots', 'priestess_cleanse'].includes(fx.type) ? 'combat-fx-nature' :
+                            fx.type === 'radiant_smite' ? 'combat-fx-smite' :
+                            fx.type === 'old_tome_shot' ? 'combat-fx-tome' :
+                            fx.type === 'dwarf_surprise' ? 'combat-fx-surprise' :
+                            fx.type === 'poison_mire' ? 'combat-fx-mire-cast' : 'combat-fx-blast';
                         let fxText = fx.text || '✨';
                         cEl.innerHTML += `<div class="combat-fx-banner ${fxClass}">${fxText}</div>`;
                     }
@@ -1628,6 +1692,9 @@ function initPlayerEventListeners() {
     bind('clear-target-btn', 'click', clearBattleTarget);
     bind('attack-main-btn', 'click', attack);
     bind('btn-toggle-ready', 'click', toggleReady);
+    bind('btn-coop-start-wave', 'click', () => {
+        socket.send(JSON.stringify({ type: 'COOP_START_WAVE' }));
+    });
     bind('tm-btn-range-preview', 'click', previewTowerRange);
     bind('tm-btn-rally', 'click', startRallySelection);
     bind('tm-btn-demolish', 'click', requestDemolishCurrentTower);
@@ -1647,3 +1714,89 @@ if (typeof window !== 'undefined' && typeof window.addEventListener === 'functio
         try { window.renderGrid(window.lastReceivedState); } catch(e) {}
     }
 });
+
+
+window.closeCoopSceneDialog = function() {
+    const dialog = document.getElementById('coop-scene-dialog');
+    if (dialog) dialog.style.display = 'none';
+};
+
+window.openCoopSceneDialog = function() {
+    const dialog = document.getElementById('coop-scene-dialog');
+    const list = document.getElementById('coop-scene-dialog-list');
+    if (!dialog || !list) return;
+    dialog.style.display = 'flex';
+    list.innerHTML = '<div style="text-align:center; padding:20px; color:#8fa398;">' + _tr('Loading scenarios...') + '</div>';
+
+    fetch('/api/scenes')
+        .then(res => res.json())
+        .then(data => {
+            const scenes = data.scenes || [];
+            if (!scenes.length) {
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:#8fa398;">' + _tr('No scenarios found in library.') + '</div>';
+                return;
+            }
+            const currentId = window.lastReceivedState?.sceneId || data.currentSceneId;
+            const currentTitle = window.lastReceivedState?.sceneTitle || data.currentSceneTitle;
+
+            list.innerHTML = '';
+            scenes.forEach(s => {
+                const isCurrent = s.id === currentId || (currentTitle && s.title === currentTitle);
+                const card = document.createElement('div');
+                card.style.cssText = 'background:#1a2522; border:1px solid ' + (isCurrent ? '#4caf50' : '#37483f') + '; padding:12px; border-radius:8px; display:flex; flex-direction:column; gap:6px;';
+
+                const headerRow = document.createElement('div');
+                headerRow.style.cssText = 'display:flex; justify-content:space-between; align-items:center; gap:8px;';
+
+                const titleEl = document.createElement('h4');
+                titleEl.style.cssText = 'margin:0; font-size:14px; color:#fff; font-weight:bold;';
+                titleEl.textContent = s.title;
+
+                const badge = document.createElement('span');
+                badge.style.cssText = 'font-size:11px; background:' + (isCurrent ? '#1b3b24' : '#243228') + '; color:' + (isCurrent ? '#81c784' : '#b8d18c') + '; border:1px solid ' + (isCurrent ? '#388e3c' : '#3e5243') + '; padding:2px 8px; border-radius:10px; font-weight:bold;';
+                badge.textContent = isCurrent ? ('✓ ' + _tr('Current map')) : (s.gridWidth + '×' + s.gridHeight + ' · ' + s.waveCount + ' ' + _tr('waves'));
+
+                headerRow.appendChild(titleEl);
+                headerRow.appendChild(badge);
+
+                const descEl = document.createElement('p');
+                descEl.style.cssText = 'margin:0; font-size:12px; color:#aebeb9; line-height:1.4;';
+                descEl.textContent = s.description || _tr('Custom battlefield scenario.');
+
+                const footerRow = document.createElement('div');
+                footerRow.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:12px; color:#8fa398;';
+
+                const statsSpan = document.createElement('span');
+                statsSpan.textContent = '💰 ' + s.gold + ' · 🏰 ' + s.baseHp + ' HP';
+
+                const selectBtn = document.createElement('button');
+                selectBtn.type = 'button';
+                if (isCurrent) {
+                    selectBtn.style.cssText = 'background:#233027; color:#8fa398; border:1px solid #37483f; padding:6px 14px; border-radius:4px; font-weight:bold; cursor:default; font-size:12px;';
+                    selectBtn.disabled = true;
+                    selectBtn.textContent = _tr('Active');
+                } else {
+                    selectBtn.style.cssText = 'background:#37523f; color:#d4f58b; border:1px solid #4a6a52; padding:6px 14px; border-radius:4px; font-weight:bold; cursor:pointer; font-size:12px;';
+                    selectBtn.textContent = _tr('Load map →');
+                    selectBtn.onclick = function() {
+                        const confirmMsg = _tr('Switch to map "%s"? Current battlefield and positions will reset.', s.title);
+                        if (confirm(confirmMsg)) {
+                            sendWs({ type: 'COOP_ACTIVATE_SCENE', sceneId: s.id });
+                            window.closeCoopSceneDialog();
+                        }
+                    };
+                }
+
+                footerRow.appendChild(statsSpan);
+                footerRow.appendChild(selectBtn);
+
+                card.appendChild(headerRow);
+                card.appendChild(descEl);
+                card.appendChild(footerRow);
+                list.appendChild(card);
+            });
+        })
+        .catch(err => {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:#ff6b6b;">Error: ' + err.message + '</div>';
+        });
+};

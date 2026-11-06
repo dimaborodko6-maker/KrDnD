@@ -1,0 +1,17 @@
+{
+  "name": "Kr6DnD — Cooperative Tower Defense",
+  "short_name": "Kr6DnD",
+  "description": "Browser cooperative tower defense RPG with heroes and tactical combat.",
+  "start_url": "player.html",
+  "display": "standalone",
+  "background_color": "#10191c",
+  "theme_color": "#10191c",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

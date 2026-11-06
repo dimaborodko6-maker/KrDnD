@@ -13,7 +13,7 @@ let draft = null, revision = -1, builtinIds = [], section = 'mobs', selectedMob 
 let dirty = false, saving = false, online = false, conflict = false, forceReload = false;
 let socket;
 function notify(message, error = false) {
-    el('editor-notice').textContent = message; el('editor-notice').hidden = !message;
+    el('editor-notice').textContent = _tr(message); el('editor-notice').hidden = !message;
     el('editor-notice').classList.toggle('error',error);
 }
 function controls() {

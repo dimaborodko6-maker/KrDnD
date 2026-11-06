@@ -75,6 +75,8 @@ function getTowerEffectiveRange(state, x, y, proto) {
             }
         }
         if (falconerFound) range += 1;
+        const curCell = state.grid[y]?.[x];
+        if (curCell && curCell.type === 'mecha_missile' && (curCell.upgrades || []).includes('mecha_radar')) range += 1;
     }
     return range;
 }

@@ -1,3 +1,30 @@
+
+function ensureSolarisCompanion(player) {
+    if (!player || (player.heroKey !== 'solaris' && !(player.name || '').includes('Solaris') && !(player.name || '').includes('Солярис'))) return;
+    if (!gameState.soldiers) gameState.soldiers = [];
+    let existing = gameState.soldiers.find(s => s.isElemental && s.ownerId === player.id);
+    if (!existing) {
+        gameState.soldiers.push({
+            id: 'elemental_' + player.id,
+            towerKey: 'hero_' + player.id,
+            towerType: 'elemental_ignis',
+            ownerId: player.id,
+            isElemental: true,
+            name: 'Ignis (Solar Elemental)',
+            soldierIndex: 99,
+            x: player.x,
+            y: player.y,
+            hp: 120,
+            maxHp: 120,
+            armor: 20,
+            magicRes: 20,
+            dmg: 10,
+            blockLimit: 2,
+            respawnTimer: 0,
+            blockedEnemyIds: []
+        });
+    }
+}
 const express = require('express');
 const http = require('http');
 const WebSocket = require('ws');
@@ -42,7 +69,7 @@ const sceneEditors = new Set();
 function sendSceneLibrary(ws, reason = 'loaded') {
     if (ws?.readyState !== WebSocket.OPEN) return;
     const library = sceneStore.read();
-    if (!sceneEditors.has(ws)) library.scenes = library.scenes.map(({id,title,kind,gridWidth,gridHeight}) => ({id,title,kind,gridWidth,gridHeight}));
+    if (!sceneEditors.has(ws)) library.scenes = library.scenes.map(({id,title,description,kind,gridWidth,gridHeight,gold,baseHp,waves}) => ({id,title,description:description||'',kind:kind||'combat',gridWidth,gridHeight,gold,baseHp,waveCount:(waves||[]).length}));
     ws.send(JSON.stringify({type:'SCENE_LIBRARY',reason,...library}));
 }
 function broadcastSceneLibrary(sender) {
@@ -63,6 +90,7 @@ let gameState = {
     wave: 1,
     phase: 'player', // 'player' (фаза игроков) или 'wave' (фаза волны)
     gamePeriod: 'preparation', // Период партии; переключается только мастером.
+    gameMode: 'gm', // 'gm' (по умолчанию, с мастером) или 'coop' (кооператив без мастера)
     availableTowerTypes: TOWER_RULES.getBaseTypes(GAME_DATA.towers).slice(0, TOWER_RULES.maxTypes),
     baseHp: 20, 
     gridWidth: DEFAULT_GRID_W,
@@ -208,7 +236,7 @@ function broadcastState() {
     const { sceneMaster, adventureMaster, actionLogs, masterUndo, ...publicState } = gameState;
     const publicLog = actionLogs.map(({id,text}) => ({id,text}));
     const data = JSON.stringify({ type: 'STATE_UPDATE', combatEvents: events, combatReset, state: { ...publicState, actionLogs:publicLog,
-        sceneTitle:sceneMaster?.title || '', revealedNotes:SCENES.publicSceneNotes(sceneMaster), sceneProgress:sceneDirector.publicView(), log:publicLog } });
+        sceneId:sceneMaster?.id || '', sceneTitle:sceneMaster?.title || '', revealedNotes:SCENES.publicSceneNotes(sceneMaster), sceneProgress:sceneDirector.publicView(), log:publicLog } });
     if (clients.master && clients.master.readyState === WebSocket.OPEN) {
         clients.master.send(JSON.stringify({ type: 'STATE_UPDATE', combatEvents: events, combatReset,
             state: { ...gameState, masterUndo: masterUndo ? { id: masterUndo.id, label: masterUndo.label } : null, log: gameState.actionLogs.map(l => ({ id: l.id, text: l.text,
@@ -772,6 +800,23 @@ function moveEnemies() {
     combatEngine.moveEnemies();
 }
 
+function checkAndAdvanceCoopTurn() {
+    if (gameState.gameMode !== 'coop' || gameState.gamePeriod !== 'game' || gameState.phase !== 'player') {
+        broadcastState();
+        return;
+    }
+    const activeEntries = Object.entries(gameState.players).filter(([name, p]) => {
+        return clients.players[name] && p.hp > 0;
+    });
+    if (activeEntries.length > 0 && activeEntries.every(([_, p]) => p.isReady)) {
+        logAction(Date.now(), '⚔️ [Co-op] All players ready! Advancing wave turn...');
+        Object.values(gameState.players).forEach(p => { p.isReady = false; });
+        moveEnemies();
+    } else {
+        broadcastState();
+    }
+}
+
 const heroActions = require('./hero-actions')({
     getState: () => gameState,
     getData: () => GAME_DATA,
@@ -831,7 +876,9 @@ function startScenarioWave(waveDef) {
 function activatePreparedScene(sceneId, adventure = null) {
     const scene = SCENES.validatePlayable(sceneStore.get(sceneId),GAME_DATA);
     const players = gameState.players;
+    const existingMode = gameState?.gameMode || 'gm';
     gameState = {gold:scene.gold,baseHp:scene.baseHp,wave:1,roundCounter:0,phase:'player',gamePeriod:'preparation',
+        gameMode: existingMode,
         grid:scene.grid,gridWidth:scene.gridWidth,gridHeight:scene.gridHeight,availableTowerTypes:scene.availableTowerTypes,
         players,enemies:[],pendingSpawns:[],activeEvents:[],soldiers:[],mines:[],napalmPuddles:[],demolishVote:null,actionLogs:[],debugLogs:[],
         sceneMaster:{id:scene.id,kind:scene.kind,scenario:scene.scenario,cards:scene.cards,eventPresets:scene.eventPresets || [],title:scene.title,description:scene.description,objectives:scene.objectives,waves:scene.waves,
@@ -864,7 +911,7 @@ function activatePreparedScene(sceneId, adventure = null) {
     }
     for (const group of scene.enemies) for (let i=0;i<group.count;i++) gameState.enemies.push(createEnemy(group.type,group.x,group.y));
     sceneDirector.ensure();
-    logAction(Date.now(),'🎭 The GM opened scene “'+scene.title+'”. Preparation period.');
+    logAction(Date.now(), (existingMode === 'coop' ? '🗺️ [Co-op] Map activated: “' : '🎭 The GM opened scene “') + scene.title + '”. Preparation period.');
     if (adventure) gameState.adventureMaster = adventure;
 }
 
@@ -898,7 +945,14 @@ wss.on('connection', (ws, request) => {
             sendSceneLibrary(ws); return;
         }
         if (['SCENE_GET_LIBRARY','SCENE_SAVE','SCENE_DELETE','SCENE_CAPTURE','ADVENTURE_SAVE','ADVENTURE_DELETE'].includes(msg.type)) {
-            if (!['master','scene-editor'].includes(clientRole)) { sendError(ws,'Scenes are available only to the GM and preparation editor'); return; }
+            if (!['master','scene-editor'].includes(clientRole)) {
+                if (msg.type === 'SCENE_GET_LIBRARY' && gameState.gameMode === 'coop') {
+                    sendSceneLibrary(ws);
+                    return;
+                }
+                sendError(ws,'Scenes are available only to the GM and preparation editor');
+                return;
+            }
             try {
                 if (msg.type === 'SCENE_GET_LIBRARY') sendSceneLibrary(ws);
                 if (msg.type === 'SCENE_CAPTURE') ws.send(JSON.stringify({type:'SCENE_CAPTURED',scene:SCENES.captureScene(gameState,GAME_DATA,require('crypto').randomUUID())}));
@@ -1255,6 +1309,8 @@ wss.on('connection', (ws, request) => {
                         else if (name.includes("Illiana") || name.includes("Иллиана")) hKey = "illiana";
                         else if (name.includes("Torghar") || name.includes("Торгар")) hKey = "torghar";
                         else if (name.includes("Ratchet") || name.includes("Рэтчет")) hKey = "ratchet";
+                        else if (name.includes("Dante") || name.includes("Данте")) hKey = "dante";
+                        else if (name.includes("Solaris") || name.includes("Солярис") || name.includes("Ignis")) hKey = "solaris";
                         else hKey = "gerald";
                     }
                     
@@ -1288,6 +1344,18 @@ wss.on('connection', (ws, request) => {
                         baseArmor = 35;
                         hRange = 3;
                         bLimit = 1;
+                    } else if (hKey === 'solaris') {
+                        calculatedMaxHp = 35 + (conMod * 5);
+                        calculatedMaxMana = 45 + (intMod * 5);
+                        hRange = 4;
+                        hSpeed = 2;
+                        bLimit = 1;
+                    } else if (hKey === 'dante') {
+                        calculatedMaxHp = 45 + (conMod * 5);
+                        calculatedMaxMana = 40 + (intMod * 5);
+                        hRange = 3;
+                        hSpeed = 3;
+                        bLimit = 1;
                     } else if (hKey === 'gerald') {
                         baseArmor = 30;
                     } else if (hKey === 'malik') {
@@ -1316,6 +1384,7 @@ wss.on('connection', (ws, request) => {
                         stats: msg.stats, 
                         skills: msg.skills 
                     };
+                    ensureSolarisCompanion(gameState.players[msg.name]);
                 }
                 logAction(Date.now(), `👤 CREATION: Player ${msg.name} successfully created a D&D character sheet for ${msg.heroName}!`);
                 broadcastState();
@@ -2033,9 +2102,74 @@ wss.on('connection', (ws, request) => {
                 if (rPlayer) {
                     rPlayer.isReady = !rPlayer.isReady;
                     logAction(Date.now(), `⏱️ [${rPlayer.heroName || rName}] ${rPlayer.isReady ? 'ENDED TURN ✅' : 'resumed actions 🟡'}`);
-                    broadcastState();
+                    if (gameState.gameMode === 'coop') {
+                        checkAndAdvanceCoopTurn();
+                    } else {
+                        broadcastState();
+                    }
                 }
                 break;
+
+            case 'SET_GAME_MODE': {
+                const targetMode = msg.mode === 'coop' ? 'coop' : 'gm';
+                gameState.gameMode = targetMode;
+                logAction(Date.now(), `⚙️ Game mode set to ${targetMode === 'coop' ? 'Co-op (No GM)' : 'GM Led'}.`);
+                broadcastState();
+                break;
+            }
+
+            case 'COOP_ACTIVATE_SCENE': {
+                if (gameState.gameMode !== 'coop' && clientRole !== 'master') {
+                    sendError(ws, 'Scene selection is available in Co-op mode or to the GM');
+                    return;
+                }
+                if (gameState.gamePeriod !== 'preparation') {
+                    sendError(ws, 'You can change the map only during the Preparation period');
+                    return;
+                }
+                if (!msg.sceneId) {
+                    sendError(ws, 'Scene ID is required');
+                    return;
+                }
+                const targetScene = sceneStore.get(msg.sceneId);
+                if (!targetScene) {
+                    sendError(ws, 'Scene not found in library');
+                    return;
+                }
+                activatePreparedScene(msg.sceneId);
+                gameState.gameMode = 'coop';
+                broadcastState();
+                broadcastSceneLibrary(ws);
+                break;
+            }
+
+            case 'COOP_START_WAVE': {
+                if (gameState.gamePeriod === 'game' && (gameState.enemies.length > 0 || (gameState.pendingSpawns && gameState.pendingSpawns.length > 0))) {
+                    sendError(ws, 'Wave is already in progress'); return;
+                }
+                const sceneWaves = gameState.sceneMaster?.waves || GAME_DATA.presetWaves || [];
+                let currentWaveNum = gameState.wave || 0;
+                let nextIndex = 0;
+                if (gameState.coopWaveStartedOnce) {
+                    nextIndex = currentWaveNum;
+                }
+                if (nextIndex >= sceneWaves.length) {
+                    logAction(Date.now(), '🏆 VICTORY: All waves of the scenario have been cleared!');
+                    gameState.gamePeriod = 'preparation';
+                    broadcastState();
+                    return;
+                }
+                let waveDef = sceneWaves[nextIndex];
+                if (waveDef.enemies.some(group => !Object.hasOwn(GAME_DATA.enemies, group.type))) {
+                    sendError(ws, 'The wave contains a removed enemy type. Fix the scene in the library.'); return;
+                }
+                gameState.coopWaveStartedOnce = true;
+                gameState.gamePeriod = 'game';
+                startScenarioWave(waveDef);
+                logAction(Date.now(), `⚔️ [Co-op] Wave ${waveDef.waveNum || (nextIndex + 1)} started! Protect the road!`);
+                broadcastState();
+                break;
+            }
         }
         } catch (error) {
             gameState = JSON.parse(before);
@@ -2123,6 +2257,53 @@ app.post('/api/client-logs', express.json({ limit: '64kb' }), (req, res) => {
     }
     res.sendStatus(written ? 204 : 503);
 });
+app.get('/api/scenes', (req, res) => {
+    try {
+        const library = sceneStore.read();
+        const scenes = library.scenes.map(s => ({
+            id: s.id,
+            title: s.title,
+            description: s.description || '',
+            kind: s.kind || 'combat',
+            gridWidth: s.gridWidth,
+            gridHeight: s.gridHeight,
+            gold: s.gold,
+            baseHp: s.baseHp,
+            waveCount: (s.waves || []).length
+        }));
+        res.json({
+            revision: library.revision,
+            scenes,
+            currentSceneId: gameState.sceneMaster?.id || null,
+            currentSceneTitle: gameState.sceneMaster?.title || '',
+            gameMode: gameState.gameMode || 'gm',
+            gamePeriod: gameState.gamePeriod,
+            wave: gameState.wave || 1
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+app.post('/api/coop/select-scene', express.json(), (req, res) => {
+    try {
+        const { sceneId, force } = req.body || {};
+        if (!sceneId) return res.status(400).json({ error: 'Missing sceneId' });
+        const targetScene = sceneStore.get(sceneId);
+        if (!targetScene) return res.status(404).json({ error: 'Scene not found' });
+        if (!force && gameState.gamePeriod !== 'preparation') {
+            return res.status(400).json({ error: 'Cannot change map during active battle' });
+        }
+        activatePreparedScene(sceneId);
+        gameState.gameMode = 'coop';
+        broadcastState();
+        broadcastSceneLibrary();
+        res.json({ ok: true, sceneId, title: targetScene.title });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.get('/gamedata.js', (req,res) => {
     res.set('Cache-Control','no-store').type('application/javascript').send(
         'window.GAME_DATA = ' + JSON.stringify(GAME_DATA).replace(/</g,'\\u003c') + ';');
@@ -2146,7 +2327,8 @@ function printAccessInfo() {
     console.log('======================================================');
     console.log(`Kr6DnD engine running on port ${port}.`);
     console.log('  Log file: ' + logger.file);
-    console.log(`  GM (this computer):  http://localhost:${port}/master.html`);
+    console.log(`  Start / Menu (this computer): http://localhost:${port}/`);
+    console.log(`  GM (this computer):           http://localhost:${port}/master.html`);
     if (ips.length === 0) {
         console.log('  ⚠ No local network IP found. Connect to a shared hotspot or router and restart.');
     } else {

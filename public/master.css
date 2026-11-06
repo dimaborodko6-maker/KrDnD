@@ -181,6 +181,64 @@
         }
 
         /* Combat FX flashes on the map */
+        .cell-magma-pool {
+            position: relative;
+        }
+        .magma-pool-overlay {
+            position: absolute;
+            inset: 1px;
+            background: radial-gradient(circle, rgba(230, 81, 0, 0.65) 0%, rgba(191, 54, 12, 0.5) 75%, rgba(127, 0, 0, 0.35) 100%);
+            border: 1px dashed #ff9800;
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 4px;
+            box-sizing: border-box;
+        }
+        .cell-oil-slick {
+            position: relative;
+        }
+        .oil-slick-overlay {
+            position: absolute;
+            inset: 1px;
+            background: radial-gradient(circle, rgba(38, 50, 56, 0.8) 0%, rgba(55, 71, 79, 0.65) 75%, rgba(0, 0, 0, 0.5) 100%);
+            border: 1px dashed #90a4ae;
+            border-radius: 4px;
+            pointer-events: none;
+            z-index: 6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 2px 4px;
+            box-sizing: border-box;
+        }
+        .combat-fx-fire {
+            background: radial-gradient(circle, rgba(255, 87, 34, 0.95) 0%, rgba(191, 54, 12, 0.9) 70%, rgba(0,0,0,0.7) 100%);
+            border: 2px solid #ffeb3b;
+            color: #fff;
+            box-shadow: 0 0 16px #ff5722;
+        }
+        .combat-fx-rocket {
+            background: radial-gradient(circle, rgba(69, 90, 100, 0.95) 0%, rgba(38, 50, 56, 0.9) 70%, rgba(0,0,0,0.7) 100%);
+            border: 2px solid #90caf9;
+            color: #e3f2fd;
+            box-shadow: 0 0 14px #42a5f5;
+        }
+        .combat-fx-shock {
+            background: radial-gradient(circle, rgba(255, 179, 0, 0.95) 0%, rgba(121, 85, 72, 0.9) 70%, rgba(0,0,0,0.7) 100%);
+            border: 2px solid #ffe082;
+            color: #fff;
+            box-shadow: 0 0 14px #ffb300;
+        }
+        .combat-fx-nature {
+            background: radial-gradient(circle, rgba(76, 175, 80, 0.95) 0%, rgba(27, 94, 32, 0.9) 70%, rgba(0,0,0,0.7) 100%);
+            border: 2px solid #a5d6a7;
+            color: #e8f5e9;
+            box-shadow: 0 0 14px #4caf50;
+        }
         .combat-fx-banner {
             position: absolute;
             inset: 2px;

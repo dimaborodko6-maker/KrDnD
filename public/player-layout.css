@@ -116,3 +116,18 @@ button:focus-visible, select:focus-visible, summary:focus-visible, .cell:focus-v
 .revealed-scene-panel h3 { color:#ffe080; margin:0 0 8px; font-size:15px; }
 .scene-note-card { border-top:1px solid #494435; padding:10px 0; white-space:pre-wrap; overflow-wrap:anywhere; }
 .scene-note-card p { margin:6px 0 0; line-height:1.5; }
+
+#btn-coop-start-wave {
+  background: #2e7d32 !important;
+  color: #fff !important;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  border: 1px solid #4caf50;
+  border-radius: 8px;
+  transition: transform 0.1s, background-color 0.15s;
+}
+#btn-coop-start-wave:hover, #btn-coop-start-wave:active {
+  background: #388e3c !important;
+  transform: scale(0.98);
+}

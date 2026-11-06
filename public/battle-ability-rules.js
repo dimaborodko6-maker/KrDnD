@@ -5,13 +5,17 @@ const BATTLE_ABILITY_RULES = (() => {
     const disengage = { key: 'disengage', name: 'Disengage', cooldown: 0, desc: 'Use your action to move without provoking retreat attacks for the rest of this round. Costs no mana; movement is still required.' };
     const centeredAttacks = ['slash', 'shatter', 'earthquake', 'blades', 'ground_tremor'];
     const selfBuffs = ['shield_wall', 'retribution', 'unbreakable', 'connor_retribution'];
-    const targetAreas = ['mortar', 'glitter', 'hammer', 'tag'];
+    const targetAreas = ['mortar', 'glitter', 'hammer', 'tag', 'consecrated_ground'];
     function definition(ability, heroKey, player = {}) {
         const key = (ability || '').replace('spell_', '');
         const rule = (selection, shape, radius = 0, tone = 'attack', metric = 'chebyshev') => ({ selection, shape, radius, tone, metric });
         if (!ability) return rule('none', 'none');
         if (ability === 'disengage') return rule('none', 'self', 0, 'support');
         if (centeredAttacks.includes(key) || (ability === 'ultimate' && heroKey === 'malik')) return rule('none', 'aoe_around_player', 1);
+        if (ability === 'ultimate' && heroKey === 'dante') return rule('none', 'aoe_around_player', 2);
+        if (ability === 'ultimate' && heroKey === 'solaris') return rule('none', 'aoe_around_player', 3);
+        if (key === 'solar_flare') return rule('unit', 'aoe_around_target', 1);
+        if (key === 'solar_overdrive') return rule('none', 'self', 0, 'support');
         if (key === 'nanite_cloud') return rule('none', 'nanites', 2, 'heal', 'euclidean');
         if (key === 'inspire') return rule('none', 'all_allies', Infinity, 'support');
         if (selfBuffs.includes(key) || (ability === 'ultimate' && heroKey === 'connor')) return rule('none', 'self', key === 'unbreakable' ? 3 : 0, 'support');
@@ -107,7 +111,7 @@ const BATTLE_ABILITY_RULES = (() => {
 function rangeInfo(abilityKey, heroObj) {
     if (!heroObj || !abilityKey) return null;
     let hKey = heroObj.heroKey || 'gerald';
-    let isRangedHero = ['zefira', 'bolin', 'illiana', 'ratchet'].includes(hKey);
+    let isRangedHero = ['zefira', 'bolin', 'illiana', 'ratchet', 'dante', 'solaris'].includes(hKey);
     const spec = definition(abilityKey, hKey, heroObj);
     if (spec.selection === 'none') return { range: spec.radius, metric: spec.metric };
 
@@ -131,7 +135,7 @@ function rangeInfo(abilityKey, heroObj) {
     }
 
     let cleanKey = abilityKey.startsWith('spell_') ? abilityKey.substring(6) : abilityKey;
-    const euclideanSkills = ['hammer', 'mortar', 'tag', 'glitter', 'prey', 'surgical_laser', 'nanite_cloud', 'ambulance_rush'];
+    const euclideanSkills = ['hammer', 'mortar', 'tag', 'glitter', 'prey', 'surgical_laser', 'nanite_cloud', 'ambulance_rush', 'silver_bullet', 'consecrated_ground', 'sunray_lance', 'solar_flare'];
     const skillRanges = {
         'hammer': 4,
         'blades': 1,
@@ -156,7 +160,11 @@ function rangeInfo(abilityKey, heroObj) {
         // Ratchet
         'surgical_laser': 3,
         'nanite_cloud': 2,
-        'ambulance_rush': 4
+        'ambulance_rush': 4,
+        'silver_bullet': 3,
+        'consecrated_ground': 3,
+        'sunray_lance': 4,
+        'solar_flare': 3
     };
 
     let metric = euclideanSkills.includes(cleanKey) ? 'euclidean' : 'chebyshev';
@@ -170,7 +178,7 @@ function manaCost(ability) {
     const key = ability.replace('spell_', '');
     if (ability === 'attack' || ability === 'ultimate' || ability === 'disengage') return 0;
     if (key === 'blink') return 3;
-    if (['blades', 'unbreakable', 'mines', 'tag', 'prey', 'shield_slam'].includes(key)) return 4;
+    if (['blades', 'unbreakable', 'mines', 'tag', 'prey', 'shield_slam', 'silver_bullet', 'sunray_lance', 'solar_overdrive'].includes(key)) return 4;
     if (['retribution', 'earthquake', 'connor_retribution', 'nanite_cloud'].includes(key)) return 6;
     return 5;
 }

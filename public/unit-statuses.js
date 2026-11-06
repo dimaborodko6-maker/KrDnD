@@ -8,6 +8,7 @@ const UNIT_STATUSES = (() => {
     const definitions = [
         { id: 'bleeding', polarity: 'negative', icon: '🩸', label: 'Bleeding', turns: ['bleedTurns'] },
         { id: 'poison', polarity: 'negative', icon: '🌿', label: 'Poison', turns: ['poisonTurns'] },
+        { id: 'burn', polarity: 'negative', icon: '🔥', label: 'Burning', turns: ['burnTurns'] },
         { id: 'paralysis', polarity: 'negative', icon: '⛓️', label: 'Paralysis', turns: ['paralysisTurns', 'paralyzeTurns'] },
         { id: 'stun', polarity: 'negative', icon: '💫', label: 'Stun', turns: ['stunTurns'] },
         { id: 'slow', polarity: 'negative', icon: '🐌', label: 'Slow', turns: ['slowTurns'] },

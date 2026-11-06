@@ -409,6 +409,105 @@
         "traits": {},
         "maxHp": 480,
         "baseSpeed": 1
+      },
+      "skeleton_warrior": {
+        "name": "Skeleton Warrior",
+        "shortName": "Skeleton",
+        "color": "#c8c8c8",
+        "initiative": 10,
+        "hp": 60,
+        "maxHp": 60,
+        "speed": 1,
+        "baseSpeed": 1,
+        "armor": 20,
+        "magicRes": 0,
+        "isFlying": false,
+        "reward": 8,
+        "isRanged": false,
+        "meleeDmg": 4,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "shield": {
+            "percent": 30,
+            "recharge": true,
+            "rechargeDelay": 2
+          }
+        },
+        "description": "An undead warrior with a regenerating bone shield (60 HP, 20% armor, damage 4, initiative 10)."
+      },
+      "ghoul": {
+        "name": "Ghoul",
+        "shortName": "Ghoul",
+        "color": "#7a9a60",
+        "initiative": 14,
+        "hp": 90,
+        "maxHp": 90,
+        "speed": 2,
+        "baseSpeed": 2,
+        "armor": 0,
+        "magicRes": 20,
+        "isFlying": false,
+        "reward": 18,
+        "isRanged": false,
+        "meleeDmg": 6,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "berserk": {
+            "threshold": 40,
+            "damagePercent": 30,
+            "speedBonus": 1
+          }
+        },
+        "description": "A ravenous ghoul that enters a frenzy when wounded (90 HP, speed 2, damage 6, 20% magic resistance)."
+      },
+      "necromancer": {
+        "name": "Necromancer",
+        "shortName": "Necromancer",
+        "color": "#5c2d91",
+        "initiative": 8,
+        "hp": 240,
+        "maxHp": 240,
+        "speed": 1,
+        "baseSpeed": 1,
+        "armor": 0,
+        "magicRes": 50,
+        "isFlying": false,
+        "reward": 41,
+        "isRanged": true,
+        "meleeDmg": 4,
+        "rangedDmg": 8,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "summoning": {
+            "type": "skeleton_warrior",
+            "count": 1,
+            "interval": 3,
+            "maxAlive": 6,
+            "reward": 0,
+            "blockedStops": true
+          }
+        },
+        "description": "A dark sorcerer who raises skeleton warriors (240 HP, 50% magic resistance, ranged damage 8, initiative 8)."
       }
     },
     "presetWaves": [

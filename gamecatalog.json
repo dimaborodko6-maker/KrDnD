@@ -409,6 +409,105 @@
         "traits": {},
         "maxHp": 480,
         "baseSpeed": 1
+      },
+      "skeleton_warrior": {
+        "name": "Скелет-воин",
+        "shortName": "Скелет",
+        "color": "#c8c8c8",
+        "initiative": 10,
+        "hp": 60,
+        "maxHp": 60,
+        "speed": 1,
+        "baseSpeed": 1,
+        "armor": 20,
+        "magicRes": 0,
+        "isFlying": false,
+        "reward": 8,
+        "isRanged": false,
+        "meleeDmg": 4,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "shield": {
+            "percent": 30,
+            "recharge": true,
+            "rechargeDelay": 2
+          }
+        },
+        "description": "Воин нежити с восстанавливающимся костяным щитом (60 ХП, броня 20%, урон 4, инициатива 10)."
+      },
+      "ghoul": {
+        "name": "Гуль",
+        "shortName": "Гуль",
+        "color": "#7a9a60",
+        "initiative": 14,
+        "hp": 90,
+        "maxHp": 90,
+        "speed": 2,
+        "baseSpeed": 2,
+        "armor": 0,
+        "magicRes": 20,
+        "isFlying": false,
+        "reward": 18,
+        "isRanged": false,
+        "meleeDmg": 6,
+        "rangedDmg": 6,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "berserk": {
+            "threshold": 40,
+            "damagePercent": 30,
+            "speedBonus": 1
+          }
+        },
+        "description": "Ненасытный гуль, впадающий в ярость при ранении (90 ХП, скорость 2, урон 6, сопр. магии 20%)."
+      },
+      "necromancer": {
+        "name": "Некромант",
+        "shortName": "Некромант",
+        "color": "#5c2d91",
+        "initiative": 8,
+        "hp": 240,
+        "maxHp": 240,
+        "speed": 1,
+        "baseSpeed": 1,
+        "armor": 0,
+        "magicRes": 50,
+        "isFlying": false,
+        "reward": 41,
+        "isRanged": true,
+        "meleeDmg": 4,
+        "rangedDmg": 8,
+        "range": 4,
+        "livesTaken": 1,
+        "dodgeChance": 0,
+        "healPower": 25,
+        "isMiniBoss": false,
+        "aoeCleave": false,
+        "executeThreshold": 0,
+        "traits": {
+          "summoning": {
+            "type": "skeleton_warrior",
+            "count": 1,
+            "interval": 3,
+            "maxAlive": 6,
+            "reward": 0,
+            "blockedStops": true
+          }
+        },
+        "description": "Темный колдун, поднимающий скелетов-воинов (240 ХП, сопр. магии 50%, урон дальнего боя 8, инициатива 8)."
       }
     },
     "presetWaves": [

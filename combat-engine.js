@@ -226,7 +226,13 @@ function moveEnemies() {
                     s.x = tCell.rallyPoint.x;
                     s.y = tCell.rallyPoint.y;
                 }
-                logAction(Date.now(), `🛡️ REINFORCEMENT: A garrison soldier recovered in the barracks and moved to (${s.x}, ${s.y})!`);
+                if (s.isElemental) {
+                    let owner = Object.values(gameState.players).find(p => p.id === s.ownerId);
+                    if (owner) { s.x = owner.x; s.y = owner.y; }
+                    logAction(Date.now(), `🔥 REBIRTH: Ignis the Solar Elemental manifested back at (${s.x}, ${s.y})!`);
+                } else {
+                    logAction(Date.now(), `🛡️ REINFORCEMENT: A garrison soldier recovered in the barracks and moved to (${s.x}, ${s.y})!`);
+                }
             } else {
                 logAction(Date.now(), `⏳ RESERVE: Militiaman is recovering. Turns remaining: ${s.respawnTimer}`);
             }
@@ -266,6 +272,23 @@ function moveEnemies() {
                 gameState.gold += enemy.reward;
                 logAction(Date.now(), `💀 [${enemy.name}] died from poison! Treasury +${enemy.reward}💰.`);
                 logDebug('POISON_DEATH', `Enemy [${enemy.name}] (#${enemy.id}) died from poison (+${enemy.reward}💰)`);
+                Object.values(gameState.players).forEach(p => { p.blockedEnemyIds = (p.blockedEnemyIds || []).filter(id => id !== enemy.id); });
+                (gameState.soldiers || []).forEach(s => { s.blockedEnemyIds = (s.blockedEnemyIds || []).filter(id => id !== enemy.id); });
+            }
+        }
+
+        // 2.1. Горение
+        if (enemy.hp > 0 && enemy.burnTurns > 0) {
+            let burnDmg = enemy.burnDmg || 10;
+            let oldHp = enemy.hp;
+            mobTraits.damage(enemy, burnDmg);
+            enemy.burnTurns--;
+            logAction(Date.now(), `🔥 BURNING: [${enemy.name}] (#${enemy.id}) is burning, taking ${burnDmg} fire damage (HP: ${enemy.hp}/${enemy.maxHp}, turns: ${enemy.burnTurns}).`);
+            logDebug('BURN_TICK', `Enemy [${enemy.name}] (#${enemy.id}) lost ${burnDmg} HP to burning (HP: ${oldHp} -> ${enemy.hp}, remaining: ${enemy.burnTurns})`);
+            if (enemy.hp <= 0) {
+                gameState.gold += enemy.reward;
+                logAction(Date.now(), `💀 [${enemy.name}] burned to ashes! Treasury +${enemy.reward}💰.`);
+                logDebug('BURN_DEATH', `Enemy [${enemy.name}] (#${enemy.id}) died from fire (+${enemy.reward}💰)`);
                 Object.values(gameState.players).forEach(p => { p.blockedEnemyIds = (p.blockedEnemyIds || []).filter(id => id !== enemy.id); });
                 (gameState.soldiers || []).forEach(s => { s.blockedEnemyIds = (s.blockedEnemyIds || []).filter(id => id !== enemy.id); });
             }
@@ -323,6 +346,39 @@ function moveEnemies() {
             puddle.turns--;
         });
         gameState.poisonPuddles = gameState.poisonPuddles.filter(p => p.turns > 0);
+    }
+
+    // 6. Лавовые лужи Огненного Мехи (Magma Pools)
+    if (gameState.magmaPuddles && gameState.magmaPuddles.length > 0) {
+        gameState.magmaPuddles.forEach(puddle => {
+            gameState.enemies.filter(e => e.hp > 0 && e.x === puddle.x && e.y === puddle.y).forEach(enemy => {
+                let mDmg = puddle.dmg || 15;
+                mobTraits.damage(enemy, mDmg);
+                enemy.burnTurns = Math.max(enemy.burnTurns || 0, 2);
+                logAction(Date.now(), `🌋 MAGMA: [${enemy.name}] is scorching in molten magma at (${puddle.x}, ${puddle.y}) (-${mDmg} fire damage)!`);
+                logDebug('MAGMA_POOL_TICK', `Enemy [${enemy.name}] (#${enemy.id}) took ${mDmg} magma damage [HP: ${enemy.hp}]`);
+                if (enemy.hp <= 0) {
+                    gameState.gold += enemy.reward;
+                    logAction(Date.now(), `💀 MAGMA: [${enemy.name}] incinerated in molten lava! Treasury +${enemy.reward}💰.`);
+                    Object.values(gameState.players).forEach(p => { p.blockedEnemyIds = (p.blockedEnemyIds || []).filter(id => id !== enemy.id); });
+                    (gameState.soldiers || []).forEach(s => { s.blockedEnemyIds = (s.blockedEnemyIds || []).filter(id => id !== enemy.id); });
+                }
+            });
+            puddle.turns--;
+        });
+        gameState.magmaPuddles = gameState.magmaPuddles.filter(p => p.turns > 0);
+    }
+
+    // 7. Масляные пятна Тяжёлого Мехи (Oil Slicks - замедление)
+    if (gameState.oilPuddles && gameState.oilPuddles.length > 0) {
+        gameState.oilPuddles.forEach(puddle => {
+            gameState.enemies.filter(e => e.hp > 0 && e.x === puddle.x && e.y === puddle.y).forEach(enemy => {
+                enemy.slowTurns = Math.max(enemy.slowTurns || 0, 2);
+                logAction(Date.now(), `🛢️ OIL SLICK: [${enemy.name}] slipped in viscous oil at (${puddle.x}, ${puddle.y}) and was slowed!`);
+            });
+            puddle.turns--;
+        });
+        gameState.oilPuddles = gameState.oilPuddles.filter(p => p.turns > 0);
     }
 
     removeDeadEnemies();
@@ -410,6 +466,27 @@ function moveEnemies() {
             }
 
             // Проверка наступания в ядовитую трясину Некроманта
+            let magmaPuddleOnNext = (gameState.magmaPuddles || []).find(p => p.x === nextCell.x && p.y === nextCell.y);
+            if (magmaPuddleOnNext) {
+                let mDmg = magmaPuddleOnNext.dmg || 15;
+                mobTraits.damage(enemy, mDmg);
+                enemy.burnTurns = Math.max(enemy.burnTurns || 0, 2);
+                logAction(Date.now(), `🌋 MAGMA: [${enemy.name}] stepped into molten lava at (${nextCell.x}, ${nextCell.y}) (-${mDmg} HP, burning)!`);
+                logDebug('MAGMA_STEP', `Enemy [${enemy.name}] (#${enemy.id}) stepped into magma at (${nextCell.x}, ${nextCell.y}) [HP: ${enemy.hp}]`);
+                if (enemy.hp <= 0) {
+                    gameState.gold += enemy.reward;
+                    logAction(Date.now(), `💀 MAGMA: [${enemy.name}] melted in lava! Treasury +${enemy.reward}💰.`);
+                    resolveEnemyDeath(enemy);
+                    speedRemaining = 0;
+                    break;
+                }
+            }
+            let oilPuddleOnNext = (gameState.oilPuddles || []).find(p => p.x === nextCell.x && p.y === nextCell.y);
+            if (oilPuddleOnNext) {
+                enemy.slowTurns = Math.max(enemy.slowTurns || 0, 2);
+                logAction(Date.now(), `🛢️ OIL: [${enemy.name}] stepped into an oil slick at (${nextCell.x}, ${nextCell.y}) (slowed)!`);
+            }
+
             let poisonPuddleOnNext = (gameState.poisonPuddles || []).find(p => p.x === nextCell.x && p.y === nextCell.y);
             if (poisonPuddleOnNext) {
                 let pDmg = poisonPuddleOnNext.dmg || 15;
@@ -459,8 +536,8 @@ function moveEnemies() {
                     if (enemy.hp <= 0 || resolveCastleArrival(enemy)) break;
                     if (!directSoldier.blockedEnemyIds) directSoldier.blockedEnemyIds = [];
                     directSoldier.blockedEnemyIds.push(enemy.id);
-                    let sMaxBlock = directSoldier.isGolem ? 3 : (directSoldier.blockLimit ?? 1);
-                    let sLabel = directSoldier.name || (directSoldier.isGolem ? 'Stone Golem' : 'Garrison Soldier');
+                    let sMaxBlock = directSoldier.isGolem ? 3 : directSoldier.isElemental ? 2 : (directSoldier.blockLimit ?? 1);
+                    let sLabel = directSoldier.name || (directSoldier.isGolem ? 'Stone Golem' : directSoldier.isElemental ? 'Solar Elemental' : 'Garrison Soldier');
                     logAction(Date.now(), `🛡️ BLOCK: ${sLabel} formed a living wall and stopped [${enemy.name}] at cell (${enemy.x}, ${enemy.y}) (block ${directSoldier.blockedEnemyIds.length}/${sMaxBlock})!`);
                     logDebug('MOVE_STEP', `Enemy [${enemy.name}] (#${enemy.id}) (${fromX}, ${fromY}) -> (${enemy.x}, ${enemy.y}) [BLOCKED: ${sLabel}]`);
                     speedRemaining = 0;
@@ -499,8 +576,8 @@ function moveEnemies() {
                     if (enemy.hp <= 0 || resolveCastleArrival(enemy)) break;
                     if (!adjacentSoldier.blockedEnemyIds) adjacentSoldier.blockedEnemyIds = [];
                     adjacentSoldier.blockedEnemyIds.push(enemy.id);
-                    let sMaxBlock = adjacentSoldier.isGolem ? 3 : (adjacentSoldier.blockLimit ?? 1);
-                    let sLabel = adjacentSoldier.name || (adjacentSoldier.isGolem ? 'Stone Golem' : 'Garrison Soldier');
+                    let sMaxBlock = adjacentSoldier.isGolem ? 3 : adjacentSoldier.isElemental ? 2 : (adjacentSoldier.blockLimit ?? 1);
+                    let sLabel = adjacentSoldier.name || (adjacentSoldier.isGolem ? 'Stone Golem' : adjacentSoldier.isElemental ? 'Solar Elemental' : 'Garrison Soldier');
                     logAction(Date.now(), `🛡️ INTERCEPT: ${sLabel} intercepted [${enemy.name}] on the adjacent road lane (${enemy.x}, ${enemy.y}) (block ${adjacentSoldier.blockedEnemyIds.length}/${sMaxBlock})!`);
                     logDebug('MOVE_STEP', `Enemy [${enemy.name}] (#${enemy.id}) (${fromX}, ${fromY}) -> (${enemy.x}, ${enemy.y}) [INTERCEPTED: ${sLabel}]`);
                     speedRemaining = 0;
@@ -581,6 +658,14 @@ function moveEnemies() {
                 }
 
                 // Пассивка Джеральда: Hardened Steel (блок щитом от ловкости)
+                if (target.skills.includes("acrobatic_roll")) {
+                    let dexMod = getModifier(target.stats.dex);
+                    if (random() * 100 < (20 + (dexMod * 5))) {
+                        logAction(Date.now(), `💨 DODGE: Dante nimbly rolled away from [${enemy.name}]'s attack!`);
+                        logDebug('ENEMY_ATK', `[${enemy.name}] (#${enemy.id}) attacked Dante [DODGED]`);
+                        continue;
+                    }
+                }
                 if (target.skills.includes("steel")) {
                     let dexMod = getModifier(target.stats.dex);
                     if (random() * 100 < (30 + (dexMod * 5))) {
@@ -728,6 +813,15 @@ function moveEnemies() {
             if (!isShieldBlocked) {
                 actualDmg = applyIncomingDamage(soldier, baseEnemyDmg, { attacker: enemy, melee: true });
                 logAction(Date.now(), `⚔️ CLASH: [${enemy.name}] attacked a garrison soldier for ${actualDmg} physical damage (armor: ${soldier.armor}%). HP: ${soldier.hp}/${soldier.maxHp}`);
+                if (soldier.isElemental && enemy.hp > 0) {
+                    let refl = mobTraits.damage(enemy, 5);
+                    enemy.burnTurns = Math.max(enemy.burnTurns || 0, 1);
+                    logAction(Date.now(), `🔥 RETRIBUTION: Ignis scorched [${enemy.name}] for ${refl} fire damage (burning applied)!`);
+                    if (enemy.hp <= 0) {
+                        gameState.gold += enemy.reward;
+                        logAction(Date.now(), `💀 RETRIBUTION: [${enemy.name}] burned down from elemental retribution! Treasury +${enemy.reward}💰.`);
+                    }
+                }
             }
 
             if (soldier.hp <= 0) {
@@ -735,6 +829,10 @@ function moveEnemies() {
                     soldier.hp = Math.round(soldier.maxHp * 0.5);
                     logAction(Date.now(), `🏆 HOLY GRAIL: Templar was saved from death by divine grace (+${soldier.hp} HP)!`);
                     logDebug('TEMPLAR_GRAIL', `Templar (#${soldier.id}) cheated death through Holy Grail [HP: ${soldier.hp}/${soldier.maxHp}]`);
+                } else if (soldier.isElemental) {
+                    soldier.respawnTimer = 2;
+                    soldier.blockedEnemyIds = [];
+                    logAction(Date.now(), `🔥 ELEMENTAL DISSIPATION: Ignis dissipated into solar embers! Respawns in 2 turns.`);
                 } else if (soldier.isSkeleton) {
                     soldier.blockedEnemyIds = [];
                     logAction(Date.now(), `💀 DUST: ${soldier.name} crumbled to dust!`);
@@ -866,6 +964,10 @@ function moveEnemies() {
     if (!gameState.enemies.some(enemy => enemy.eventKind !== 'goldenGoblin') && !(gameState.pendingSpawns || []).length) {
         resetWaveBonuses();
         logAction(Date.now(), `🎉 WAVE CLEARED: All enemies on the map have been defeated! The team can prepare for the next wave.`);
+        if (gameState.gameMode === 'coop') {
+            gameState.gamePeriod = 'preparation';
+            logAction(Date.now(), '🛡️ [Co-op] Preparation phase active. Build defenses and start the next wave when ready.');
+        }
     }
 
     broadcastState();

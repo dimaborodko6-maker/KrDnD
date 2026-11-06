@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <script src="diagnostics.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#10191c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="icon.svg">
     <title>Hero Screen — Kr6DnD</title>
     <link rel="stylesheet" href="player.css">
     <link rel="stylesheet" href="player-layout.css">
@@ -52,7 +57,7 @@
     <div id="screen-game" class="screen">
       <header class="battle-header">
         <div class="hero-heading">
-          <div class="eyebrow"><span id="phase-title">Play period</span><span id="phase-wave-badge">Wave 1</span><div class="lang-switcher-slot" style="display:inline-block; margin-left:10px;"></div></div>
+          <div class="eyebrow"><span id="phase-title">Play period</span><span id="phase-wave-badge">Wave 1</span><span id="coop-mode-badge" style="display:none; margin-left:8px; padding:2px 6px; border-radius:4px; font-weight:bold; background:#2e7d32; color:#fff;">🤝 Co-op</span><div class="lang-switcher-slot" style="display:inline-block; margin-left:10px;"></div></div>
           <strong id="hero-name">Your hero</strong>
         </div>
         <div class="stats">
@@ -208,6 +213,15 @@
               Preparation period: configure the team tower roster
             </div>
           </div>
+          <div id="coop-scene-box" style="display:none; margin:0 0 10px 0;">
+            <button type="button" id="btn-coop-change-map" class="btn" style="background:#1d2a23; color:#c9e4a1; border:1px solid #4a6338; font-weight:bold; width:100%; padding:10px; font-size:13px; display:flex; align-items:center; justify-content:center; gap:8px; border-radius:6px; cursor:pointer;" onclick="openCoopSceneDialog()">
+              <span>🗺️</span>
+              <span id="coop-scene-btn-text">Map: <span id="coop-scene-current-name">Roadside Defense</span> (Change)</span>
+            </button>
+            <div style="font-size:11px; color:#8fa398; margin-top:4px; text-align:center;">
+              Preparation period: select battlefield scenario
+            </div>
+          </div>
           <p id="map-mode-hint" role="status">Select an ability, then a target on the map.</p>
           <section id="journal-controls" hidden aria-label="Passive abilities and journal">
             <h3 class="section-label">Passive abilities</h3>
@@ -220,6 +234,7 @@
         <div class="dock-footer">
           <button class="btn" id="attack-main-btn" onclick="attack()" disabled>Select a target</button>
           <button id="btn-toggle-ready" class="btn ready-btn">✓ End turn</button>
+          <button id="btn-coop-start-wave" class="btn" style="display:none; background:#2e7d32; color:#fff; font-weight:bold;">⚔️ Start wave</button>
         </div>
       </aside>
     </div>
@@ -234,6 +249,26 @@
         </div></header>
         <div id="tower-preparation-content" class="tp-shell"></div>
         <footer id="tower-preparation-footer" class="tp-shell" aria-live="polite"></footer>
+    </dialog>
+
+    <dialog id="coop-scene-dialog" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.85); z-index:10001; align-items:center; justify-content:center; padding:16px; box-sizing:border-box;">
+        <div style="background:#141e1c; border:2px solid #4a6338; border-radius:12px; width:100%; max-width:540px; max-height:85vh; display:flex; flex-direction:column; padding:20px; box-shadow:0 12px 32px rgba(0,0,0,0.95); color:#e9f0e9; box-sizing:border-box;">
+            <header style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px; border-bottom:1px solid #2d3e35; padding-bottom:10px;">
+                <div>
+                    <h3 style="margin:0 0 4px 0; color:#b8d18c; font-size:18px; display:flex; align-items:center; gap:8px;">
+                        <span>🗺️</span> <span>Choose battlefield scenario</span>
+                    </h3>
+                    <p style="margin:0; font-size:12px; color:#8fa398;">Preparation period: change battlefield map before combat</p>
+                </div>
+                <button type="button" onclick="closeCoopSceneDialog()" style="background:none; border:none; color:#8fa398; font-size:20px; cursor:pointer; line-height:1; padding:2px 6px;">✕</button>
+            </header>
+            <div id="coop-scene-dialog-list" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:10px; padding-right:4px;">
+                <div style="text-align:center; padding:20px; color:#8fa398;">Loading scenarios...</div>
+            </div>
+            <footer style="margin-top:14px; padding-top:10px; border-top:1px solid #2d3e35; display:flex; justify-content:flex-end;">
+                <button type="button" class="btn" onclick="closeCoopSceneDialog()" style="background:#2a3630; color:#e9f0e9; border:none; padding:8px 16px; border-radius:6px; cursor:pointer; font-size:13px;">Close</button>
+            </footer>
+        </div>
     </dialog>
 
     <!-- EXTERNAL LOGIC SCRIPT -->

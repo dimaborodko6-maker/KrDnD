@@ -774,6 +774,259 @@ const TOWER_DRAFT_CATALOG = (() => {
             }
         ]
     }
+,
+    {
+            "id": "crossbow_tower",
+            "name": "Crossbow Fort",
+            "subtitle": "Crossbow Fort (Arbalest and Fortress)",
+            "archetype": "archers",
+            "icon": "🏹🏰",
+            "cost": 70,
+            "baseCost": 70,
+            "range": 3,
+            "progressionType": "single",
+            "progressionLabel": "1 direct line (I ➔ IV)",
+            "dmgType": "phys",
+            "damageRange": "4 – 30 physical",
+            "initiative": 18,
+            "targets": "Ground and air",
+            "hiddenFromPlayers": false,
+            "description": "High-speed arbalest battery with extreme initiative (18-20). Deals physical damage to ground and flying enemies. Level IV upgrades: Crossbow Barrage and Falconer.",
+            "levels": [
+                    {
+                            "lvl": "I",
+                            "name": "Crossbow Post I",
+                            "cost": 70,
+                            "range": 3,
+                            "initiative": 18,
+                            "minDmg": 4,
+                            "maxDmg": 7,
+                            "dmgType": "phys"
+                    },
+                    {
+                            "lvl": "II",
+                            "name": "Heavy Ballista II",
+                            "cost": 100,
+                            "range": 4,
+                            "initiative": 19,
+                            "minDmg": 8,
+                            "maxDmg": 14,
+                            "dmgType": "phys"
+                    },
+                    {
+                            "lvl": "III",
+                            "name": "Arbalest Battery III",
+                            "cost": 150,
+                            "range": 4,
+                            "initiative": 19,
+                            "minDmg": 15,
+                            "maxDmg": 24,
+                            "dmgType": "phys"
+                    },
+                    {
+                            "lvl": "IV",
+                            "name": "Crossbow Fort IV",
+                            "cost": 230,
+                            "range": 5,
+                            "initiative": 20,
+                            "minDmg": 20,
+                            "maxDmg": 30,
+                            "dmgType": "phys"
+                    }
+            ],
+            "effects": [
+                    {
+                            "name": "Crossbow Barrage (Level IV)",
+                            "icon": "🏹",
+                            "cost": 160,
+                            "tag": "Burst Fire",
+                            "cooldown": 3,
+                            "desc": "Every 3 rounds, fires a rapid burst of 2 additional bolts at the target."
+                    },
+                    {
+                            "name": "Falconer (Level IV)",
+                            "icon": "🦅",
+                            "cost": 180,
+                            "tag": "Aura",
+                            "cooldown": 0,
+                            "desc": "A trained scouting falcon increases the attack range of all allied shooting and magic towers within 4 cells by +1 cell."
+                    }
+            ]
+    },
+    {
+            "id": "dwaarp_tower",
+            "name": "DWAARP Seismic Engine",
+            "subtitle": "DWAARP (Seismic Drill and Core Magma)",
+            "archetype": "artillery",
+            "icon": "🌋💣",
+            "cost": 125,
+            "baseCost": 125,
+            "range": 2,
+            "progressionType": "single",
+            "progressionLabel": "1 direct line (I ➔ IV)",
+            "dmgType": "phys",
+            "damageRange": "10 – 100 physical",
+            "initiative": 8,
+            "targets": "Ground only (360 shockwave)",
+            "hiddenFromPlayers": false,
+            "description": "Heavy seismic siege engine. Unleashes ground shockwaves dealing physical damage to all ground enemies in range. Level IV upgrades: Core Drill and Furnace Blast.",
+            "levels": [
+                    {
+                            "lvl": "I",
+                            "name": "Mining Drill I",
+                            "cost": 125,
+                            "range": 2,
+                            "initiative": 8,
+                            "minDmg": 10,
+                            "maxDmg": 20,
+                            "dmgType": "phys"
+                    },
+                    {
+                            "lvl": "II",
+                            "name": "Steam Crusher II",
+                            "cost": 220,
+                            "range": 2,
+                            "initiative": 7,
+                            "minDmg": 22,
+                            "maxDmg": 40,
+                            "dmgType": "phys"
+                    },
+                    {
+                            "lvl": "III",
+                            "name": "Magma Engine III",
+                            "cost": 320,
+                            "range": 2,
+                            "initiative": 7,
+                            "minDmg": 38,
+                            "maxDmg": 65,
+                            "dmgType": "phys"
+                    },
+                    {
+                            "lvl": "IV",
+                            "name": "DWAARP Seismic Engine IV",
+                            "cost": 400,
+                            "range": 2,
+                            "initiative": 6,
+                            "minDmg": 60,
+                            "maxDmg": 100,
+                            "dmgType": "phys"
+                    }
+            ],
+            "effects": [
+                    {
+                            "name": "Core Drill (Level IV)",
+                            "icon": "⛏️",
+                            "cost": 240,
+                            "tag": "Execute",
+                            "cooldown": 4,
+                            "desc": "Every 4 rounds, drills into the strongest ground enemy in range: instantly eliminates normal enemies; deals 180 true damage to bosses."
+                    },
+                    {
+                            "name": "Furnace Blast (Level IV)",
+                            "icon": "🔥",
+                            "cost": 190,
+                            "tag": "Napalm",
+                            "cooldown": 3,
+                            "desc": "Every 3 rounds, vents superheated magma onto adjacent road cells, dealing 10 fire damage for 2 turns to passing enemies."
+                    }
+            ]
+    },
+    {
+            "id": "templar_tower",
+            "name": "Knights Templar",
+            "subtitle": "Knights Templar (Crusaders and Greatswords)",
+            "archetype": "barracks",
+            "icon": "⚔️🛡️",
+            "cost": 70,
+            "baseCost": 70,
+            "range": 2,
+            "progressionType": "single",
+            "progressionLabel": "1 direct line (I ➔ IV)",
+            "dmgType": "phys",
+            "damageRange": "4 – 16",
+            "hpRange": "45 – 140",
+            "armorRange": "25% – 50%",
+            "initiative": 12,
+            "targets": "Ground (3 soldiers)",
+            "hiddenFromPlayers": false,
+            "description": "Elite heavy crusaders wielding greatswords. Unyielding defense with heavy armor (up to 50%) and high HP. Level IV upgrades: Arterial Strike, Holy Grail, and Toughness.",
+            "levels": [
+                    {
+                            "lvl": "I",
+                            "name": "Templar Novices I",
+                            "cost": 70,
+                            "range": 2,
+                            "initiative": 12,
+                            "soldierHp": 45,
+                            "soldierArmor": 25,
+                            "soldierDmg": 4,
+                            "soldierCount": 3,
+                            "respawnTurns": 2
+                    },
+                    {
+                            "lvl": "II",
+                            "name": "Crusader Barracks II",
+                            "cost": 110,
+                            "range": 2,
+                            "initiative": 14,
+                            "soldierHp": 70,
+                            "soldierArmor": 35,
+                            "soldierDmg": 6,
+                            "soldierCount": 3,
+                            "respawnTurns": 2
+                    },
+                    {
+                            "lvl": "III",
+                            "name": "Knight Chapter III",
+                            "cost": 160,
+                            "range": 3,
+                            "initiative": 16,
+                            "soldierHp": 100,
+                            "soldierArmor": 45,
+                            "soldierDmg": 10,
+                            "soldierCount": 3,
+                            "respawnTurns": 2
+                    },
+                    {
+                            "lvl": "IV",
+                            "name": "Knights Templar IV",
+                            "cost": 230,
+                            "range": 3,
+                            "initiative": 18,
+                            "soldierHp": 140,
+                            "soldierArmor": 50,
+                            "soldierDmg": 16,
+                            "soldierCount": 3,
+                            "respawnTurns": 2
+                    }
+            ],
+            "effects": [
+                    {
+                            "name": "Arterial Strike (Level IV)",
+                            "icon": "🩸",
+                            "cost": 160,
+                            "tag": "Bleed",
+                            "cooldown": 0,
+                            "desc": "Templar attacks have a 30% chance to deal double damage and inflict bleeding for 2 turns (6 physical DoT per turn)."
+                    },
+                    {
+                            "name": "Holy Grail (Level IV)",
+                            "icon": "🏆",
+                            "cost": 180,
+                            "tag": "Revive",
+                            "cooldown": 0,
+                            "desc": "When a Templar suffers a fatal blow, there is a 40% chance divine grace revives him immediately with 50% maximum HP."
+                    },
+                    {
+                            "name": "Toughness (Level IV)",
+                            "icon": "🛡️",
+                            "cost": 140,
+                            "tag": "HP Boost",
+                            "cooldown": 0,
+                            "desc": "Increases the maximum HP of all 3 Templars by +30 (up to 170 HP)."
+                    }
+            ]
+    }
 ];
 
     const PRESETS = [

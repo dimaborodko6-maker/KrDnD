@@ -72,7 +72,7 @@ module.exports=function createActivatedEvents(ctx) {
         for(const event of [...events()]) {
             const c=event.config;
             if(event.entityId !== undefined && !entity(event) || missingSource(event)) { finish(event.id); continue; }
-            if(event.kind === 'sandstorm') hit(rules.targets(state(),c),c);
+            if(event.kind === 'sandstorm' || event.kind === 'necroticMist') hit(rules.targets(state(),c),c);
             if(event.kind === 'chainLightning' && round() >= event.nextRound) { hit(rules.chain(state(),c),c); finish(event.id); }
             if(event.kind === 'bombardment' && round() >= event.nextRound) {
                 const affected=new Map();

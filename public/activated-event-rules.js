@@ -1,6 +1,6 @@
 'use strict';
 const ACTIVATED_EVENT_RULES = (() => {
-    const kinds = { frost:'Frost', goldenGoblin:'Golden goblin', sandstorm:'Sandstorm', goblinTower:'Goblin tower', bombardment:'Bombardment', ritualTotem:'Ritual totem', banner:'Warlord banner', chainLightning:'Chain lightning' };
+    const kinds = { frost:'Frost', goldenGoblin:'Golden goblin', sandstorm:'Sandstorm', goblinTower:'Goblin tower', bombardment:'Bombardment', ritualTotem:'Ritual totem', banner:'Warlord banner', chainLightning:'Chain lightning', necroticMist:'Necrotic mist' };
     const bases = {
         frost:{ damage:10, damageType:'magic', duration:2, dc:12, playerNames:[], results:{} },
         goldenGoblin:{ hp:20, speed:2, reward:50, duration:5 },
@@ -9,7 +9,8 @@ const ACTIVATED_EVENT_RULES = (() => {
         bombardment:{ radius:1, damage:15, damageType:'physical', delay:1, areas:[], side:'all' },
         ritualTotem:{ hp:40, delay:3, enemyType:'goblin', count:3, summonReward:0 },
         banner:{ radius:2, duration:3, buff:'damage', bonus:20 },
-        chainLightning:{ damage:10, damageType:'magic', radius:2, count:4, side:'all', delay:0 }
+        chainLightning:{ damage:10, damageType:'magic', radius:2, count:4, side:'all', delay:0 },
+        necroticMist:{ radius:2, duration:3, damage:8, damageType:'magic', side:'heroes' }
     };
     const integer = (v,min,max,label) => { if (!Number.isSafeInteger(v) || v < min || v > max) throw new Error(label + ': invalid integer'); return v; };
     const alive = u => u.hp > 0 && !(u.deathTimer > 0) && !(u.respawnTimer > 0);
@@ -36,13 +37,13 @@ const ACTIVATED_EVENT_RULES = (() => {
     function normalize(input,state,data,options={}) {
         if (!input || typeof input !== 'object' || Array.isArray(input)) throw new Error('Invalid event configuration');
         const base=defaults(input.kind);
-        const allowed=new Set([...Object.keys(base),'title',...(['goldenGoblin','sandstorm','goblinTower','ritualTotem'].includes(input.kind) ? ['x','y'] : []),...(['goblinTower','ritualTotem'].includes(input.kind) ? ['spawnX','spawnY'] : []),...(input.kind === 'banner' ? ['sourceId'] : []),...(input.kind === 'chainLightning' ? ['target'] : [])]);
+        const allowed=new Set([...Object.keys(base),'title',...(['goldenGoblin','sandstorm','goblinTower','ritualTotem','necroticMist'].includes(input.kind) ? ['x','y'] : []),...(['goblinTower','ritualTotem'].includes(input.kind) ? ['spawnX','spawnY'] : []),...(input.kind === 'banner' ? ['sourceId'] : []),...(input.kind === 'chainLightning' ? ['target'] : [])]);
         const c={...base};
         for(const [key,value] of Object.entries(input)) if(allowed.has(key)) c[key]=value;
         c.title=c.title === undefined ? kinds[c.kind] : c.title;
         if (typeof c.title !== 'string' || !c.title.trim() || c.title.length > 120) throw new Error('Invalid event title');
         const cell=(x,y)=>{integer(x,0,state.grid[0].length-1,'X');integer(y,0,state.grid.length-1,'Y');};
-        if (['goldenGoblin','sandstorm','goblinTower','ritualTotem'].includes(c.kind)) cell(c.x,c.y);
+        if (['goldenGoblin','sandstorm','goblinTower','ritualTotem','necroticMist'].includes(c.kind)) cell(c.x,c.y);
         for(const field of ['radius','duration','damage','hp','speed','reward','interval','maxAlive','count','summonReward','delay','bonus','dc']) {
             const max=field === 'delay' && c.kind === 'chainLightning' ? 1 : ['dc','radius','speed'].includes(field) ? 40 : field === 'count' ? 100 : ['duration','interval','delay'].includes(field) ? 1000 : 1000000;
             if(c[field] !== undefined) integer(c[field],['reward','summonReward','damage'].includes(field) || field === 'delay' && c.kind === 'chainLightning' ? 0 : 1,max,field);

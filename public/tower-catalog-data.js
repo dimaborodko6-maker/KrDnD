@@ -565,6 +565,140 @@ const TOWER_CATALOG_DATA = (() => {
                     desc: 'Increases the maximum HP of all 3 Templars by +30 (up to 170 HP).'
                 }
             ]
+        },
+
+        // ==================== 🤖 BATTLE-MECHA T-200 ====================
+        mecha_1: {
+            name: "Battle-Mecha T-200 I",
+            cost: 125,
+            range: 3,
+            minDamage: 25,
+            maxDamage: 45,
+            dmgType: 'phys',
+            initiative: 7,
+            color: "#c67d0a",
+            shortName: "🤖I",
+            next: 'mecha_2',
+            progressionType: 'branch',
+            description: "Heavy walking dreadnought. Kinetic shell with area splash (25–45 damage, range 3)."
+        },
+        mecha_2: {
+            name: "Battle-Mecha T-200 II",
+            cost: 155,
+            range: 3,
+            minDamage: 45,
+            maxDamage: 75,
+            dmgType: 'phys',
+            initiative: 8,
+            color: "#b26a00",
+            shortName: "🤖II",
+            next: 'mecha_3',
+            progressionType: 'branch',
+            description: "Reinforced chassis and rotary cannon. Deals 45–75 kinetic splash damage."
+        },
+        mecha_3: {
+            name: "Battle-Mecha T-200 III",
+            cost: 185,
+            range: 3,
+            minDamage: 70,
+            maxDamage: 110,
+            dmgType: 'phys',
+            initiative: 8,
+            color: "#995200",
+            shortName: "🤖III",
+            next: ['mecha_flame', 'mecha_missile', 'mecha_heavy'],
+            progressionType: 'branch',
+            description: "Siege walker dealing 70–110 splash damage. Level IV branches: Flame Mecha, Missile Mecha, or Heavy Mecha."
+        },
+        mecha_flame: {
+            name: "Flame-Mecha T-200 IV",
+            cost: 220,
+            range: 3,
+            minDamage: 65,
+            maxDamage: 95,
+            dmgType: 'magic',
+            initiative: 9,
+            color: "#d84315",
+            shortName: "🔥IV",
+            next: null,
+            progressionType: 'branch',
+            description: "Incinerator mecha. All attacks deal area fire damage (65–95) and ignite enemies with burning.",
+            upgrades: [
+                {
+                    id: 'mecha_magma',
+                    name: 'Magma Vent',
+                    cost: 150,
+                    icon: '🌋',
+                    desc: 'Vents molten magma onto impact ground for 2 rounds, burning enemies for 15 fire damage.'
+                },
+                {
+                    id: 'mecha_inferno',
+                    name: 'Thermite Fuel',
+                    cost: 120,
+                    icon: '🔥',
+                    desc: 'Burning duration increased to 3 turns, and burning targets suffer -20% armor.'
+                }
+            ]
+        },
+        mecha_missile: {
+            name: "Missile-Mecha T-200 IV",
+            cost: 220,
+            range: 4,
+            minDamage: 60,
+            maxDamage: 100,
+            dmgType: 'phys',
+            initiative: 10,
+            color: "#455a64",
+            shortName: "🚀IV",
+            next: null,
+            progressionType: 'branch',
+            description: "Long-range rocket platform (60–100 splash, range 4). Guided Wasp missiles target aerial threats.",
+            upgrades: [
+                {
+                    id: 'mecha_wasp',
+                    name: 'Wasp Missiles',
+                    cost: 140,
+                    icon: '🚀',
+                    desc: 'Fires 2 guided missiles per round dealing 40 true damage, prioritizing flying enemies.'
+                },
+                {
+                    id: 'mecha_radar',
+                    name: 'Targeting Radar',
+                    cost: 110,
+                    icon: '📡',
+                    desc: 'Increases tower range to 5 and ensures missiles never miss and bypass aerial evasion.'
+                }
+            ]
+        },
+        mecha_heavy: {
+            name: "Heavy-Mecha T-200 IV",
+            cost: 220,
+            range: 3,
+            minDamage: 90,
+            maxDamage: 140,
+            dmgType: 'phys',
+            initiative: 8,
+            color: "#37474f",
+            shortName: "🦾IV",
+            next: null,
+            progressionType: 'branch',
+            description: "Massive kinetic dreadnought dealing colossal splash (90–140). Dumps slowing oil slicks and delivers concussive blows.",
+            upgrades: [
+                {
+                    id: 'mecha_oil',
+                    name: 'Oil Slick',
+                    cost: 120,
+                    icon: '🛢️',
+                    desc: 'Deploys an oil puddle around target cell for 2 rounds, slowing enemies by 50%.'
+                },
+                {
+                    id: 'mecha_concussive',
+                    name: 'Concussive Shockwave',
+                    cost: 130,
+                    icon: '💥',
+                    desc: 'Shell impacts have a 35% chance to stun enemies for 1 turn and knock them back 1 cell.'
+                }
+            ]
         }
     };
 

@@ -55,6 +55,7 @@ Enter a unique player name, choose a hero, allocate exactly **27 ability-score p
 | Illiana and Sparky | Mobile ranged duo with physical and magic attacks |
 | Torghar the Unbreakable | Heavy armor, thorns and multi-enemy blocking |
 | Ratchet | Healing, shields, recovery and energy attacks |
+| Dante the Inquisitor | Ranged holy attacks, true damage and undead bane |
 
 STR affects melee damage, DEX affects ranged attacks and defensive mechanics, CON affects maximum health, INT affects maximum mana, WIS strengthens some effects, and CHA affects some command/support abilities. Individual abilities use different formulas; inspect their descriptions and the current combat rules. Existing prototype descriptions are not a promise that every number represents a new rule.
 
@@ -178,6 +179,16 @@ Events can spawn reinforcements, launch a saved scene wave, change a cell, updat
 NPC cards record role, motivation, voice and knowledge. Tactics cards are reminders. Boss cards have descending HP thresholds; phase reminders can advance as the boss loses health, but **do not change its combat stats automatically**.
 
 In **Session Plan**, arrange saved scenes as Required, Optional or Backup. Add outcome-based branches where needed. Without branches, Next skips backup scenes. With branches, the available transition must match the scene outcome. Transitions always need a GM decision; opening the next scene replaces the map and restores heroes. Save the plan, then start it from the GM dashboard.
+
+
+### Battle-Mecha T-200 and Solaris & Ignis
+
+The **Battle-Mecha T-200** provides walking artillery progression (Tier I–III) branching into three specialized Tier IV variants:
+- **Flame Mecha**: AoE fire damage applying the Burning status (`burnTurns`) which disables regeneration, venting molten Magma Pools.
+- **Missile Mecha**: Long-range platform firing guided Wasp missiles that prioritize aerial threats and ignore flying evasion.
+- **Heavy Mecha**: Heavy kinetic dreadnought with massive splash (90–140), slowing Oil Slicks, and concussive shockwaves.
+
+Hero **Solaris & Ignis** features a dual-presence mechanic with Ignis the Solar Elemental fighting on the frontline (Block 2, retributive fire thorns, 2-turn rebirth), supported by Solaris's long-range solar beams, Sunray Lance, Solar Overdrive, and the devastating Supernova ultimate.
 
 ## 11. Save, back up and recover
 
