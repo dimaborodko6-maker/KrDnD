@@ -12,6 +12,7 @@ const UNIT_STATUSES = (() => {
         { id: 'paralysis', polarity: 'negative', icon: '⛓️', label: 'Paralysis', turns: ['paralysisTurns', 'paralyzeTurns'] },
         { id: 'stun', polarity: 'negative', icon: '💫', label: 'Stun', turns: ['stunTurns'] },
         { id: 'slow', polarity: 'negative', icon: '🐌', label: 'Slow', turns: ['slowTurns'] },
+        { id: 'crown_mark', polarity: 'negative', icon: '🎯', label: 'Crown Mark', turns: ['crownMarkTurns'] },
         { id: 'polymorph', polarity: 'negative', icon: '🐑', label: 'Sheep transformation', turns: ['polymorphTurns'], flag: 'isPolymorphed' },
         { id: 'invulnerable', polarity: 'positive', icon: '✨', label: 'Invulnerability', turns: ['invulnerableRounds'] },
         { id: 'barrier', polarity: 'positive', icon: '🛡️', label: 'Barrier', amount: 'shieldHp' },

@@ -1621,12 +1621,12 @@ window.renderGridAndUI = function(state) {
                                        (fx.toX === undefined && fx.x !== undefined && fx.x === x && fx.y === y);
                     if (isTargetCell) {
                         let fxClass = 
-                            ['blast_keg', 'dwaarp_furnace', 'bertha_napalm', 'mecha_flame', 'solar_flare', 'supernova'].includes(fx.type) ? 'combat-fx-fire' :
+                            ['blast_keg', 'dwaarp_furnace', 'bertha_napalm', 'mecha_flame', 'solar_flare', 'supernova', 'trebuchet_pitch'].includes(fx.type) ? 'combat-fx-fire' :
                             ['bertha_missile', 'mecha_missile'].includes(fx.type) ? 'combat-fx-rocket' :
-                            ['mecha_heavy', 'mecha_concussion', 'dwaarp_shockwave', 'dwaarp_drill', 'barbarian_axe'].includes(fx.type) ? 'combat-fx-shock' :
+                            ['mecha_heavy', 'mecha_concussion', 'dwaarp_shockwave', 'dwaarp_drill', 'barbarian_axe', 'trebuchet_boulder', 'ballista_pierce', 'punishing_strike'].includes(fx.type) ? 'combat-fx-shock' :
                             ['ranger_roots', 'priestess_cleanse'].includes(fx.type) ? 'combat-fx-nature' :
-                            fx.type === 'radiant_smite' ? 'combat-fx-smite' :
-                            fx.type === 'old_tome_shot' ? 'combat-fx-tome' :
+                            ['radiant_smite', 'for_the_king', 'guard_taunt', 'champion_riposte', 'sharpshooter_mark'].includes(fx.type) ? 'combat-fx-smite' :
+                            ['old_tome_shot', 'sharpshooter_snipe', 'royal_volley', 'ballista_anti_air'].includes(fx.type) ? 'combat-fx-tome' :
                             fx.type === 'dwarf_surprise' ? 'combat-fx-surprise' :
                             fx.type === 'poison_mire' ? 'combat-fx-mire-cast' : 'combat-fx-blast';
                         let fxText = fx.text || '✨';

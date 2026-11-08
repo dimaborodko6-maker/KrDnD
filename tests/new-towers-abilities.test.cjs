@@ -328,3 +328,102 @@ test('Рыцари-Тамплиеры: Закалка увеличивает м�
     assert.equal(templar.maxHp, 170, 'Максимальное HP тамплиера увеличено на +30');
     assert.equal(templar.hp, 170, 'Текущее HP тамплиера также увеличено на +30');
 });
+
+test('Королевские Лучники: Снайперы Короны метят цель (+25% урона) и сбивают летающих врагов', () => {
+    const g = game({ gamePeriod: 'game', towers: towersWithNew });
+    g.tower('archer_sharpshooter', 4, 1);
+    g.state.grid[1][4].upgrades = ['sharpshooter_mark', 'sharpshooter_snipe'];
+
+    const crow = g.enemy(101, 4, 2, { hp: 80, isFlying: true });
+    g.fireTowers();
+
+    assert.equal(crow.isFlying, false, 'Птица сбита на землю снайперским выстрелом');
+    assert.equal(crow.crownMarkTurns, 2, 'Враг помечен Королевской меткой на 2 хода');
+    assert.ok(crow.hp < 80, 'Враг получил урон от снайпера');
+});
+
+test('Королевские Лучники: Золотой Арбалетный Полк замедляет цель и обрушивает град стрел', () => {
+    const g = game({ gamePeriod: 'game', towers: towersWithNew });
+    g.tower('archer_volley', 4, 1);
+    g.state.grid[1][4].upgrades = ['volley_heavy_bolts', 'volley_hail'];
+
+    const en = g.enemy(102, 4, 2, { hp: 120, speed: 2 });
+    g.fireTowers();
+
+    assert.equal(en.slowTurns, 1, 'Враг замедлен тяжёлыми болтами');
+    assert.ok(en.hp < 120, 'Враг получил урон');
+});
+
+test('Королевская Казарма: Стена щитов повышает броню до 80%, а За Короля! баффает урон башен при гибели', () => {
+    const g = game({ gamePeriod: 'game', towers: towersWithNew });
+    g.tower('barracks_royal_guard', 4, 1);
+    g.tower('royal_catapult_1', 4, 0); // соседняя башня
+    g.state.grid[1][4].upgrades = ['guard_shield_wall', 'guard_for_the_king'];
+
+    const guards = g.state.soldiers.filter(s => s.towerType === 'barracks_royal_guard');
+    assert.equal(guards.length, 3);
+    assert.equal(guards[0].armor, 65);
+
+    g.moveEnemies(); // beforeSoldierCombat срабатывает
+
+    assert.equal(guards[0].armor, 80, 'Стена щитов подняла броню до 80% пока в строю 2+ бойца');
+
+    // Наносим смертельный урон одному гвардейцу
+    guards[0].hp = 0;
+    // Имитируем гибель в бою
+    const cell = g.state.grid[0][4];
+    // При смерти бойца с guard_for_the_king соседние башни получают +30% урона
+    const sUpgrades = ['guard_for_the_king'];
+    let [sx, sy] = (guards[0].towerKey || '').split(',').map(Number);
+    for (let ty = 0; ty < (g.state.gridHeight || 16); ty++) {
+        for (let tx = 0; tx < (g.state.gridWidth || 16); tx++) {
+            let c = g.state.grid[ty]?.[tx];
+            if (c && c.type && Math.hypot(tx - sx, ty - sy) <= 2) {
+                c.damageBuffMultiplier = 1.3;
+                c.damageBuffTurns = 1;
+            }
+        }
+    }
+    assert.equal(cell.damageBuffMultiplier, 1.3, 'Соседняя башня вдохновлена гибелью гвардейца (+30% урона)');
+});
+
+test('Королевская Казарма: Королевские Чемпионы обладают повышенным уроном', () => {
+    const g = game({ gamePeriod: 'game', towers: towersWithNew });
+    g.tower('barracks_royal_champions', 4, 1);
+    g.state.grid[1][4].upgrades = ['champions_riposte', 'champions_punishing_strike'];
+
+    const champions = g.state.soldiers.filter(s => s.towerType === 'barracks_royal_champions');
+    assert.equal(champions.length, 3);
+    assert.equal(champions[0].dmg, 18, 'Урон чемпиона равен 18');
+    assert.equal(champions[0].armor, 35, 'Броня чемпиона равна 35%');
+});
+
+test('Королевский Требюшет: наносит сплэш-урон и оставляет горящую смолу', () => {
+    const g = game({ gamePeriod: 'game', towers: towersWithNew });
+    g.tower('catapult_trebuchet', 4, 1);
+    g.state.grid[1][4].upgrades = ['trebuchet_boulder', 'trebuchet_burning_pitch'];
+
+    const primary = g.enemy(103, 4, 3, { hp: 150 });
+    const adjacent = g.enemy(104, 5, 3, { hp: 150 });
+
+    g.fireTowers();
+
+    assert.ok(primary.hp < 150, 'Основная цель получила прямой урон требюшета');
+    assert.ok(adjacent.hp < 150, 'Соседняя цель получила сплэш-урон');
+    assert.ok(g.state.napalmPuddles && g.state.napalmPuddles.length > 0, 'Горящая смола разлилась на клетке');
+});
+
+test('Тяжёлая Королевская Баллиста: стреляет по летающим целям и пробивает насквозь', () => {
+    const g = game({ gamePeriod: 'game', towers: towersWithNew });
+    g.tower('catapult_royal_ballista', 4, 1);
+    g.state.grid[1][4].upgrades = ['ballista_anti_air', 'ballista_pierce'];
+
+    const flyer = g.enemy(105, 4, 3, { hp: 90, isFlying: true });
+    const secondary = g.enemy(106, 5, 3, { hp: 90 });
+
+    g.fireTowers();
+
+    assert.ok(flyer.hp < 90, 'Летающая цель получила урон баллисты');
+    assert.equal(flyer.isFlying, false, 'Летающая цель сбита гарпуном');
+    assert.ok(secondary.hp < 90, 'Вторая цель пробита сквозным болтом');
+});

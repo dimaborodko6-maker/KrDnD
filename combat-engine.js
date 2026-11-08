@@ -841,6 +841,24 @@ function moveEnemies() {
                     soldier.respawnTimer = proto.respawnTurns || 2;
                     soldier.blockedEnemyIds = [];
                     logAction(Date.now(), `💀 FALLEN WARRIOR: A garrison soldier fell in battle! Respawns in ${soldier.respawnTimer} turns.`);
+                    if (sUpgrades.includes('guard_for_the_king')) {
+                        (gameState.soldiers || []).filter(s => s.towerKey === soldier.towerKey && s.hp > 0).forEach(s => {
+                            s.hp = Math.min(s.maxHp, s.hp + 25);
+                        });
+                        let [sx, sy] = (soldier.towerKey || "").split(',').map(Number);
+                        for (let ty = 0; ty < (gameState.gridHeight || 16); ty++) {
+                            for (let tx = 0; tx < (gameState.gridWidth || 16); tx++) {
+                                let c = gameState.grid[ty]?.[tx];
+                                if (c && c.type && Math.hypot(tx - sx, ty - sy) <= 2) {
+                                    c.damageBuffMultiplier = 1.3;
+                                    c.damageBuffTurns = 1;
+                                }
+                            }
+                        }
+                        gameState.recentCombatFx = gameState.recentCombatFx || [];
+                        gameState.recentCombatFx.push({ x: sx, y: sy, type: 'for_the_king', text: '👑 FOR THE KING!' });
+                        logAction(Date.now(), `👑 FOR THE KING!: Fallen guard inspired nearby towers (+30% damage) and healed surviving unit guards (+25 HP)!`);
+                    }
                 }
             }
         });
@@ -854,6 +872,14 @@ function moveEnemies() {
                     logDebug('ENEMY_DODGE', `[${targetEnemy.name}] (#${targetEnemy.id}) dodged soldier's attack (#${soldier.id})`);
                 } else {
                     let sDmg = soldier.dmg || 3;
+                    if (sUpgrades.includes('champions_punishing_strike') && (gameState.roundCounter - (soldier.lastPunishRound || -999) >= 3)) {
+                        soldier.lastPunishRound = gameState.roundCounter;
+                        sDmg += 18;
+                        targetEnemy.stunTurns = Math.max(targetEnemy.stunTurns || 0, 1);
+                        gameState.recentCombatFx = gameState.recentCombatFx || [];
+                        gameState.recentCombatFx.push({ x: targetEnemy.x, y: targetEnemy.y, type: 'punishing_strike', text: '⚡ PUNISH' });
+                        logAction(Date.now(), `⚡ PUNISHING STRIKE: Royal Champion struck [${targetEnemy.name}] for ${sDmg} damage and stunned them for 1 turn!`);
+                    }
                     if (sUpgrades.includes('templar_arterial') && (random ? random() : Math.random()) < 0.30) {
                         sDmg *= 2;
                         targetEnemy.bleedTurns = 2;
@@ -863,6 +889,7 @@ function moveEnemies() {
                     }
                     let targetArmor = Math.min(100, (targetEnemy.armor || 0) + ACTIVATED_EVENT_RULES.auraBonus(gameState, targetEnemy, 'armor'));
                     let calculatedDmg = Math.max(1, Math.round(sDmg * ((100 - targetArmor) / 100)));
+                    if (targetEnemy.crownMarkTurns > 0) calculatedDmg = Math.round(calculatedDmg * 1.25);
                     mobTraits.damage(targetEnemy,calculatedDmg);
                     logAction(Date.now(), `🗡️ SOLDIER STRIKE: A garrison soldier hit [${targetEnemy.name}] ${calculatedDmg} physical damage!`);
 
@@ -887,6 +914,7 @@ function moveEnemies() {
     gameState.enemies.forEach(enemy => {
         if (enemy.stunTurns > 0) enemy.stunTurns--;
         if (enemy.slowTurns > 0) enemy.slowTurns--;
+        if (enemy.crownMarkTurns > 0) enemy.crownMarkTurns--;
     });
 
     // Защитные эффекты действуют весь ход врагов, затем теряют один раунд.

@@ -91,7 +91,9 @@ let gameState = {
     phase: 'player', // 'player' (фаза игроков) или 'wave' (фаза волны)
     gamePeriod: 'preparation', // Период партии; переключается только мастером.
     gameMode: 'gm', // 'gm' (по умолчанию, с мастером) или 'coop' (кооператив без мастера)
-    availableTowerTypes: TOWER_RULES.getBaseTypes(GAME_DATA.towers).slice(0, TOWER_RULES.maxTypes),
+    availableTowerTypes: ['royal_archer_1', 'royal_barracks_1', 'royal_mage_1', 'royal_catapult_1'].every(t => GAME_DATA.towers[t])
+        ? ['royal_archer_1', 'royal_barracks_1', 'royal_mage_1', 'royal_catapult_1']
+        : TOWER_RULES.getBaseTypes(GAME_DATA.towers).slice(0, TOWER_RULES.maxTypes),
     baseHp: 20, 
     gridWidth: DEFAULT_GRID_W,
     gridHeight: DEFAULT_GRID_H,

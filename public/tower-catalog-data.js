@@ -200,6 +200,355 @@ const TOWER_CATALOG_DATA = (() => {
             ]
         },
 
+        // ==================== 🏹 КОРОЛЕВСКИЕ ЛУЧНИКИ (РАЗВИЛКА НА IV УРОВНЕ) ====================
+        royal_archer_1: {
+            name: "Royal Archers I",
+            cost: 70,
+            range: 3,
+            minDamage: 4,
+            maxDamage: 7,
+            dmgType: 'phys',
+            initiative: 16,
+            color: "#8d6e63",
+            shortName: "👑🏹I",
+            next: 'royal_archer_2',
+            progressionType: 'branch',
+            description: "Disciplined crown archers (initiative 16, range 3). Physical damage 4–7. Attacks ground and air."
+        },
+        royal_archer_2: {
+            name: "Royal Archers II",
+            cost: 100,
+            range: 4,
+            minDamage: 8,
+            maxDamage: 14,
+            dmgType: 'phys',
+            initiative: 17,
+            color: "#6d4c41",
+            shortName: "👑🏹II",
+            next: 'royal_archer_3',
+            progressionType: 'branch',
+            description: "Experienced longbowmen (initiative 17, range 4). Physical damage 8–14."
+        },
+        royal_archer_3: {
+            name: "Royal Archers III",
+            cost: 150,
+            range: 4,
+            minDamage: 15,
+            maxDamage: 24,
+            dmgType: 'phys',
+            initiative: 18,
+            color: "#5d4037",
+            shortName: "👑🏹III",
+            next: ['archer_sharpshooter', 'archer_volley'],
+            progressionType: 'branch',
+            description: "Crown marksmen veterans (initiative 18, range 4). Level IV branches: Crown Sharpshooters or Golden Arbalests."
+        },
+        archer_sharpshooter: {
+            name: "Crown Sharpshooters IV",
+            cost: 230,
+            range: 5,
+            minDamage: 30,
+            maxDamage: 45,
+            dmgType: 'phys',
+            initiative: 19,
+            color: "#3e2723",
+            shortName: "🎯IV",
+            next: null,
+            progressionType: 'branch',
+            description: "Extreme range (5 cells, initiative 19). Physical damage 30–45. Crown Mark and Eagle Eye Snipe available.",
+            upgrades: [
+                {
+                    id: 'sharpshooter_mark',
+                    name: 'Crown Mark',
+                    cost: 150,
+                    icon: '🎯',
+                    cooldown: 3,
+                    desc: 'Every 3 rounds, marks the strongest enemy in range for 2 turns (+25% damage from all attacks).'
+                },
+                {
+                    id: 'sharpshooter_snipe',
+                    name: 'Eagle Eye Snipe',
+                    cost: 160,
+                    icon: '🦅',
+                    cooldown: 3,
+                    desc: 'Every 3 rounds, fires an armor-piercing shot (+50% damage, ignores 50% armor) and grounds flying targets.'
+                }
+            ]
+        },
+        archer_volley: {
+            name: "Golden Arbalests IV",
+            cost: 240,
+            range: 4,
+            minDamage: 22,
+            maxDamage: 34,
+            dmgType: 'phys',
+            initiative: 17,
+            color: "#ffb300",
+            shortName: "📯IV",
+            next: null,
+            progressionType: 'branch',
+            description: "Rapid arbalest battery (initiative 17, range 4). Physical damage 22–34. Royal Volley and Armor-Piercing Bolts available.",
+            upgrades: [
+                {
+                    id: 'volley_hail',
+                    name: 'Royal Volley',
+                    cost: 150,
+                    icon: '🌧️',
+                    cooldown: 4,
+                    desc: 'Every 4 rounds, releases a hail of 5 arrows hitting random enemies in range for 16 physical damage each.'
+                },
+                {
+                    id: 'volley_heavy_bolts',
+                    name: 'Armor-Piercing Bolts',
+                    cost: 140,
+                    icon: '📌',
+                    desc: 'Attacks ignore 30% armor and slow the target by 1 cell for 1 round.'
+                }
+            ]
+        },
+
+        // ==================== 🛡️ КОРОЛЕВСКАЯ КАЗАРМА (РАЗВИЛКА НА IV УРОВНЕ) ====================
+        royal_barracks_1: {
+            name: "Royal Barracks I",
+            cost: 75,
+            range: 2,
+            initiative: 12,
+            soldierCount: 3,
+            soldierHp: 45,
+            soldierArmor: 25,
+            soldierDmg: 4,
+            respawnTurns: 2,
+            isBarracks: true,
+            dmgType: 'phys',
+            color: "#455a64",
+            shortName: "👑🛡️I",
+            next: 'royal_barracks_2',
+            progressionType: 'branch',
+            description: "3 Crown Guards: 45 HP, 25% armor, 4 physical damage. Holds enemies on the road."
+        },
+        royal_barracks_2: {
+            name: "Royal Barracks II",
+            cost: 110,
+            range: 2,
+            initiative: 13,
+            soldierCount: 3,
+            soldierHp: 75,
+            soldierArmor: 40,
+            soldierDmg: 6,
+            respawnTurns: 2,
+            isBarracks: true,
+            dmgType: 'phys',
+            color: "#37474f",
+            shortName: "👑🛡️II",
+            next: 'royal_barracks_3',
+            progressionType: 'branch',
+            description: "3 Crown Sergeants: 75 HP, 40% armor, 6 physical damage."
+        },
+        royal_barracks_3: {
+            name: "Royal Barracks III",
+            cost: 150,
+            range: 2,
+            initiative: 14,
+            soldierCount: 3,
+            soldierHp: 110,
+            soldierArmor: 50,
+            soldierDmg: 9,
+            respawnTurns: 2,
+            isBarracks: true,
+            dmgType: 'phys',
+            color: "#263238",
+            shortName: "👑🛡️III",
+            next: ['barracks_royal_guard', 'barracks_royal_champions'],
+            progressionType: 'branch',
+            description: "3 Crown Veterans: 110 HP, 50% armor, 9 physical damage. Level IV branches: Royal Lion Guard or Royal Champions."
+        },
+        barracks_royal_guard: {
+            name: "Royal Lion Guard IV",
+            cost: 220,
+            range: 2,
+            initiative: 14,
+            soldierCount: 3,
+            soldierHp: 180,
+            soldierArmor: 65,
+            soldierDmg: 12,
+            respawnTurns: 2,
+            isBarracks: true,
+            dmgType: 'phys',
+            color: "#ffd54f",
+            shortName: "🦁IV",
+            next: null,
+            progressionType: 'branch',
+            description: "3 Royal Lion Guards: 180 HP, 65% armor, 12 damage. Shield Wall, Challenge of Honor and For the King! available.",
+            upgrades: [
+                {
+                    id: 'guard_shield_wall',
+                    name: 'Shield Wall',
+                    cost: 150,
+                    icon: '🛡️',
+                    desc: 'Passive: When 2+ guards are alive in the unit, armor increases to 80%.'
+                },
+                {
+                    id: 'guard_taunt',
+                    name: 'Challenge of Honor',
+                    cost: 140,
+                    icon: '⚔️',
+                    cooldown: 3,
+                    desc: 'Every 3 rounds, a guard taunts the blocked enemy, completely parrying their attack.'
+                },
+                {
+                    id: 'guard_for_the_king',
+                    name: 'For the King!',
+                    cost: 130,
+                    icon: '👑',
+                    desc: 'Passive: When a guard falls, allied towers within range 2 gain +30% damage for 1 round, and surviving guards heal 25 HP.'
+                }
+            ]
+        },
+        barracks_royal_champions: {
+            name: "Royal Champions IV",
+            cost: 230,
+            range: 2,
+            initiative: 15,
+            soldierCount: 3,
+            soldierHp: 130,
+            soldierArmor: 35,
+            soldierDmg: 18,
+            respawnTurns: 2,
+            isBarracks: true,
+            dmgType: 'phys',
+            color: "#00897b",
+            shortName: "⚔️IV",
+            next: null,
+            progressionType: 'branch',
+            description: "3 Royal Champions: 130 HP, 35% armor, 18 damage. Parry and Riposte, and Punishing Strike available.",
+            upgrades: [
+                {
+                    id: 'champions_riposte',
+                    name: 'Parry and Riposte',
+                    cost: 150,
+                    icon: '🤺',
+                    desc: 'Passive: 25% chance to parry incoming physical attack and counter-attack for 15 damage.'
+                },
+                {
+                    id: 'champions_punishing_strike',
+                    name: 'Punishing Strike',
+                    cost: 140,
+                    icon: '⚡',
+                    cooldown: 3,
+                    desc: 'Every 3 rounds, strikes the blocked enemy for 36 damage and stuns them for 1 turn.'
+                }
+            ]
+        },
+
+        // ==================== 🪨 КОРОЛЕВСКАЯ КАТАПУЛЬТА (РАЗВИЛКА НА IV УРОВНЕ) ====================
+        royal_catapult_1: {
+            name: "Royal Catapult I",
+            cost: 120,
+            range: 3,
+            minDamage: 12,
+            maxDamage: 20,
+            dmgType: 'phys',
+            initiative: 9,
+            noAir: true,
+            color: "#8d6e63",
+            shortName: "👑🪨I",
+            next: 'royal_catapult_2',
+            progressionType: 'branch',
+            description: "Field catapult (initiative 9, range 3). Physical splash damage 12–20. Cannot hit flying enemies!"
+        },
+        royal_catapult_2: {
+            name: "Royal Catapult II",
+            cost: 160,
+            range: 3,
+            minDamage: 24,
+            maxDamage: 40,
+            dmgType: 'phys',
+            initiative: 10,
+            noAir: true,
+            color: "#795548",
+            shortName: "👑🪨II",
+            next: 'royal_catapult_3',
+            progressionType: 'branch',
+            description: "Reinforced royal onager (initiative 10, range 3). Physical splash damage 24–40."
+        },
+        royal_catapult_3: {
+            name: "Royal Catapult III",
+            cost: 240,
+            range: 4,
+            minDamage: 45,
+            maxDamage: 70,
+            dmgType: 'phys',
+            initiative: 11,
+            noAir: true,
+            color: "#5d4037",
+            shortName: "👑🪨III",
+            next: ['catapult_trebuchet', 'catapult_royal_ballista'],
+            progressionType: 'branch',
+            description: "Heavy siege catapult (initiative 11, range 4). Physical splash damage 45–70. Level IV branches: Crown Trebuchet or Heavy Crown Ballista."
+        },
+        catapult_trebuchet: {
+            name: "Crown Trebuchet IV",
+            cost: 260,
+            range: 5,
+            minDamage: 65,
+            maxDamage: 105,
+            dmgType: 'phys',
+            initiative: 10,
+            noAir: true,
+            color: "#4e342e",
+            shortName: "🏰IV",
+            next: null,
+            progressionType: 'branch',
+            description: "Extreme range siege engine (5 cells, initiative 10). Physical splash damage 65–105. Monolithic Boulder and Burning Pitch Pots available.",
+            upgrades: [
+                {
+                    id: 'trebuchet_boulder',
+                    name: 'Monolithic Boulder',
+                    cost: 160,
+                    icon: '🪨',
+                    desc: 'Passive: Expands splash impact; 35% chance to stun enemies caught in splash for 1 turn.'
+                },
+                {
+                    id: 'trebuchet_burning_pitch',
+                    name: 'Burning Pitch Pots',
+                    cost: 150,
+                    icon: '🛢️',
+                    cooldown: 4,
+                    desc: 'Every 4 rounds, covers target cell in burning pitch for 2 turns (15 fire DoT, prevents regeneration).'
+                }
+            ]
+        },
+        catapult_royal_ballista: {
+            name: "Heavy Crown Ballista IV",
+            cost: 240,
+            range: 4,
+            minDamage: 55,
+            maxDamage: 85,
+            dmgType: 'phys',
+            initiative: 12,
+            color: "#37474f",
+            shortName: "🏹IV",
+            next: null,
+            progressionType: 'branch',
+            description: "Heavy ballista (initiative 12, range 4). Physical damage 55–85. Attacks ground and air! Flak Harpoon and Piercing Bolt available.",
+            upgrades: [
+                {
+                    id: 'ballista_anti_air',
+                    name: 'Flak Harpoon',
+                    cost: 140,
+                    icon: '🦅',
+                    desc: 'Passive: Deals +30% damage to flying enemies and grounds them for 1 turn.'
+                },
+                {
+                    id: 'ballista_pierce',
+                    name: 'Piercing Bolt',
+                    cost: 150,
+                    icon: '📌',
+                    desc: 'Passive: Bolt pierces through primary target, dealing 60% damage to the enemy behind it.'
+                }
+            ]
+        },
+
         // ==================== 🔮 КОРОЛЕВСКИЙ МАГ (РАЗВИЛКА НА IV УРОВНЕ) ====================
         royal_mage_1: {
             name: "Royal Mage I",

@@ -579,6 +579,183 @@ function mechaHeavyAfterAttack(ctx) {
     }
 }
 
+
+// ==================== 🏹 ROYAL ARCHERS ABILITIES ====================
+function sharpshooterMark(ctx) {
+    const { state, cell, proto, upgrades, x, y, action, debug } = ctx;
+    if (!upgrades.includes('sharpshooter_mark')) return;
+    if (state.roundCounter - (cell.lastMarkRound || -999) < 3) return;
+    let best, bestHp = -1;
+    for (const enemy of state.enemies) {
+        if (enemy.hp > 0 && ctx.inRange(x, y, enemy, ctx.effectiveRange || proto.range || 5)) {
+            if (enemy.hp > bestHp) {
+                best = enemy;
+                bestHp = enemy.hp;
+            }
+        }
+    }
+    if (!best) return;
+    cell.lastMarkRound = state.roundCounter;
+    best.crownMarkTurns = 2;
+    state.recentCombatFx = state.recentCombatFx || [];
+    state.recentCombatFx.push({ x: best.x, y: best.y, type: 'sharpshooter_mark', text: '🎯 MARK' });
+    action(`🎯 CROWN MARK: Sharpshooter at (${x}, ${y}) marked [${best.name}] for 2 turns (+25% damage taken)!`);
+    debug('SHARPSHOOTER_MARK', `Sharpshooter marked [${best.name}] (#${best.id}) for 2 turns`);
+}
+
+function sharpshooterSnipe(ctx) {
+    const { state, cell, proto, shot, upgrades, action, debug } = ctx;
+    if (!upgrades.includes('sharpshooter_snipe')) return;
+    if (state.roundCounter - (cell.lastSnipeRound || -999) < 3) return;
+    cell.lastSnipeRound = state.roundCounter;
+    shot.armorPiercing = 50;
+    shot.baseDamage = Math.round(shot.baseDamage * 1.5);
+    if (shot.target.isFlying) {
+        shot.target.isFlying = false;
+        state.recentCombatFx = state.recentCombatFx || [];
+        state.recentCombatFx.push({ x: shot.target.x, y: shot.target.y, type: 'sharpshooter_snipe', text: '🦅 SNIPE' });
+        action(`🦅 EAGLE EYE: Sharpshooter shot down [${shot.target.name}] to the ground!`);
+        debug('SHARPSHOOTER_GROUND', `[${shot.target.name}] grounded by eagle eye snipe`);
+    }
+}
+
+function volleyHeavyBolts(ctx) {
+    const { shot, upgrades, debug } = ctx;
+    if (!upgrades.includes('volley_heavy_bolts')) return;
+    shot.armorPiercing = 30;
+    if (shot.target && shot.target.hp > 0) {
+        shot.target.slowTurns = Math.max(shot.target.slowTurns || 0, 1);
+        debug('VOLLEY_SLOW', `[${shot.target.name}] slowed by armor-piercing bolt`);
+    }
+}
+
+function volleyHail(ctx) {
+    const { state, cell, proto, upgrades, x, y, action, debug } = ctx;
+    if (!upgrades.includes('volley_hail')) return;
+    if (state.roundCounter - (cell.lastHailRound || -999) < 4) return;
+    cell.lastHailRound = state.roundCounter;
+    const candidates = state.enemies.filter(en => en.hp > 0 && ctx.inRange(x, y, en, ctx.effectiveRange || proto.range || 4));
+    if (candidates.length === 0) return;
+    state.recentCombatFx = state.recentCombatFx || [];
+    state.recentCombatFx.push({ x, y, type: 'royal_volley', text: '🌧️ VOLLEY' });
+    action(`🌧️ ROYAL VOLLEY: Golden Arbalests at (${x}, ${y}) fired an arrow storm!`);
+    const count = Math.min(5, candidates.length);
+    for (let i = 0; i < count; i++) {
+        const en = candidates[i % candidates.length];
+        if (en.hp > 0) {
+            const dmg = ctx.damage(en, 16, 'phys');
+            debug('VOLLEY_HAIL_HIT', `Arrow hit [${en.name}] (#${en.id}) for ${dmg} damage [HP: ${en.hp}]`);
+            if (en.hp <= 0) ctx.reward(en, `💀 ROYAL VOLLEY: [${en.name}] was slain by the arrow storm! Treasury +${en.reward}💰.`);
+        }
+    }
+    ctx.removeDead();
+}
+
+// ==================== 🛡️ ROYAL BARRACKS ABILITIES ====================
+function guardBeforeCombat(ctx) {
+    const { state, soldier, upgrades } = ctx;
+    if (upgrades.includes('guard_shield_wall')) {
+        const sameUnits = (state.soldiers || []).filter(s => s.towerKey === soldier.towerKey && s.hp > 0);
+        if (sameUnits.length >= 2) {
+            soldier.armor = Math.min(80, (soldier.armor || 65) < 80 ? 80 : soldier.armor);
+        }
+    }
+}
+
+function guardBlocksHit({ state, soldier, upgrades, action, debug }, enemy) {
+    if (upgrades.includes('guard_taunt')) {
+        if (state.roundCounter - (soldier.lastTauntRound || -999) >= 3) {
+            soldier.lastTauntRound = state.roundCounter;
+            state.recentCombatFx = state.recentCombatFx || [];
+            state.recentCombatFx.push({ x: soldier.x, y: soldier.y, type: 'guard_taunt', text: '🛡️ TAUNT' });
+            action(`⚔️ CHALLENGE OF HONOR: Royal Guard (#${soldier.id}) deflected [${enemy.name}]'s attack!`);
+            debug('GUARD_TAUNT', `Guard (#${soldier.id}) taunted [${enemy.name}]`);
+            return true;
+        }
+    }
+    return false;
+}
+
+function championsBeforeCombat(ctx) {}
+
+function championsBlocksHit({ state, soldier, upgrades, random, action, debug, damage }, enemy) {
+    if (upgrades.includes('champions_riposte') && random() < 0.25) {
+        state.recentCombatFx = state.recentCombatFx || [];
+        state.recentCombatFx.push({ x: soldier.x, y: soldier.y, type: 'champion_riposte', text: '🤺 RIPOSTE' });
+        action(`🤺 RIPOSTE: Royal Champion parried [${enemy.name}]'s strike and executed a deadly counter-attack!`);
+        debug('CHAMPIONS_RIPOSTE', `Champion (#${soldier.id}) parried attack from [${enemy.name}]`);
+        damage(enemy, 15, 'phys');
+        return true;
+    }
+    return false;
+}
+
+// ==================== 🪨 ROYAL CATAPULT ABILITIES ====================
+function trebuchetPitch(ctx) {
+    const { state, cell, proto, upgrades, x, y, action, debug } = ctx;
+    if (!upgrades.includes('trebuchet_burning_pitch')) return;
+    if (state.roundCounter - (cell.lastPitchRound || -999) < 4) return;
+    const target = state.enemies.find(en => en.hp > 0 && !(proto.noAir && en.isFlying) && ctx.inRange(x, y, en, ctx.effectiveRange || proto.range || 5));
+    if (!target) return;
+    cell.lastPitchRound = state.roundCounter;
+    if (!state.napalmPuddles) state.napalmPuddles = [];
+    state.napalmPuddles.push({ x: target.x, y: target.y, turns: 2, dmg: 15 });
+    target.burnTurns = Math.max(target.burnTurns || 0, 2);
+    state.recentCombatFx = state.recentCombatFx || [];
+    state.recentCombatFx.push({ x: target.x, y: target.y, type: 'trebuchet_pitch', text: '🛢️ PITCH' });
+    action(`🛢️ BURNING PITCH: Crown Trebuchet at (${x}, ${y}) launched burning pitch onto (${target.x}, ${target.y}) for 2 turns (15 fire DoT)!`);
+    debug('TREBUCHET_PITCH', `Burning pitch launched at (${target.x}, ${target.y}) by Trebuchet`);
+}
+
+function trebuchetBoulderSplash(ctx) {
+    const { state, shot, upgrades, random, action, debug } = ctx;
+    splash(ctx);
+    if (!upgrades.includes('trebuchet_boulder')) return;
+    state.recentCombatFx = state.recentCombatFx || [];
+    state.recentCombatFx.push({ x: shot.impactX, y: shot.impactY, type: 'trebuchet_boulder', text: '🪨 BOULDER' });
+    const targets = state.enemies.filter(en => en.hp > 0 &&
+        Math.max(Math.abs(en.x - shot.impactX), Math.abs(en.y - shot.impactY)) <= 1);
+    for (const en of targets) {
+        if (random() < 0.35) {
+            en.stunTurns = Math.max(en.stunTurns || 0, 1);
+            action(`💫 CONCUSSION: Monolithic boulder impact stunned [${en.name}] for 1 turn!`);
+            debug('TREBUCHET_STUN', `[${en.name}] (#${en.id}) stunned by Trebuchet boulder`);
+        }
+    }
+}
+
+function ballistaModifyShot(ctx) {
+    const { shot, upgrades, action, debug } = ctx;
+    if (upgrades.includes('ballista_anti_air') && shot.target && shot.target.isFlying) {
+        shot.baseDamage = Math.round(shot.baseDamage * 1.3);
+        shot.target.isFlying = false;
+        const { state } = ctx;
+        state.recentCombatFx = state.recentCombatFx || [];
+        state.recentCombatFx.push({ x: shot.target.x, y: shot.target.y, type: 'ballista_anti_air', text: '🦅 FLAK' });
+        action(`🦅 FLAK HARPOON: Crown Ballista struck down [${shot.target.name}] from the sky!`);
+        debug('BALLISTA_ANTI_AIR', `[${shot.target.name}] grounded by Crown Ballista`);
+    }
+}
+
+function ballistaPierceAttack(ctx) {
+    const { state, shot, upgrades, action, debug, damage, reward, removeDead } = ctx;
+    if (!upgrades.includes('ballista_pierce') || !shot.target) return;
+    const secondary = state.enemies.find(en => en.id !== shot.target.id && en.hp > 0 &&
+        Math.max(Math.abs(en.x - shot.impactX), Math.abs(en.y - shot.impactY)) <= 1);
+    if (secondary) {
+        const rawDmg = Math.round(shot.baseDamage * 0.6);
+        const actualDmg = damage(secondary, rawDmg, 'phys');
+        state.recentCombatFx = state.recentCombatFx || [];
+        state.recentCombatFx.push({ x: secondary.x, y: secondary.y, type: 'ballista_pierce', text: '📌 PIERCE' });
+        action(`📌 PIERCING BOLT: Ballista bolt pierced [${shot.target.name}] and struck [${secondary.name}] for ${actualDmg} physical damage!`);
+        debug('BALLISTA_PIERCE', `Piercing bolt hit [${secondary.name}] (#${secondary.id}) for ${actualDmg} damage`);
+        if (secondary.hp <= 0) {
+            reward(secondary, `💀 PIERCED: [${secondary.name}] was impaled by piercing bolt! Treasury +${secondary.reward}💰.`);
+            removeDead();
+        }
+    }
+}
+
 module.exports = {
     towers: {
         archer_ranger: { afterAttack: rangerEffects },
@@ -603,7 +780,17 @@ module.exports = {
         mecha_3: { afterAttack: splash },
         mecha_flame: { afterAttack: mechaFlameAfterAttack },
         mecha_missile: { beforeAttack: mechaMissileBeforeAttack, afterAttack: splash },
-        mecha_heavy: { afterAttack: mechaHeavyAfterAttack }
+                mecha_heavy: { afterAttack: mechaHeavyAfterAttack },
+        royal_catapult_1: { afterAttack: splash },
+        royal_catapult_2: { afterAttack: splash },
+        royal_catapult_3: { afterAttack: splash },
+        catapult_trebuchet: { beforeAttack: trebuchetPitch, afterAttack: trebuchetBoulderSplash },
+        catapult_royal_ballista: { modifyShot: ballistaModifyShot, afterAttack: ballistaPierceAttack },
+        royal_archer_1: {},
+        royal_archer_2: {},
+        royal_archer_3: {},
+        archer_sharpshooter: { beforeAttack: sharpshooterMark, modifyShot: sharpshooterSnipe },
+        archer_volley: { modifyShot: volleyHeavyBolts, afterAttack: volleyHail }
     },
     soldiers: {
         barracks_paladins: { beforeCombat: paladinGrace, blocksHit: paladinShield },
@@ -615,6 +802,11 @@ module.exports = {
         templar_1: {},
         templar_2: {},
         templar_3: {},
-        templar_4: { beforeCombat: templarSoldierBeforeCombat }
+                templar_4: { beforeCombat: templarSoldierBeforeCombat },
+        royal_barracks_1: {},
+        royal_barracks_2: {},
+        royal_barracks_3: {},
+        barracks_royal_guard: { beforeCombat: guardBeforeCombat, blocksHit: guardBlocksHit },
+        barracks_royal_champions: { beforeCombat: championsBeforeCombat, blocksHit: championsBlocksHit }
     }
 };

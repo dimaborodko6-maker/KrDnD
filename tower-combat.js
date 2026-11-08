@@ -32,6 +32,9 @@ module.exports = function createTowerCombat({
                         (armorPiercing ? Math.max(0, armor - armorPiercing) : armor);
                     amount = Math.max(1, Math.round(raw * ((100 - resist) / 100)));
                 }
+                if (enemy.crownMarkTurns > 0) {
+                    amount = Math.round(amount * 1.25);
+                }
                 damageEnemy(enemy, amount);
                 return amount;
             },
