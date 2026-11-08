@@ -6,13 +6,16 @@ const TOWER_DRAFT_CATALOG = require('../public/tower-draft-catalog.js');
 const { towers: baseTowers } = require('../public/gamedata.js');
 const rules = require('../public/tower-rules.js');
 
-test('каталог башен содержит все 10 согласованных семейств', () => {
+test('каталог башен содержит все 13 согласованных семейств (включая королевские)', () => {
     const all = TOWER_DRAFT_CATALOG.TOWERS;
-    assert.equal(all.length, 10);
+    assert.equal(all.length, 13);
     const ids = all.map(t => t.id);
     assert.ok(ids.includes('dwarf_outpost'), 'Dwarven Outpost');
     assert.ok(ids.includes('necro_tower'), 'Necromancer Tower');
     assert.ok(ids.includes('royal_mage'), 'Royal Mage');
+    assert.ok(ids.includes('royal_archers'), 'Royal Archers');
+    assert.ok(ids.includes('royal_barracks'), 'Royal Barracks');
+    assert.ok(ids.includes('royal_catapult'), 'Royal Catapult');
     assert.ok(ids.includes('archer_tower'), 'Лучники');
     assert.ok(ids.includes('mage_tower'), 'Маги');
     assert.ok(ids.includes('bombard_tower'), 'Бомбарды');
@@ -20,6 +23,28 @@ test('каталог башен содержит все 10 согласован�
     assert.ok(ids.includes('crossbow_tower'), 'Crossbow Fort');
     assert.ok(ids.includes('dwaarp_tower'), 'DWAARP');
     assert.ok(ids.includes('templar_tower'), 'Knights Templar');
+});
+
+test('королевские башни имеют развилку (branch) на IV уровне и корректные параметры', () => {
+    const archers = TOWER_DRAFT_CATALOG.getTowerById('royal_archers');
+    const barracks = TOWER_DRAFT_CATALOG.getTowerById('royal_barracks');
+    const catapult = TOWER_DRAFT_CATALOG.getTowerById('royal_catapult');
+
+    assert.equal(archers.progressionType, 'branch');
+    assert.equal(archers.levels.length, 5);
+    assert.ok(archers.levels[0].minDmg > 0);
+    assert.ok(archers.levels[3].minDmg >= 30); // Снайпер
+
+    assert.equal(barracks.progressionType, 'branch');
+    assert.equal(barracks.archetype, 'barracks');
+    assert.equal(barracks.levels.length, 5);
+    assert.ok(barracks.levels[0].soldierHp > 0);
+    assert.ok(barracks.levels[0].soldierArmor >= 25);
+
+    assert.equal(catapult.progressionType, 'branch');
+    assert.equal(catapult.archetype, 'artillery');
+    assert.equal(catapult.levels.length, 5);
+    assert.ok(catapult.levels[0].minDmg > 0);
 });
 
 test('дворфы, некромант, арбалеты, dwaarp и тамплиеры имеют прямую линию (single), остальные — развилку (branch)', () => {

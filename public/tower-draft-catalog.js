@@ -224,6 +224,362 @@ const TOWER_DRAFT_CATALOG = (() => {
         ]
     },
     {
+    "id": "royal_archers",
+    "name": "Royal Archers",
+    "subtitle": "Crown Sharpshooters & Arbalests (Level IV Branch)",
+    "archetype": "archers",
+    "icon": "👑🏹",
+    "cost": 70,
+    "baseCost": 70,
+    "range": 3,
+    "progressionType": "branch",
+    "progressionLabel": "Branches at level IV",
+    "dmgType": "phys",
+    "damageRange": "4 – 45",
+    "initiative": 16,
+    "targets": "Ground and air",
+    "hiddenFromPlayers": false,
+    "description": "Disciplined crown archers. Deals physical damage (4–45). Level IV branches into the deadly Crown Sharpshooters or the rapid Golden Arbalests.",
+    "levels": [
+        {
+            "lvl": "I",
+            "towerId": "royal_archer_1",
+            "name": "Royal Archers I",
+            "cost": 70,
+            "range": 3,
+            "initiative": 16,
+            "minDmg": 4,
+            "maxDmg": 7,
+            "dmgType": "phys"
+        },
+        {
+            "lvl": "II",
+            "towerId": "royal_archer_2",
+            "name": "Royal Archers II",
+            "cost": 100,
+            "range": 4,
+            "initiative": 17,
+            "minDmg": 8,
+            "maxDmg": 14,
+            "dmgType": "phys"
+        },
+        {
+            "lvl": "III",
+            "towerId": "royal_archer_3",
+            "name": "Royal Archers III",
+            "cost": 150,
+            "range": 4,
+            "initiative": 18,
+            "minDmg": 15,
+            "maxDmg": 24,
+            "dmgType": "phys"
+        },
+        {
+            "lvl": "IV.A",
+            "branchName": "Crown Sharpshooters",
+            "towerId": "archer_sharpshooter",
+            "name": "Crown Sharpshooters IV",
+            "cost": 230,
+            "range": 5,
+            "initiative": 19,
+            "minDmg": 30,
+            "maxDmg": 45,
+            "dmgType": "phys"
+        },
+        {
+            "lvl": "IV.B",
+            "branchName": "Golden Arbalests",
+            "towerId": "archer_volley",
+            "name": "Golden Arbalests IV",
+            "cost": 240,
+            "range": 4,
+            "initiative": 17,
+            "minDmg": 22,
+            "maxDmg": 34,
+            "dmgType": "phys"
+        }
+    ],
+    "effects": [
+        {
+            "name": "Crown Mark (Sharpshooters)",
+            "icon": "🎯",
+            "cost": 150,
+            "cooldown": 3,
+            "tag": "+25% damage",
+            "desc": "Every 3 rounds, marks the strongest enemy in range for 2 turns (+25% damage from all attacks)."
+        },
+        {
+            "name": "Eagle Eye Snipe (Sharpshooters)",
+            "icon": "🦅",
+            "cost": 160,
+            "cooldown": 3,
+            "tag": "Grounding shot",
+            "desc": "Every 3 rounds, fires an armor-piercing shot (+50% damage, ignores 50% armor) and grounds flying targets."
+        },
+        {
+            "name": "Royal Volley (Arbalests)",
+            "icon": "🌧️",
+            "cost": 150,
+            "cooldown": 4,
+            "tag": "AoE hail",
+            "desc": "Every 4 rounds, releases a hail of 5 arrows hitting random enemies in range for 16 physical damage each."
+        },
+        {
+            "name": "Armor-Piercing Bolts (Arbalests)",
+            "icon": "📌",
+            "cost": 140,
+            "tag": "Slow & pierce",
+            "desc": "Attacks ignore 30% armor and slow the target by 1 cell for 1 round."
+        }
+    ]
+},
+    {
+    "id": "royal_barracks",
+    "name": "Royal Barracks",
+    "subtitle": "Crown Guards & Champions (Level IV Branch)",
+    "archetype": "barracks",
+    "icon": "👑🛡️",
+    "cost": 75,
+    "baseCost": 75,
+    "range": 2,
+    "progressionType": "branch",
+    "progressionLabel": "Branches at level IV",
+    "dmgType": "phys",
+    "damageRange": "4 – 18",
+    "hpRange": "45 – 180",
+    "armorRange": "25% – 65%",
+    "initiative": 12,
+    "targets": "Ground blocking",
+    "hiddenFromPlayers": false,
+    "description": "Regular crown garrison. Level IV branches into the impenetrable Royal Lion Guard or the offensive Royal Champions.",
+    "levels": [
+        {
+            "lvl": "I",
+            "towerId": "royal_barracks_1",
+            "name": "Royal Barracks I",
+            "cost": 75,
+            "range": 2,
+            "initiative": 12,
+            "minDmg": 4,
+            "maxDmg": 4,
+            "dmgType": "phys",
+            "soldierCount": 3,
+            "soldierHp": 45,
+            "soldierArmor": 25,
+            "soldierDmg": 4
+        },
+        {
+            "lvl": "II",
+            "towerId": "royal_barracks_2",
+            "name": "Royal Barracks II",
+            "cost": 110,
+            "range": 2,
+            "initiative": 13,
+            "minDmg": 6,
+            "maxDmg": 6,
+            "dmgType": "phys",
+            "soldierCount": 3,
+            "soldierHp": 75,
+            "soldierArmor": 40,
+            "soldierDmg": 6
+        },
+        {
+            "lvl": "III",
+            "towerId": "royal_barracks_3",
+            "name": "Royal Barracks III",
+            "cost": 150,
+            "range": 2,
+            "initiative": 14,
+            "minDmg": 9,
+            "maxDmg": 9,
+            "dmgType": "phys",
+            "soldierCount": 3,
+            "soldierHp": 110,
+            "soldierArmor": 50,
+            "soldierDmg": 9
+        },
+        {
+            "lvl": "IV.A",
+            "branchName": "Royal Lion Guard",
+            "towerId": "barracks_royal_guard",
+            "name": "Royal Lion Guard IV",
+            "cost": 220,
+            "range": 2,
+            "initiative": 14,
+            "minDmg": 12,
+            "maxDmg": 12,
+            "dmgType": "phys",
+            "soldierCount": 3,
+            "soldierHp": 180,
+            "soldierArmor": 65,
+            "soldierDmg": 12
+        },
+        {
+            "lvl": "IV.B",
+            "branchName": "Royal Champions",
+            "towerId": "barracks_royal_champions",
+            "name": "Royal Champions IV",
+            "cost": 230,
+            "range": 2,
+            "initiative": 15,
+            "minDmg": 18,
+            "maxDmg": 18,
+            "dmgType": "phys",
+            "soldierCount": 3,
+            "soldierHp": 130,
+            "soldierArmor": 35,
+            "soldierDmg": 18
+        }
+    ],
+    "effects": [
+        {
+            "name": "Shield Wall (Lion Guard)",
+            "icon": "🛡️",
+            "cost": 150,
+            "tag": "80% armor",
+            "desc": "Passive: When 2+ guards are alive in the unit, armor increases to 80%."
+        },
+        {
+            "name": "Challenge of Honor (Lion Guard)",
+            "icon": "⚔️",
+            "cost": 140,
+            "cooldown": 3,
+            "tag": "Parry taunt",
+            "desc": "Every 3 rounds, a guard taunts the blocked enemy, completely parrying their attack."
+        },
+        {
+            "name": "For the King! (Lion Guard)",
+            "icon": "👑",
+            "cost": 130,
+            "tag": "Retribution aura",
+            "desc": "Passive: When a guard falls, allied towers within range 2 gain +30% damage for 1 round, and surviving guards heal 25 HP."
+        },
+        {
+            "name": "Parry and Riposte (Champions)",
+            "icon": "🤺",
+            "cost": 150,
+            "tag": "Counter-attack",
+            "desc": "Passive: 25% chance to parry incoming physical attack and counter-attack for 15 damage."
+        },
+        {
+            "name": "Punishing Strike (Champions)",
+            "icon": "⚡",
+            "cost": 140,
+            "cooldown": 3,
+            "tag": "Stun attack",
+            "desc": "Every 3 rounds, strikes the blocked enemy for 36 damage and stuns them for 1 turn."
+        }
+    ]
+},
+    {
+    "id": "royal_catapult",
+    "name": "Royal Catapult",
+    "subtitle": "Crown Trebuchet & Ballista (Level IV Branch)",
+    "archetype": "artillery",
+    "icon": "👑🪨",
+    "cost": 120,
+    "baseCost": 120,
+    "range": 3,
+    "progressionType": "branch",
+    "progressionLabel": "Branches at level IV",
+    "dmgType": "phys",
+    "damageRange": "12 – 105 (Splash)",
+    "initiative": 9,
+    "targets": "Ground splash / Air (Ballista)",
+    "hiddenFromPlayers": false,
+    "description": "Linirean siege artillery. Level IV branches into the massive Crown Trebuchet or the armor-piercing Heavy Crown Ballista.",
+    "levels": [
+        {
+            "lvl": "I",
+            "towerId": "royal_catapult_1",
+            "name": "Royal Catapult I",
+            "cost": 120,
+            "range": 3,
+            "initiative": 9,
+            "minDmg": 12,
+            "maxDmg": 20,
+            "dmgType": "phys"
+        },
+        {
+            "lvl": "II",
+            "towerId": "royal_catapult_2",
+            "name": "Royal Catapult II",
+            "cost": 160,
+            "range": 3,
+            "initiative": 10,
+            "minDmg": 24,
+            "maxDmg": 40,
+            "dmgType": "phys"
+        },
+        {
+            "lvl": "III",
+            "towerId": "royal_catapult_3",
+            "name": "Royal Catapult III",
+            "cost": 240,
+            "range": 4,
+            "initiative": 11,
+            "minDmg": 45,
+            "maxDmg": 70,
+            "dmgType": "phys"
+        },
+        {
+            "lvl": "IV.A",
+            "branchName": "Crown Trebuchet",
+            "towerId": "catapult_trebuchet",
+            "name": "Crown Trebuchet IV",
+            "cost": 260,
+            "range": 5,
+            "initiative": 10,
+            "minDmg": 65,
+            "maxDmg": 105,
+            "dmgType": "phys"
+        },
+        {
+            "lvl": "IV.B",
+            "branchName": "Heavy Crown Ballista",
+            "towerId": "catapult_royal_ballista",
+            "name": "Heavy Crown Ballista IV",
+            "cost": 240,
+            "range": 4,
+            "initiative": 12,
+            "minDmg": 55,
+            "maxDmg": 85,
+            "dmgType": "phys"
+        }
+    ],
+    "effects": [
+        {
+            "name": "Monolithic Boulder (Trebuchet)",
+            "icon": "🪨",
+            "cost": 160,
+            "tag": "AoE stun",
+            "desc": "Passive: Expands splash impact; 35% chance to stun enemies caught in splash for 1 turn."
+        },
+        {
+            "name": "Burning Pitch Pots (Trebuchet)",
+            "icon": "🛢️",
+            "cost": 150,
+            "cooldown": 4,
+            "tag": "Fire puddle",
+            "desc": "Every 4 rounds, covers target cell in burning pitch for 2 turns (15 fire DoT, prevents regeneration)."
+        },
+        {
+            "name": "Flak Harpoon (Ballista)",
+            "icon": "🦅",
+            "cost": 140,
+            "tag": "Anti-air",
+            "desc": "Passive: Deals +30% damage to flying enemies and grounds them for 1 turn."
+        },
+        {
+            "name": "Piercing Bolt (Ballista)",
+            "icon": "📌",
+            "cost": 150,
+            "tag": "Line pierce",
+            "desc": "Passive: Bolt pierces through primary target, dealing 60% damage to the enemy behind it."
+        }
+    ]
+},
+    {
         "id": "royal_mage",
         "name": "Royal Mage",
         "subtitle": "Royal Spellcaster (Level IV Branch)",
@@ -1030,6 +1386,12 @@ const TOWER_DRAFT_CATALOG = (() => {
 ];
 
     const PRESETS = [
+        {
+            id: 'preset_royal_regiments',
+            name: '👑 Royal Regiments',
+            desc: 'The Crown setup: Royal Archers, Royal Barracks, Royal Mage and Royal Catapult.',
+            towers: ['royal_archers', 'royal_barracks', 'royal_mage', 'royal_catapult']
+        },
         {
             id: 'preset_balanced',
             name: '⚖️ Balanced',

@@ -710,18 +710,63 @@ function renderTowerEffects() {
     });
 }
 
+function getLevelTowerId(tower, lvlObj, index) {
+    if (lvlObj && lvlObj.towerId) return lvlObj.towerId;
+    const map = {
+        'dwarf_outpost': ['dwarf_1', 'dwarf_2', 'dwarf_3', 'dwarf_4'],
+        'necro_tower': ['necro_1', 'necro_2', 'necro_3', 'necro_4'],
+        'royal_mage': ['royal_mage_1', 'royal_mage_2', 'royal_mage_3', 'mage_court', 'mage_priestess'],
+        'royal_archers': ['royal_archer_1', 'royal_archer_2', 'royal_archer_3', 'archer_sharpshooter', 'archer_volley'],
+        'royal_barracks': ['royal_barracks_1', 'royal_barracks_2', 'royal_barracks_3', 'barracks_royal_guard', 'barracks_royal_champions'],
+        'royal_catapult': ['royal_catapult_1', 'royal_catapult_2', 'royal_catapult_3', 'catapult_trebuchet', 'catapult_royal_ballista'],
+        'archer_tower': ['archer_1', 'archer_2', 'archer_3', 'archer_ranger', 'archer_musketeer'],
+        'mage_tower': ['mage_1', 'mage_2', 'mage_3', 'mage_arcane', 'mage_sorcerer'],
+        'bombard_tower': ['bombard_1', 'bombard_2', 'bombard_3', 'bombard_bertha', 'bombard_tesla'],
+        'barracks_tower': ['barracks_1', 'barracks_2', 'barracks_3', 'barracks_paladins', 'barracks_barbarians'],
+        'crossbow_tower': ['crossbow_1', 'crossbow_2', 'crossbow_3', 'crossbow_4'],
+        'dwaarp_tower': ['dwaarp_1', 'dwaarp_2', 'dwaarp_3', 'dwaarp_4'],
+        'templar_tower': ['templar_1', 'templar_2', 'templar_3', 'templar_4']
+    };
+    return map[tower.id]?.[index] || (lvlObj ? lvlObj.id : null);
+}
+
+function applyTowerLevelStats(target, lvlObj) {
+    if (!target || !lvlObj) return;
+    if (lvlObj.minDmg !== undefined) target.minDamage = lvlObj.minDmg;
+    if (lvlObj.maxDmg !== undefined) target.maxDamage = lvlObj.maxDmg;
+    if (lvlObj.soldierDmg !== undefined) target.soldierDmg = lvlObj.soldierDmg;
+    if (lvlObj.soldierHp !== undefined) target.soldierHp = lvlObj.soldierHp;
+    if (lvlObj.soldierArmor !== undefined) target.soldierArmor = lvlObj.soldierArmor;
+    if (lvlObj.cost !== undefined) target.cost = lvlObj.cost;
+    if (lvlObj.range !== undefined) target.range = lvlObj.range;
+    if (lvlObj.initiative !== undefined) target.initiative = lvlObj.initiative;
+}
+
+function syncAllTowerStats() {
+    if (!window.TOWER_DRAFT_CATALOG || !window.TOWER_DRAFT_CATALOG.TOWERS) return;
+    window.TOWER_DRAFT_CATALOG.TOWERS.forEach(t => {
+        if (window.TOWER_CATALOG_DATA && window.TOWER_CATALOG_DATA.TOWERS && window.TOWER_CATALOG_DATA.TOWERS[t.id]) {
+            window.TOWER_CATALOG_DATA.TOWERS[t.id].hiddenFromPlayers = !!t.hiddenFromPlayers;
+        }
+        (t.levels || []).forEach((lvl, idx) => {
+            const tid = getLevelTowerId(t, lvl, idx);
+            if (tid) {
+                if (window.TOWER_CATALOG_DATA && window.TOWER_CATALOG_DATA.TOWERS) {
+                    applyTowerLevelStats(window.TOWER_CATALOG_DATA.TOWERS[tid], lvl);
+                }
+                if (window.GAME_DATA && window.GAME_DATA.towers) {
+                    applyTowerLevelStats(window.GAME_DATA.towers[tid], lvl);
+                }
+            }
+        });
+    });
+}
+
 function saveTowerCatalog() {
     try {
         if (window.TOWER_DRAFT_CATALOG) {
             localStorage.setItem('kr_tower_catalog_custom', JSON.stringify(window.TOWER_DRAFT_CATALOG.TOWERS));
-            // Keep in-memory TOWER_CATALOG_DATA updated
-            if (window.TOWER_CATALOG_DATA && window.TOWER_CATALOG_DATA.TOWERS) {
-                window.TOWER_DRAFT_CATALOG.TOWERS.forEach(t => {
-                    if (window.TOWER_CATALOG_DATA.TOWERS[t.id]) {
-                        window.TOWER_CATALOG_DATA.TOWERS[t.id].hiddenFromPlayers = !!t.hiddenFromPlayers;
-                    }
-                });
-            }
+            syncAllTowerStats();
         }
     } catch (e) {
         console.error('saveTowerCatalog error:', e);
@@ -741,6 +786,7 @@ function loadSavedTowerCatalog() {
                     }
                 }
             }
+            syncAllTowerStats();
         }
     } catch (e) {}
 }
