@@ -13,3 +13,16 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Android build artifacts
+.gradle/
+android/.gradle/
+android/app/build/
+android/app/.cxx/
+android/app/libnode/
+android/app/src/main/assets/nodejs-project.zip
+android/app/src/main/assets/nodejs-project/
+*.apk
+*.aab
+local.properties
+

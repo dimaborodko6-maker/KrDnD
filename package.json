@@ -11,6 +11,7 @@
     "check:english": "node scripts/check-english.cjs",
     "check": "npm run check:syntax && npm run check:content && npm run check:english && npm test",
     "migrate:english": "node scripts/migrate-english.cjs",
+    "bundle:android": "node scripts/bundle-android.cjs",
     "lint": "eslint ."
   },
   "engines": {

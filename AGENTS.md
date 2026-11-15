@@ -26,6 +26,7 @@ README предназначен для игроков и мастера. Инс�
 | Подготовка сцены | [docs/scene-preparation.md](docs/scene-preparation.md) | `scene-library.js`, `public/scene-editor.js`, `public/master-scenes.js` |
 | Интерфейс, статусы | [docs/development.md](docs/development.md) | нужный экран в `public/`, `public/unit-statuses.js` |
 | Локализация и перевод | [docs/localization.md](docs/localization.md), Правило 12 | `public/i18n-dict.js`, `localization/ru-en.json`, `public/i18n.js` |
+| Мобильный сервер Android | [docs/android.md](docs/android.md) | `android/`, `.github/workflows/build-apk.yml`, `scripts/bundle-android.cjs` |
 | Архитектура и лимит 300 строк | [docs/development.md](docs/development.md), Правило 13 | Модули сервера, клиента и тестов |
 
 ## Правила изменений
