@@ -21,8 +21,17 @@
             android:layout_weight="1"
             android:text="Запуск сервера KrDnD..."
             android:textColor="#4caf50"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnToggleOnline"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:layout_marginStart="4dp"
+            android:text="🌐 Онлайн"
+            android:textSize="10sp" />
 
         <Button
             android:id="@+id/btnCopyIp"
@@ -30,8 +39,8 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginStart="4dp"
-            android:text="Копия"
-            android:textSize="11sp" />
+            android:text="📋 Ссылка"
+            android:textSize="10sp" />
 
         <Button
             android:id="@+id/btnReload"
@@ -39,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="36dp"
             android:layout_marginStart="4dp"
-            android:text="Обновить"
+            android:text="🔄"
             android:textSize="11sp" />
 
         <Button

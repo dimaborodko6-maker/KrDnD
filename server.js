@@ -60,6 +60,20 @@ const DEFAULT_GRID_W = 16;
 const DEFAULT_GRID_H = 16;
 const SAVE_FILE = process.env.KR_SAVE_FILE || path.join(__dirname, 'gamestate_save.json');
 const PORT = process.env.PORT === undefined ? 3000 : Number(process.env.PORT);
+const SECURITY = require('./server-security');
+const TUNNEL = require('./tunnel-service');
+const securityManager = SECURITY.createSecurityManager({
+    enabled: process.env.KR_ONLINE === 'true' || !!process.env.KR_ROOM_PIN,
+    pin: process.env.KR_ROOM_PIN || (process.env.KR_ONLINE === 'true' ? SECURITY.generatePin() : null),
+    masterToken: process.env.KR_MASTER_TOKEN || (process.env.KR_ONLINE === 'true' ? SECURITY.generateToken() : null)
+});
+const tunnelManager = TUNNEL.createTunnelManager({
+    localPort: PORT,
+    logger
+});
+if (process.env.KR_ONLINE === 'true') {
+    tunnelManager.start();
+}
 const CATALOG_FILE = process.env.KR_CATALOG_FILE || path.join(path.dirname(SAVE_FILE), 'gamecatalog.json');
 const catalogStore = require('./game-catalog').createCatalogStore(GAME_DATA, CATALOG_FILE);
 const SCENES_FILE = process.env.KR_SCENES_FILE || path.join(path.dirname(SAVE_FILE), 'scenes.json');
@@ -237,13 +251,16 @@ function broadcastState() {
     saveGameState();
     const { sceneMaster, adventureMaster, actionLogs, masterUndo, ...publicState } = gameState;
     const publicLog = actionLogs.map(({id,text}) => ({id,text}));
+    const tunnelStatus = tunnelManager.getStatus();
     const data = JSON.stringify({ type: 'STATE_UPDATE', combatEvents: events, combatReset, state: { ...publicState, actionLogs:publicLog,
-        sceneId:sceneMaster?.id || '', sceneTitle:sceneMaster?.title || '', revealedNotes:SCENES.publicSceneNotes(sceneMaster), sceneProgress:sceneDirector.publicView(), log:publicLog } });
+        sceneId:sceneMaster?.id || '', sceneTitle:sceneMaster?.title || '', revealedNotes:SCENES.publicSceneNotes(sceneMaster), sceneProgress:sceneDirector.publicView(), log:publicLog,
+        serverSecurity: securityManager.getClientInfo(), onlineTunnel: { active: tunnelStatus.active, url: tunnelStatus.url } } });
     if (clients.master && clients.master.readyState === WebSocket.OPEN) {
         clients.master.send(JSON.stringify({ type: 'STATE_UPDATE', combatEvents: events, combatReset,
             state: { ...gameState, masterUndo: masterUndo ? { id: masterUndo.id, label: masterUndo.label } : null, log: gameState.actionLogs.map(l => ({ id: l.id, text: l.text,
                 canUndo: !!l.undoData })),
-                playerHistory: playerHistory.map(({ snapshot, bytes, ...entry }) => entry) } }));
+                playerHistory: playerHistory.map(({ snapshot, bytes, ...entry }) => entry),
+                serverSecurity: securityManager.getMasterInfo(), onlineTunnel: tunnelStatus } }));
     }
     Object.values(clients.players).forEach(ws => {
         if (ws.readyState === WebSocket.OPEN) ws.send(data);
@@ -978,6 +995,9 @@ wss.on('connection', (ws, request) => {
                     ...(gameState.activeEvents || []).filter(event => ['goblinTower','ritualTotem'].includes(event.kind)).map(event => event.config.enemyType),
                     ...gameState.enemies.filter(enemy => enemy.hp > 0).map(enemy => enemy.traits?.summoning?.type).filter(Boolean)];
                 catalogStore.save(msg.catalog,msg.revision,neededTypes);
+                if (gameState.sceneMaster && (!gameState.sceneMaster.id || gameState.sceneMaster.id === 'roadside-defense')) {
+                    gameState.sceneMaster.waves = JSON.parse(JSON.stringify(GAME_DATA.presetWaves));
+                }
                 playerHistory = [];
                 delete gameState.masterUndo;
                 sendCatalog(ws,'saved');
@@ -1292,12 +1312,18 @@ wss.on('connection', (ws, request) => {
             }
             case 'REGISTER_MASTER':
                 if (clientRole === 'editor') { sendError(ws,'The editor cannot control the game'); return; }
+                if (!securityManager.verifyMaster(msg.token || msg.masterToken || msg.key)) {
+                    sendError(ws, 'Master access denied: invalid security token'); return;
+                }
                 clientRole = 'master'; clients.master = ws;
                 ws.send(JSON.stringify({type:'CATALOG_UPDATE',...catalogStore.read()}));
                 sendSceneLibrary(ws);
                 broadcastState(); break;
                 
             case 'REGISTER_PLAYER':
+                if (!securityManager.verifyPlayerPin(msg.pin)) {
+                    sendError(ws, 'Invalid room PIN'); return;
+                }
                 ws.send(JSON.stringify({type:'CATALOG_UPDATE',...catalogStore.read()}));
                 clientRole = 'player'; clientPlayerName = msg.name; clients.players[msg.name] = ws;
                 if (!gameState.players[msg.name]) {
@@ -1404,6 +1430,33 @@ wss.on('connection', (ws, request) => {
                             delete clients.players[targetName];
                         }
                         logAction(Date.now(), `🗑️ CLEANUP: The GM removed character [${targetName}] from the tactical map.`);
+                        broadcastState();
+                    }
+                } break;
+
+            case 'MASTER_SET_SECURITY':
+                if (clientRole === 'master') {
+                    if (msg.enabled !== undefined) securityManager.setEnabled(msg.enabled);
+                    if (msg.pin !== undefined) securityManager.setRoomPin(msg.pin);
+                    logAction(Date.now(), `🔒 Security updated: PIN ${securityManager.getRoomPin() ? 'active' : 'disabled'}`);
+                    broadcastState();
+                } break;
+
+            case 'MASTER_TOGGLE_TUNNEL':
+                if (clientRole === 'master') {
+                    if (tunnelManager.getStatus().active) {
+                        tunnelManager.stop();
+                        securityManager.setEnabled(false);
+                        logAction(Date.now(), '🛑 Online access disabled');
+                        broadcastState();
+                    } else {
+                        securityManager.setEnabled(true);
+                        tunnelManager.start((err, status) => {
+                            if (!err && status?.url) {
+                                logAction(Date.now(), `🌐 Online room available: ${status.url}`);
+                            }
+                            broadcastState();
+                        });
                         broadcastState();
                     }
                 } break;
@@ -1639,13 +1692,30 @@ wss.on('connection', (ws, request) => {
                 break;
             case 'MASTER_START_PRESET_WAVE':
                 if (clientRole === 'master') {
-                    let wIndex = parseInt(msg.waveIndex) || 0;
-                    const sceneWaves = gameState.sceneMaster?.waves || GAME_DATA.presetWaves;
-                    if (sceneWaves && sceneWaves[wIndex]) {
-                        let waveDef = sceneWaves[wIndex];
+                    let wIndex = msg.waveIndex;
+                    let source = msg.source;
+                    if (typeof wIndex === 'string' && wIndex.includes(':')) {
+                        const parts = wIndex.split(':');
+                        source = parts[0];
+                        wIndex = parseInt(parts[1], 10) || 0;
+                    } else {
+                        wIndex = parseInt(wIndex, 10) || 0;
+                    }
+                    const sceneWaves = (gameState.sceneMaster?.waves?.length) ? gameState.sceneMaster.waves : null;
+                    let waveDef = null;
+                    if (source === 'catalog') {
+                        waveDef = GAME_DATA.presetWaves?.[wIndex];
+                    } else if (source === 'scene') {
+                        waveDef = sceneWaves?.[wIndex];
+                    } else {
+                        waveDef = (sceneWaves && sceneWaves[wIndex]) || GAME_DATA.presetWaves?.[wIndex];
+                    }
+                    if (waveDef) {
                         if (waveDef.enemies.some(group => !Object.hasOwn(GAME_DATA.enemies,group.type))) { sendError(ws,'The wave contains a removed enemy type. Fix the scene in the library.'); return; }
                         startScenarioWave(waveDef);
                         broadcastState();
+                    } else {
+                        sendError(ws, 'Wave scenario not found');
                     }
                 } break;
             case 'MASTER_SPAWN_ENEMY':
@@ -2306,6 +2376,45 @@ app.post('/api/coop/select-scene', express.json(), (req, res) => {
     }
 });
 
+app.get('/api/network-status', (req, res) => {
+    const port = server.address()?.port || PORT;
+    const nets = os.networkInterfaces();
+    const ips = [];
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            if (net.family === 'IPv4' && !net.internal) ips.push(net.address);
+        }
+    }
+    const tunnel = tunnelManager.getStatus();
+    const sec = securityManager.getMasterInfo();
+    res.json({
+        port,
+        localIps: ips,
+        onlineActive: tunnel.active,
+        onlineUrl: tunnel.url,
+        onlineProvider: tunnel.provider,
+        roomPin: sec.roomPin,
+        hasRoomPin: sec.hasRoomPin,
+        masterToken: sec.masterToken,
+        masterUrl: `http://localhost:${port}/master.html?token=${sec.masterToken}`
+    });
+});
+
+app.post('/api/tunnel/toggle', express.json(), (req, res) => {
+    if (tunnelManager.getStatus().active) {
+        tunnelManager.stop();
+        securityManager.setEnabled(false);
+        broadcastState();
+        res.json({ success: true, active: false });
+    } else {
+        securityManager.setEnabled(true);
+        tunnelManager.start((err, status) => {
+            broadcastState();
+            res.json({ success: !err, error: err?.message, ...status });
+        });
+    }
+});
+
 app.get('/gamedata.js', (req,res) => {
     res.set('Cache-Control','no-store').type('application/javascript').send(
         'window.GAME_DATA = ' + JSON.stringify(GAME_DATA).replace(/</g,'\\u003c') + ';');
@@ -2326,17 +2435,24 @@ function printAccessInfo() {
             if (net.family === 'IPv4' && !net.internal) ips.push(net.address);
         }
     }
+    const sec = securityManager.getMasterInfo();
     console.log('======================================================');
     console.log(`Kr6DnD engine running on port ${port}.`);
     console.log('  Log file: ' + logger.file);
     console.log(`  Start / Menu (this computer): http://localhost:${port}/`);
-    console.log(`  GM (this computer):           http://localhost:${port}/master.html`);
+    console.log(`  GM (this computer):           http://localhost:${port}/master.html${sec.enabled ? '?token=' + sec.masterToken : ''}`);
+    if (sec.enabled && sec.roomPin) {
+        console.log(`  🔒 Room PIN: ${sec.roomPin}`);
+    }
     if (ips.length === 0) {
         console.log('  ⚠ No local network IP found. Connect to a shared hotspot or router and restart.');
     } else {
         ips.forEach(ip => {
-            console.log('  Players (hotspot/LAN): http://' + ip + ':' + port + '/player.html');
+            console.log('  Players (hotspot/LAN): http://' + ip + ':' + port + '/player.html' + (sec.roomPin ? '?pin=' + sec.roomPin : ''));
         });
+    }
+    if (tunnelManager.getStatus().active && tunnelManager.getStatus().url) {
+        console.log(`  🌐 Online (remote players):   ${tunnelManager.getStatus().url}/player.html${sec.roomPin ? '?pin=' + sec.roomPin : ''}`);
     }
     console.log('  All devices must be on the SAME network (one hotspot/router).');
     console.log('  If the page does not open, allow the configured port through Windows Firewall.');

@@ -45,8 +45,10 @@ function bundle() {
         'master-controls.js',
         'scene-director.js',
         'scene-library.js',
+        'server-security.js',
         'tower-abilities.js',
-        'tower-combat.js'
+        'tower-combat.js',
+        'tunnel-service.js'
     ];
 
     for (const file of rootFiles) {

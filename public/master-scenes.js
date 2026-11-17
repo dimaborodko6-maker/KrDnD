@@ -28,12 +28,18 @@ function renderMasterScene(state) {
         }
     }
     if (!scene?.notes?.length) list.textContent = 'Select a map cell and click “＋ Note”.';
-    const signature = JSON.stringify(masterWaves());
+    const signature = JSON.stringify({
+        scene: lastState?.sceneMaster?.waves || [],
+        catalog: window.GAME_DATA?.presetWaves || []
+    });
     if (signature !== masterWavesSignature) {
-        const selectedNum = masterWaves()[Number(ui('preset-wave-select').value)]?.waveNum;
-        masterWavesSignature = signature; initPresetWavesDropdown();
-        const index = masterWaves().findIndex(wave => wave.waveNum === selectedNum);
-        if (index >= 0) ui('preset-wave-select').value = index;
+        const prevVal = ui('preset-wave-select')?.value;
+        masterWavesSignature = signature;
+        initPresetWavesDropdown();
+        if (prevVal && ui('preset-wave-select')?.querySelector('option[value="' + prevVal + '"]')) {
+            ui('preset-wave-select').value = prevVal;
+        }
+        if (typeof renderWaveDescription === 'function') renderWaveDescription();
     }
 }
 function openLiveSceneNote(note,x,y) {

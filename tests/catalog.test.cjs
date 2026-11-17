@@ -95,6 +95,10 @@ test('редактор синхронизирует клиентов, не пе�
     assert.equal(secondRound.state.pendingSpawns.length,0);
     assert.equal(secondRound.state.enemies.at(-1).hp,99);
     assert.equal((await send(master,{type:'MASTER_ADD_GOLD',amount:1},'STATE_UPDATE')).state.gold,301);
+    const catWave = await send(master,{type:'MASTER_START_PRESET_WAVE',waveIndex:'catalog:0'},'STATE_UPDATE');
+    assert.ok(catWave.state.wave > 0);
+    const catWaveObj = await send(master,{type:'MASTER_START_PRESET_WAVE',waveIndex:0,source:'catalog'},'STATE_UPDATE');
+    assert.ok(catWaveObj.state.wave > 0);
     await send(player,{type:'EDITOR_SAVE_CATALOG',revision:1,catalog:draft},'COMMAND_ERROR');
     for (const asset of ['catalog-editor.html','catalog-editor.css','catalog-editor.js']) assert.equal((await fetch(`http://127.0.0.1:${port}/${asset}`)).status,200);
 });

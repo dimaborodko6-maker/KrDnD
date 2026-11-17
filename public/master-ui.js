@@ -279,7 +279,9 @@ function confirmRollback() {
     }
 }
 function renderWaveDescription() {
-    const wave = masterWaves()[Number(ui('preset-wave-select').value)];
+    const sel = ui('preset-wave-select');
+    const val = sel ? sel.value : '0';
+    const wave = typeof getSelectedWave === 'function' ? getSelectedWave(val) : masterWaves()[Number(val)];
     ui('wave-description').textContent = wave ? wave.enemies.map(group => (GAME_DATA.enemies[group.type]?.name || group.type) + ' × ' + group.count).join(' · ') : '';
     if (wave) ui('wave-description').textContent = (wave.desc ? wave.desc + ' · ' : '') + wave.enemies.map(group => (GAME_DATA.enemies[group.type]?.name || group.type) + ' × ' + group.count + (group.offsetDelay ? ' in ' + group.offsetDelay + ' turns' : ' immediately')).join(' · ');
 }

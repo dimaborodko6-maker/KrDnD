@@ -22,7 +22,11 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
         var selectedHeroToMove = null;
         
         socket.onopen = function() { 
-            const masterToken = new URLSearchParams(window.location.search).get("token") || "";
+            const urlParams = new URLSearchParams(window.location.search);
+            const masterToken = urlParams.get("token") || urlParams.get("key") || sessionStorage.getItem('kr_master_token') || "";
+            if (masterToken) {
+                try { sessionStorage.setItem('kr_master_token', masterToken); } catch(e) {}
+            }
             socket.send(JSON.stringify({ type: "REGISTER_MASTER", token: masterToken }));
             initPresetWavesDropdown(); 
             buildSpawnSelectAutomatically(); // АВТОМАТИКА: Генерируем список врагов при старте сессии
@@ -30,37 +34,119 @@ var _tr = typeof _tr !== 'undefined' ? _tr : (text => (typeof window !== 'undefi
         };
         socket.onmessage = function(e) {
     const data = JSON.parse(e.data);
-    if (data.type === 'COMMAND_ERROR') { masterNotice(data.message, true); return; }
+    if (data.type === 'COMMAND_ERROR') {
+        masterNotice(data.message, true);
+        if (data.message && data.message.includes('Master access denied')) {
+            const entered = prompt(_tr('Enter Master Security Key:'));
+            if (entered) {
+                try { sessionStorage.setItem('kr_master_token', entered.trim()); } catch(err) {}
+                socket.send(JSON.stringify({ type: "REGISTER_MASTER", token: entered.trim() }));
+            }
+        }
+        return;
+    }
     if (data.type === 'CATALOG_UPDATE') {
-        const selectedWaveNum = masterWaves()[Number(document.getElementById('preset-wave-select').value)]?.waveNum;
-        const selectedEnemy = document.getElementById('active-spawn-type').value;
-        Object.assign(window.GAME_DATA,data.catalog);
-        initPresetWavesDropdown(); buildSpawnSelectAutomatically();
-        const index = masterWaves().findIndex(wave => wave.waveNum === selectedWaveNum);
-        if (index >= 0) document.getElementById('preset-wave-select').value = index;
-        if (GAME_DATA.enemies[selectedEnemy]) document.getElementById('active-spawn-type').value = selectedEnemy;
+        const sel = document.getElementById('preset-wave-select');
+        const prevVal = sel ? sel.value : null;
+        const selectedEnemy = document.getElementById('active-spawn-type')?.value;
+        Object.assign(window.GAME_DATA, data.catalog);
+        initPresetWavesDropdown();
+        buildSpawnSelectAutomatically();
+        if (sel) {
+            if (prevVal && sel.querySelector('option[value="' + prevVal + '"]')) {
+                sel.value = prevVal;
+            } else if (sel.options.length > 0) {
+                sel.selectedIndex = 0;
+            }
+        }
+        if (selectedEnemy && GAME_DATA.enemies[selectedEnemy]) {
+            document.getElementById('active-spawn-type').value = selectedEnemy;
+        }
+        if (typeof renderWaveDescription === 'function') renderWaveDescription();
         if (lastState) updateUI(lastState);
         return;
     }
     if (data.state) updateUI(data.state);
 };
 
-        function masterWaves() { return lastState?.sceneMaster?.waves || GAME_DATA.presetWaves || []; }
+        function getSelectedWave(val) {
+            if (val === undefined || val === null) {
+                val = document.getElementById("preset-wave-select")?.value;
+            }
+            if (typeof val === 'string' && val.includes(':')) {
+                var parts = val.split(':');
+                var src = parts[0], idx = parseInt(parts[1], 10) || 0;
+                if (src === 'catalog') return window.GAME_DATA?.presetWaves?.[idx] || null;
+                if (src === 'scene') return lastState?.sceneMaster?.waves?.[idx] || null;
+            }
+            var num = parseInt(val, 10) || 0;
+            var sw = lastState?.sceneMaster?.waves;
+            if (Array.isArray(sw) && sw.length > 0 && sw[num]) return sw[num];
+            return window.GAME_DATA?.presetWaves?.[num] || null;
+        }
+
+        function masterWaves() {
+            var sw = lastState?.sceneMaster?.waves;
+            return (Array.isArray(sw) && sw.length > 0) ? sw : (window.GAME_DATA?.presetWaves || []);
+        }
+
         function initPresetWavesDropdown() {
             var sel = document.getElementById("preset-wave-select");
-            if (!sel || !window.GAME_DATA || !window.GAME_DATA.presetWaves) return;
+            if (!sel || !window.GAME_DATA) return;
+            var prevVal = sel.value;
             sel.replaceChildren();
-            for (var i = 0; i < masterWaves().length; i++) {
-                var w = masterWaves()[i];
-                sel.add(new Option(w.title,i));
+
+            var sw = lastState?.sceneMaster?.waves;
+            var hasScene = Array.isArray(sw) && sw.length > 0;
+            var cat = window.GAME_DATA.presetWaves || [];
+            var isSame = hasScene && cat.length === sw.length && JSON.stringify(sw) === JSON.stringify(cat);
+
+            if (hasScene && !isSame) {
+                var grpScene = document.createElement('optgroup');
+                grpScene.label = _tr('Scene waves');
+                sw.forEach(function(w, i) {
+                    grpScene.appendChild(new Option(w.title, 'scene:' + i));
+                });
+                sel.appendChild(grpScene);
             }
+
+            if (cat.length > 0) {
+                var grpCat = (hasScene && !isSame) ? document.createElement('optgroup') : sel;
+                if (hasScene && !isSame) grpCat.label = _tr('Catalog waves');
+                cat.forEach(function(w, i) {
+                    grpCat.appendChild(new Option(w.title, isSame ? ('scene:' + i) : ('catalog:' + i)));
+                });
+                if (hasScene && !isSame) sel.appendChild(grpCat);
+            } else if (hasScene && isSame) {
+                sw.forEach(function(w, i) {
+                    sel.appendChild(new Option(w.title, 'scene:' + i));
+                });
+            }
+
+            if (prevVal && sel.querySelector('option[value="' + prevVal + '"]')) {
+                sel.value = prevVal;
+            } else if (sel.options.length > 0) {
+                sel.selectedIndex = 0;
+            }
+            if (typeof renderWaveDescription === 'function') renderWaveDescription();
         }
 
         function startSelectedPresetWave() {
             if ((lastState?.enemies.length || lastState?.pendingSpawns?.length) && !confirm(_tr('There are active enemies or pending reinforcements. Add another wave to them?'))) return;
             var sel = document.getElementById("preset-wave-select");
-            var waveIdx = sel ? sel.value : 0;
-            socket.send(JSON.stringify({ type: "MASTER_START_PRESET_WAVE", waveIndex: waveIdx }));
+            var val = sel ? sel.value : "0";
+            var source = "scene";
+            var waveIdx = 0;
+            if (typeof val === 'string' && val.includes(':')) {
+                var parts = val.split(':');
+                source = parts[0];
+                waveIdx = parseInt(parts[1], 10) || 0;
+            } else {
+                waveIdx = parseInt(val, 10) || 0;
+                var sw = lastState?.sceneMaster?.waves;
+                source = (Array.isArray(sw) && sw.length > 0) ? "scene" : "catalog";
+            }
+            socket.send(JSON.stringify({ type: "MASTER_START_PRESET_WAVE", waveIndex: waveIdx, source: source }));
         }
         
         // АВТОМАТИКА: Функция вытаскивает всех врагов из gamedata.js и строит выпадающее меню

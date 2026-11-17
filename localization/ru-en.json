@@ -2881,5 +2881,12 @@
   "Сквозное пробитие (Баллиста)": "Piercing Bolt (Ballista)",
   "Дисциплинированные стрелки Короны. Физический урон (4–45). Развилки IV уровня: смертоносные Снайперы Короны или скорострельный Золотой Арбалетный Полк.": "Disciplined crown archers. Deals physical damage (4–45). Level IV branches into the deadly Crown Sharpshooters or the rapid Golden Arbalests.",
   "Регулярный гарнизон Короны. Развилки IV уровня: несокрушимая Королевская Гвардия Короны или атакующие Королевские Чемпионы.": "Regular crown garrison. Level IV branches into the impenetrable Royal Lion Guard or the offensive Royal Champions.",
-  "Осадная артиллерия Линиреи. Развилки IV уровня: циклопический Королевский Требюшет или бронебойная Тяжёлая Королевская Баллиста.": "Linirean siege artillery. Level IV branches into the massive Crown Trebuchet or the armor-piercing Heavy Crown Ballista."
+  "Осадная артиллерия Линиреи. Развилки IV уровня: циклопический Королевский Требюшет или бронебойная Тяжёлая Королевская Баллиста.": "Linirean siege artillery. Level IV branches into the massive Crown Trebuchet or the armor-piercing Heavy Crown Ballista.",
+  "Доступ ведущего отклонён: неверный ключ безопасности": "Master access denied: invalid security token",
+  "Неверный PIN-код комнаты": "Invalid room PIN",
+  "Введите ключ безопасности мастера:": "Enter Master Security Key:",
+  "PIN комнаты": "Room PIN",
+  "Каталог волн": "Catalog waves",
+  "Предустановленные волны": "Preset waves",
+  "Сценарий волны не найден": "Wave scenario not found"
 }

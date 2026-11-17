@@ -23,13 +23,22 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private View headerBar;
     private View btnShowHeader;
     private TextView tvServerIp;
+    private Button btnToggleOnline;
     private String serverUrl = "http://127.0.0.1:3000/";
-    private String friendIpUrl = "";
+    private String friendInvite = "";
+    private boolean isOnlineActive = false;
 
     private final BroadcastReceiver serverReadyReceiver = new BroadcastReceiver() {
         @Override
@@ -47,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         headerBar = findViewById(R.id.headerBar);
         btnShowHeader = findViewById(R.id.btnShowHeader);
         tvServerIp = findViewById(R.id.tvServerIp);
+        btnToggleOnline = findViewById(R.id.btnToggleOnline);
         webView = findViewById(R.id.webView);
 
         setupWebView();
@@ -102,13 +112,15 @@ public class MainActivity extends AppCompatActivity {
     private void setupButtons() {
         Button btnCopy = findViewById(R.id.btnCopyIp);
         btnCopy.setOnClickListener(v -> {
-            if (!friendIpUrl.isEmpty()) {
+            if (!friendInvite.isEmpty()) {
                 ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                ClipData clip = ClipData.newPlainText("KrDnD URL", friendIpUrl);
+                ClipData clip = ClipData.newPlainText("KrDnD Invite", friendInvite);
                 clipboard.setPrimaryClip(clip);
-                Toast.makeText(this, "Адрес скопирован в буфер!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Ссылка для игроков скопирована!", Toast.LENGTH_SHORT).show();
             }
         });
+
+        btnToggleOnline.setOnClickListener(v -> toggleOnlineMode());
 
         Button btnReload = findViewById(R.id.btnReload);
         btnReload.setOnClickListener(v -> webView.reload());
@@ -126,10 +138,78 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onServerReady() {
-        String ip = NetworkUtils.getPrimaryIpAddress();
-        friendIpUrl = "http://" + ip + ":3000/";
-        tvServerIp.setText("Игроки: " + friendIpUrl);
-        webView.loadUrl(serverUrl);
+        fetchNetworkStatus();
+    }
+
+    private void fetchNetworkStatus() {
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://127.0.0.1:3000/api/network-status");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(1000);
+                conn.setReadTimeout(1000);
+                if (conn.getResponseCode() == 200) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) sb.append(line);
+                    reader.close();
+
+                    JSONObject json = new JSONObject(sb.toString());
+                    runOnUiThread(() -> updateNetworkUI(json));
+                }
+                conn.disconnect();
+            } catch (Exception ignored) {
+            }
+        }).start();
+    }
+
+    private void updateNetworkUI(JSONObject json) {
+        try {
+            isOnlineActive = json.optBoolean("onlineActive", false);
+            String onlineUrl = json.optString("onlineUrl", "");
+            String roomPin = json.optString("roomPin", "");
+            String masterUrl = json.optString("masterUrl", "http://127.0.0.1:3000/");
+            String ip = NetworkUtils.getPrimaryIpAddress();
+
+            if (isOnlineActive && !onlineUrl.isEmpty()) {
+                btnToggleOnline.setText("🛑 Офлайн");
+                friendInvite = onlineUrl + "/player.html" + (roomPin.isEmpty() ? "" : "?pin=" + roomPin);
+                tvServerIp.setText("🌐 " + onlineUrl + (roomPin.isEmpty() ? "" : " [PIN: " + roomPin + "]"));
+            } else {
+                btnToggleOnline.setText("🌐 Онлайн");
+                friendInvite = "http://" + ip + ":3000/player.html" + (roomPin.isEmpty() ? "" : "?pin=" + roomPin);
+                tvServerIp.setText("🏠 " + ip + ":3000" + (roomPin.isEmpty() ? "" : " [PIN: " + roomPin + "]"));
+            }
+
+            if (webView.getUrl() == null || webView.getUrl().equals("about:blank")) {
+                serverUrl = masterUrl;
+                webView.loadUrl(serverUrl);
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void toggleOnlineMode() {
+        btnToggleOnline.setEnabled(false);
+        btnToggleOnline.setText("⏳ ...");
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://127.0.0.1:3000/api/tunnel/toggle");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.getResponseCode();
+                conn.disconnect();
+            } catch (Exception ignored) {
+            }
+            try { Thread.sleep(1500); } catch (InterruptedException ignored) {}
+            runOnUiThread(() -> {
+                btnToggleOnline.setEnabled(true);
+                fetchNetworkStatus();
+            });
+        }).start();
     }
 
     @Override

@@ -1,6 +1,10 @@
 // Kr6DnD Bilingual Dictionary (RU <-> EN)
 (function() {
   const ru2en = {
+  "Доступ ведущего отклонён: неверный ключ безопасности": "Master access denied: invalid security token",
+  "Неверный PIN-код комнаты": "Invalid room PIN",
+  "Введите ключ безопасности мастера:": "Enter Master Security Key:",
+  "PIN комнаты": "Room PIN",
   "🛡️ ЩИТ: [": "🛡️ SHIELD: [",
   "] поглотил ": "] absorbed ",
   " урона (прочность ": " damage (durability ",
@@ -5981,6 +5985,9 @@
     "Deploys an oil puddle around target cell for 2 rounds, slowing enemies by 50%.": "Разливает масло вокруг цели на 2 раунда, замедляя врагов на 50%.",
     "Concussive Shockwave": "Контузящая волна",
     "Shell impacts have a 35% chance to stun enemies for 1 turn and knock them back 1 cell.": "Взрывы снарядов с шансом 35% оглушают врагов на 1 ход и отбрасывают на 1 клетку назад.",
+    "Catalog waves": "Каталог волн",
+    "Preset waves": "Предустановленные волны",
+    "Wave scenario not found": "Сценарий волны не найден",
   };
   Object.assign(en2ru, interfaceTranslations);
   for (const [english, russian] of Object.entries(interfaceTranslations)) {

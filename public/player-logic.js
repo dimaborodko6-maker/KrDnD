@@ -149,6 +149,17 @@ function toggleSkillSelect(skillId) {
     }
     document.getElementById('skills-left').innerText = 3 - character.skills.length;
 }
+
+function getStoredPin() {
+    const urlPin = new URLSearchParams(window.location.search).get('pin');
+    if (urlPin) return urlPin.trim();
+    try {
+        return sessionStorage.getItem('kr_room_pin') || '';
+    } catch (e) {
+        return '';
+    }
+}
+
 window.finishCharacterCreation = function() {
     if (Object.values(character.stats).reduce((spent, score) => spent + score - 10, 0) !== 27) {
         alert(_tr('Allocate exactly 27 ability score points.')); return;
@@ -156,11 +167,14 @@ window.finishCharacterCreation = function() {
     if (character.skills.length !== 3) { alert(_tr('Select exactly 3 abilities!')); return; }
     myId = document.getElementById('p-name').value.trim();
     if (!myId) { alert(_tr('Enter a player name!')); return; }
+    const pinInput = document.getElementById('room-pin-input');
+    const pin = (pinInput && pinInput.value ? pinInput.value.trim() : '') || getStoredPin();
     try {
         localStorage.setItem('kr_player_id', myId);
         localStorage.setItem('kr_character', JSON.stringify(character));
+        if (pin) sessionStorage.setItem('kr_room_pin', pin);
     } catch(e) {}
-    socket.send(JSON.stringify({ type: 'REGISTER_PLAYER', name: myId, heroName: character.heroName, heroKey: character.heroKey, sen: character.sen, stats: character.stats, skills: character.skills }));
+    socket.send(JSON.stringify({ type: 'REGISTER_PLAYER', name: myId, heroName: character.heroName, heroKey: character.heroKey, sen: character.sen, stats: character.stats, skills: character.skills, pin: pin }));
     document.getElementById('screen-login').classList.remove('active');
     document.getElementById('screen-game').classList.add('active');
     renderBattleAbilitiesButtons();
@@ -1164,7 +1178,7 @@ socket.onopen = function() {
             }
         } catch(e) {}
         // Автоматически переподключаемся под своим сохранённым персонажем
-        socket.send(JSON.stringify({ type: 'REGISTER_PLAYER', name: myId, heroName: character.heroName, sen: character.sen, stats: character.stats, skills: character.skills }));
+        socket.send(JSON.stringify({ type: 'REGISTER_PLAYER', name: myId, heroName: character.heroName, sen: character.sen, stats: character.stats, skills: character.skills, pin: getStoredPin() }));
     }
 };
 socket.onclose = function() {
@@ -1179,7 +1193,27 @@ socket.onmessage = function(e) {
         if (window.lastReceivedState) renderGridAndUI(window.lastReceivedState);
         return;
     }
-    if (rawData.type === 'COMMAND_ERROR') { actionPending = false; updateBattleTargets(); alert(_tr(rawData.message)); return; }
+    if (rawData.type === 'COMMAND_ERROR') {
+        actionPending = false;
+        updateBattleTargets();
+        if (rawData.message && rawData.message.toLowerCase().includes('pin')) {
+            const errEl = document.getElementById('login-error-msg');
+            if (errEl) {
+                errEl.innerText = _tr(rawData.message);
+                errEl.style.display = 'block';
+            }
+            document.getElementById('screen-login')?.classList.add('active');
+            document.getElementById('screen-game')?.classList.remove('active');
+            const pinCont = document.getElementById('room-pin-container');
+            if (pinCont) pinCont.style.display = 'block';
+            const pinIn = document.getElementById('room-pin-input');
+            if (pinIn) { pinIn.value = ''; pinIn.focus(); }
+            try { sessionStorage.removeItem('kr_room_pin'); } catch (err) {}
+            return;
+        }
+        alert(_tr(rawData.message));
+        return;
+    }
     if (rawData.type === 'KICKED') {
         alert(_tr(rawData.message || 'Your character was removed by the GM.'));
         try {
@@ -1196,6 +1230,15 @@ socket.onmessage = function(e) {
         Object.assign(window.GAME_DATA.towers, TOWER_CATALOG_DATA.TOWERS);
     }
     const state = rawData.state;
+    if (state.serverSecurity?.hasRoomPin) {
+        const pinCont = document.getElementById('room-pin-container');
+        if (pinCont) pinCont.style.display = 'block';
+        const pinIn = document.getElementById('room-pin-input');
+        if (pinIn && !pinIn.value) {
+            const stored = getStoredPin();
+            if (stored) pinIn.value = stored;
+        }
+    }
     renderGridAndUI(state);
     if (rawData.combatReset) combatText.clear();
     combatText.show(rawData.combatEvents, state);
